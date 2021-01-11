@@ -45,7 +45,7 @@ describe('frame.onWindowLoaded ', () => {
                 defaultWorkspace = wsp;
                 defaultFrame = wsp.frame;
                 ready();
-            });
+            }).catch(done);
     });
 
     afterEach(async () => {

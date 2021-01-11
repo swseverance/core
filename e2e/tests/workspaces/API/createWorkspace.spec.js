@@ -275,7 +275,7 @@ describe('createWorkspace() ', function () {
                 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
                 const createPromises = [];
-                
+
                 for (const _ of Array.from({ length: 10 })) {
                     const createPromise = glue.workspaces.createWorkspace(basicConfig);
                     createPromises.push(createPromise);
@@ -284,13 +284,13 @@ describe('createWorkspace() ', function () {
 
                 await Promise.all(createPromises);
             });
-    
+
             it(`should resolve when 10 workspaces are opened in ${interval}ms intervals with newFrame setting and there should be 10 frames`, async () => {
                 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
                 const createConfig = Object.assign({}, basicConfig, { frame: { newFrame: true } });
 
                 const createPromises = [];
-                
+
                 for (const _ of Array.from({ length: 10 })) {
                     const createPromise = glue.workspaces.createWorkspace(createConfig);
                     createPromises.push(createPromise);
@@ -306,6 +306,334 @@ describe('createWorkspace() ', function () {
 
         });
 
+    });
+
+    describe('reuseWorkspaceId Should ', () => {
+        // BASIC
+        const basicConfig = {
+            children: [
+                {
+                    type: "row",
+                    children: [
+                        {
+                            type: "window",
+                            appName: "dummyApp"
+                        }
+                    ]
+                }
+            ]
+        };
+
+        const secondBasicConfig = {
+            children: [
+                {
+                    type: "group",
+                    children: [
+                        {
+                            type: "window",
+                            appName: "dummyApp"
+                        },
+                        {
+                            type: "window",
+                            appName: "dummyApp"
+                        }
+                    ]
+                }
+            ]
+        }
+
+        const context = {
+            test: "window context"
+        };
+
+        const basicConfigWithContext = {
+            children: [
+                {
+                    type: "row",
+                    children: [
+                        {
+                            type: "window",
+                            context,
+                            appName: "GTF_Glue_Isolated_Support"
+                        }
+                    ]
+                }
+            ]
+        };
+        it("resolve with a worksapce instance when noTabHeaderIs true", async () => {
+            const workspace = await glue.workspaces.createWorkspace(Object.assign({}, basicConfig, { config: { noTabHeader: true } }));
+
+            expect(workspace.constructor.name).to.eql("Workspace");
+        });
+
+        it("change noTabHeader to true when the new workspace has noTabHeader:true and target one has false", async () => {
+            const workspace = await glue.workspaces.createWorkspace(Object.assign({}, basicConfig, {
+                config: {
+                    noTabHeader: false
+                }
+            }));
+
+            const secondWorkspace = await glue.workspaces.createWorkspace(Object.assign({}, secondBasicConfig, {
+                config: {
+                    reuseWorkspaceId: workspace.id,
+                    noTabHeader: true
+                }
+            }));
+
+            const secondWorkspaceWindows = secondWorkspace.getAllWindows();
+            expect(secondWorkspaceWindows.length).to.eql(2);
+            // TODO assert correctly
+        });
+
+        it("change noTabHeader to false when the new workspaces has noTabHeader:false and target one has true", async () => {
+            const workspace = await glue.workspaces.createWorkspace(Object.assign({}, basicConfig, {
+                config: {
+                    noTabHeader: true
+                }
+            }));
+
+            const secondWorkspace = await glue.workspaces.createWorkspace(Object.assign({}, secondBasicConfig, {
+                config: {
+                    reuseWorkspaceId: workspace.id,
+                    noTabHeader: false
+                }
+            }));
+
+            const secondWorkspaceWindows = secondWorkspace.getAllWindows();
+            expect(secondWorkspaceWindows.length).to.eql(2);
+            // TODO assert correctly
+        });
+
+        Array.from({ length: 10 }).forEach((_, i) => {
+            it(`reuse the same workspace ${i + 1} times succesfully`, async () => {
+                const workspaceToBeReused = await glue.workspaces.createWorkspace(basicConfig);
+
+                await Array.from({ length: i + 1 }).reduce(async (acc, _, i2) => {
+                    await acc;
+                    const configToUseForReplacing = {
+                        children: [
+                            {
+                                type: "group",
+                                children: Array.from({ length: i2 + 1 }).map(() => ({
+                                    type: "window",
+                                    appName: "dummyApp"
+                                }))
+                            }
+                        ],
+                        config: {
+                            reuseWorkspaceId: workspaceToBeReused.id
+                        }
+                    };
+
+                    const newWorkspace = await glue.workspaces.createWorkspace(configToUseForReplacing);
+                    const windowsInNewWorkspace = newWorkspace.getAllWindows();
+
+                    expect(windowsInNewWorkspace.length).to.eql(i2 + 1);
+                }, Promise.resolve());
+            });
+        });
+
+        it('not add a new workspace in the summaries collection after resolve', async () => {
+            const workspace = await glue.workspaces.createWorkspace(basicConfig);
+            const allWorkspacesBeforeReuse = await glue.workspaces.getAllWorkspacesSummaries();
+
+            const secondWorkspаce = await glue.workspaces.createWorkspace(Object.assign({}, secondBasicConfig, {
+                config: {
+                    reuseWorkspaceId: workspace.id
+                }
+            }));
+
+            const allWorkspacesAfterReuse = await glue.workspaces.getAllWorkspacesSummaries();
+
+            expect(allWorkspacesAfterReuse.some((wsp) => wsp.id === workspace.id)).to.be.true;
+            expect(allWorkspacesAfterReuse.length).to.eql(allWorkspacesBeforeReuse.length);
+        });
+
+        it('preserve the id', async () => {
+            const workspace = await glue.workspaces.createWorkspace(basicConfig);
+            const secondWorkspаce = await glue.workspaces.createWorkspace(Object.assign({}, secondBasicConfig, {
+                config: {
+                    reuseWorkspaceId: workspace.id
+                }
+            }));
+
+            expect(workspace.id).to.eql(secondWorkspаce.id);
+        });
+
+        it('increase the number of windows by one when the reused workspace has one app less', async () => {
+            const workspace = await glue.workspaces.createWorkspace(basicConfig);
+            await Promise.all(workspace.getAllWindows().map(w => w.forceLoad()));
+            await gtf.wait(3000);
+            const windowsCount = glue.windows.list().length;
+            const secondWorkspаce = await glue.workspaces.createWorkspace(Object.assign({}, secondBasicConfig, {
+                config: {
+                    reuseWorkspaceId: workspace.id
+                }
+            }));
+
+            await Promise.all(secondWorkspаce.getAllWindows().map(w => w.forceLoad()));
+            await gtf.wait(3000);
+            const secondWindowsCount = glue.windows.list().length;
+            expect(windowsCount + 1).to.eql(secondWindowsCount);
+        });
+
+        it("preserve the context when a new context has not been passed", async () => {
+            const firstContext = {
+                "a": "b"
+            };
+
+            const workspace = await glue.workspaces.createWorkspace(Object.assign({}, basicConfig, {
+                context: firstContext
+            }));
+
+            const secondWorkspaceContext = await workspace.getContext();
+
+            const secondWorkspace = await glue.workspaces.createWorkspace(Object.assign({}, basicConfig, {
+                config: {
+                    reuseWorkspaceId: workspace.id
+                }
+            }));
+
+
+            expect(secondWorkspaceContext).to.eql(firstContext);
+        });
+
+        it("set the context correctly when a new context has been passed", async () => {
+            const firstContext = {
+                "a": "b"
+            };
+
+            const secondContext = {
+                "c": "d"
+            };
+
+            const workspace = await glue.workspaces.createWorkspace(Object.assign({}, basicConfig, {
+                context: firstContext
+            }));
+
+            const secondWorkspace = await glue.workspaces.createWorkspace(Object.assign({}, basicConfig, {
+                config: {
+                    reuseWorkspaceId: workspace.id,
+                },
+                context: secondContext
+
+            }));
+
+            const secondWorkspaceContext = await secondWorkspace.getContext();
+
+            expect(secondWorkspaceContext).to.eql(secondContext);
+        });
+
+        it('reject and not open a workspace when called with no data', (done) => {
+            glue.workspaces.createWorkspace()
+                .then(() => {
+                    done('Should not have resolved, because the method is called with no arguments');
+                })
+                .catch(() => {
+                    return glue.workspaces.getAllWorkspacesSummaries();
+                })
+                .then((summaries) => {
+                    expect(summaries.length).to.eql(0);
+                    done();
+                })
+                .catch((err) => {
+                    done(err);
+                });
+        });
+
+        it('not trigger workspace opened', (done) => {
+            let unSubFunc;
+            let workspace;
+
+            glue.workspaces.createWorkspace(basicConfig).then((w) => {
+                workspace = w;
+                return glue.workspaces.onWorkspaceOpened(() => {
+                    try {
+                        done("Should not be invoked");
+
+                        unSubFunc();
+                    } catch (error) { }
+                });
+            }).then((unSub) => {
+                unSubFunc = unSub;
+                return glue.workspaces.createWorkspace(Object.assign(JSON.parse(JSON.stringify(basicConfig)), {
+                    config: {
+                        reuseWorkspaceId: workspace.id
+                    }
+                }));
+            }).then(() => {
+                return gtf.wait(3000, () => { done(); unSubFunc(); });
+            }).catch(done);
+        });
+
+        it('not trigger workspace closed', (done) => {
+            let unSubFunc;
+            let workspace;
+
+            glue.workspaces.createWorkspace(basicConfig).then((w) => {
+                workspace = w;
+                return glue.workspaces.onWorkspaceClosed(() => {
+                    try {
+                        done("Should not be invoked");
+
+                        unSubFunc();
+                    } catch (error) { }
+                });
+            }).then((unSub) => {
+                unSubFunc = unSub;
+                return glue.workspaces.createWorkspace(Object.assign(JSON.parse(JSON.stringify(basicConfig)), {
+                    config: {
+                        reuseWorkspaceId: workspace.id
+                    }
+                }));
+            }).then(() => {
+                return gtf.wait(3000, () => { done(); unSubFunc(); });
+            }).catch(done);
+        });
+
+        it("resolve with correct title when it is specified and valid", async () => {
+            const testTitle = "myTestTitle";
+            const workspace = await glue.workspaces.createWorkspace(basicConfig);
+            const secondWorkspace = await glue.workspaces.createWorkspace(
+                Object.assign(JSON.parse(JSON.stringify(secondBasicConfig)), { config: { title: testTitle, reuseWorkspaceId: workspace.id } })
+            );
+
+            expect(secondWorkspace.title).to.eql(testTitle);
+        });
+
+        it("resolve when there are multiple frames opened and one of the middle ones (by starting order) contains the target workspace", async () => {
+            const workspaceOne = await glue.workspaces.createWorkspace(Object.assign(JSON.parse(JSON.stringify(basicConfig)), { frame: { newFrame: true } }));
+            const workspaceTwo = await glue.workspaces.createWorkspace(Object.assign(JSON.parse(JSON.stringify(basicConfig)), { frame: { newFrame: true } }));
+            const workspaceThree = await glue.workspaces.createWorkspace(Object.assign(JSON.parse(JSON.stringify(basicConfig)), { frame: { newFrame: true } }));
+            const workspaceFour = await glue.workspaces.createWorkspace(Object.assign(JSON.parse(JSON.stringify(secondBasicConfig)), { config: { reuseWorkspaceId: workspaceTwo.id } }));
+
+            const allWorkspaces = await glue.workspaces.getAllWorkspaces();
+            const allFrames = await glue.workspaces.getAllFrames();
+            const windowsInWorkspaceFour = workspaceFour.getAllWindows();
+
+            expect(allWorkspaces.length).to.eql(3);
+            expect(allFrames.length).to.eql(3);
+            expect(windowsInWorkspaceFour.length).to.eql(2);
+        });
+
+        it.skip("reject when reuseFrameId is specified", (done) => {
+            glue.workspaces.createWorkspace(basicConfig).then((workspace) => {
+                const reuseFrameConfig = Object.assign(JSON.parse(JSON.stringify(basicConfig)), {
+                    frame: {
+                        newFrame: false,
+                        reuseFrameId: workspace.frame.id
+                    },
+                    config: {
+                        reuseWorkspaceId: workspace.id
+                    }
+                });
+
+                glue.workspaces.createWorkspace(reuseFrameConfig)
+                    .then(() => done("Should not resolve"))
+                    .catch(() => done());
+            }).catch(done);
+
+        });
     });
     // SAVE CONFIG
     // after resolve the layout should be present in the layouts collection when specified in the save config

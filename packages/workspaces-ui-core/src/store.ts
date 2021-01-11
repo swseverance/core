@@ -53,7 +53,7 @@ class WorkspaceStore {
     }
 
     public removeLayout(id: string) {
-        this._idToLayout[id].layout.destroy();
+        this._idToLayout[id].layout?.destroy();
         this._idToLayout[id].layout = undefined;
     }
 

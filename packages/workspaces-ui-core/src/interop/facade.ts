@@ -345,7 +345,13 @@ export class GlueFacade {
     }
 
     private async handleCreateWorkspace(operationArguments: CreateWorkspaceArguments) {
+        if (!operationArguments.config) {
+            operationArguments.config = {};
+        }
+        
+        operationArguments.config.context = operationArguments.config.context || operationArguments.context;
         const config = this._converter.convertToRendererConfig(operationArguments);
+
         const workspaceId = await manager.createWorkspace(config as GoldenLayout.Config);
 
         const apiConfig = this._converter.convertToAPIConfig(manager.stateResolver.getWorkspaceConfig(workspaceId));

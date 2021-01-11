@@ -480,6 +480,11 @@ declare module '@glue42/golden-layout' {
              * Hides the tab element of the workspace
              */
             noTabHeader?: boolean;
+
+            /**
+             * Replaces the specified workspace instead of creating a new one
+             */
+            reuseWorkspaceId?: string;
         }
 
         export interface Config {

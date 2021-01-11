@@ -261,6 +261,15 @@ export class LayoutController {
         this.emitter.raiseEvent("workspace-added", { workspace: store.getById(id) });
     }
 
+    public reinitializeWorkspace(id: string, config: GoldenLayout.Config) {
+        store.removeLayout(id);
+        if (config.workspacesOptions?.reuseWorkspaceId) {
+            // Making sure that the property doesn't leak in a workspace summary or a saved layout
+            delete config.workspacesOptions.reuseWorkspaceId;
+        }
+        return this.initWorkspaceContents(id, config);
+    }
+
     public removeWorkspace(workspaceId: string) {
         const workspaceToBeRemoved = store.getWorkspaceLayoutItemById(workspaceId);
 
@@ -654,7 +663,7 @@ export class LayoutController {
     }
 
     private initWorkspaceConfig(workspaceConfig: GoldenLayout.Config) {
-        return new Promise((res) => {
+        return new Promise<void>((res) => {
             workspaceConfig.settings.selectionEnabled = true;
             store.workspaceLayout = new GoldenLayout(workspaceConfig, $(this._workspaceLayoutElementId), componentStateMonitor.decoratedFactory);
 
@@ -905,7 +914,7 @@ export class LayoutController {
     }
 
     private waitForLayout(id: string) {
-        return new Promise((res) => {
+        return new Promise<void>((res) => {
             const unsub = this._registry.add(`content-layout-initialised-${id}`, () => {
                 res();
                 unsub();
@@ -919,7 +928,7 @@ export class LayoutController {
     }
 
     private waitForWindowContainer(placementId: string) {
-        return new Promise((res) => {
+        return new Promise<void>((res) => {
             const unsub = this.emitter.onContentComponentCreated((component) => {
                 if (component.config.id === placementId) {
                     res();
