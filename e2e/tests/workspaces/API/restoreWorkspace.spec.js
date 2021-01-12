@@ -1,4 +1,4 @@
-describe.only('restoreWorkspace() Should', function () {
+describe.skip('restoreWorkspace() Should', function () {
 
     const basicConfig = {
         children: [
@@ -38,21 +38,9 @@ describe.only('restoreWorkspace() Should', function () {
     before(() => coreReady);
 
     beforeEach(async () => {
-        console.log("START");
-        const frames = await glue.workspaces.getAllFrames();
-        const workspaces = await glue.workspaces.getAllWorkspaces();
-        console.log(frames.length);
-        console.log(workspaces.length);
         workspace = await glue.workspaces.createWorkspace(basicConfig);
-        console.log("FIRST CREATED");
-        // await workspace.saveLayout(layoutName);
-        console.log("FIRST");
         let secondWorkspace = await glue.workspaces.createWorkspace(secondBasicConfig);
-        // await secondWorkspace.saveLayout(secondLayoutName, { saveContext: false });
-        // console.log("SECOND");
         await secondWorkspace.close();
-        await gtf.wait(500);
-        // console.log("SECOND CLOSE");
     });
 
     afterEach(async () => {
@@ -60,16 +48,13 @@ describe.only('restoreWorkspace() Should', function () {
         const frames = await glue.workspaces.getAllFrames();
         await Promise.all(frames.map((f) => f.close()));
     });
-    Array.from({ length: 50 }).forEach(() => {
 
-        it("restore the layout when the arguments are correct and the workspace is still opened", async () => {
-            // const secondWorkspace = await glue.workspaces.restoreWorkspace(layoutName);
-            const summaries = await glue.workspaces.getAllWorkspacesSummaries();
+    it("restore the layout when the arguments are correct and the workspace is still opened", async () => {
+        const secondWorkspace = await glue.workspaces.restoreWorkspace(layoutName);
+        const summaries = await glue.workspaces.getAllWorkspacesSummaries();
 
-            // expect(summaries.length).to.eql(2);
-        });
+        expect(summaries.length).to.eql(2);
     });
-
 
     it("restore the layout when the arguments are correct and the workspace is closed", async () => {
         await workspace.close();
