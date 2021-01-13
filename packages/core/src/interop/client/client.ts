@@ -9,6 +9,7 @@ import ClientRepository from "./repository";
 import { UnsubscribeFunction } from "callback-registry";
 import random from "shortid";
 import { rejectAfter } from "../helpers/promiseHelpers";
+import { isSubset } from "../../contexts/helpers";
 import InvocationResult = Glue42Core.AGM.InvocationResult;
 import MethodDefinition = Glue42Core.AGM.MethodDefinition;
 import Method = Glue42Core.Interop.Method;
@@ -322,7 +323,7 @@ export default class Client {
                         getServers: () => [],
                         supportsStreaming: false,
                         objectTypes: methodDefinition.objectTypes ?? [],
-                        flags: methodDefinition.flags ?? {}
+                        flags: methodDefinition.flags?.metadata ?? {}
                     };
                     const errorObj: InvocationResult = {
                         method,
@@ -541,13 +542,19 @@ export default class Client {
             const filterValue = filter[prop];
             const repoMethodValue = repoMethod[prop];
 
-            if (prop === "objectTypes") {
-                // filterValue needs to be a subset of repoMethodValue.
-                isMatch = (filterValue as string[]).every((filterValueEl) => {
-                    return (repoMethodValue as string[]).includes(filterValueEl);
-                });
-            } else {
-                isMatch = String(filterValue).toLowerCase() === String(repoMethodValue).toLowerCase();
+            switch (prop) {
+                case "objectTypes":
+                    // filterValue needs to be a subset of repoMethodValue.
+                    isMatch = ((filterValue || []) as string[]).every((filterValueEl) => {
+                        return ((repoMethodValue || []) as string[]).includes(filterValueEl);
+                    });
+                    break;
+                case "flags":
+                    // filterValue needs to be a subset of repoMethodValue.
+                    isMatch = isSubset(repoMethodValue || {}, filterValue || {});
+                    break;
+                default:
+                    isMatch = String(filterValue).toLowerCase() === String(repoMethodValue).toLowerCase();
             }
 
             return isMatch;
@@ -617,7 +624,7 @@ export default class Client {
 
         return servers.reduce<ServerMethodsPair[]>((prev, current) => {
 
-            const methodsForServer = this.repo.getServerMethodsById(current.id);
+            const methodsForServer = Object.values(current.methods);
 
             const matchingMethods = methodsForServer.filter((method) => {
                 return this.methodMatch(methodFilter, method);

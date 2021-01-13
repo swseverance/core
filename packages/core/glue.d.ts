@@ -796,7 +796,7 @@ export namespace Glue42Core {
             supportsStreaming?: boolean;
 
             /** Optional flags attached to the method */
-            flags?: { [key: string]: string };
+            flags?: { [key: string]: any };
 
             /** Returns all servers that provide the method. */
             getServers?(): Instance[];
@@ -833,7 +833,7 @@ export namespace Glue42Core {
             supportsStreaming: boolean;
 
             /** Optional flags attached to the method */
-            flags: { [key: string]: string };
+            flags: { [key: string]: any };
 
             /** Returns all servers that provide the method. */
             getServers(): Instance[];

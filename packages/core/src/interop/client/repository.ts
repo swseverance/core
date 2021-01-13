@@ -7,6 +7,14 @@ import { ClientMethodInfo, ServerInfo } from "./types";
 import { MethodInfoMessage } from "../protocols/gw3/messages";
 import { Logger } from "../../logger/logger";
 import { InstanceWrapper } from "../instance";
+import Client from "./client";
+
+const hideMethodSystemFlags = (method: ClientMethodInfo): ClientMethodInfo => {
+    return {
+        ...method,
+        flags: method.flags.metadata || {}
+    };
+};
 
 export default class ClientRepository {
 
@@ -110,14 +118,16 @@ export default class ClientRepository {
 
         server.methods[method.id] = methodDefinition;
 
+        const clientMethodDefinition = hideMethodSystemFlags(methodDefinition);
+
         // increase the ref and notify listeners
         if (!this.methodsCount[identifier]) {
             this.methodsCount[identifier] = 0;
-            this.callbacks.execute("onMethodAdded", methodDefinition);
+            this.callbacks.execute("onMethodAdded", clientMethodDefinition);
         }
         this.methodsCount[identifier] = this.methodsCount[identifier] + 1;
 
-        this.callbacks.execute("onServerMethodAdded", server.instance, methodDefinition);
+        this.callbacks.execute("onServerMethodAdded", server.instance, clientMethodDefinition);
         return methodDefinition;
     }
 
@@ -130,48 +140,23 @@ export default class ClientRepository {
         const method = server.methods[methodId];
         delete server.methods[methodId];
 
+        const clientMethodDefinition = hideMethodSystemFlags(method);
+
         // update ref counting
         this.methodsCount[method.identifier] = this.methodsCount[method.identifier] - 1;
         if (this.methodsCount[method.identifier] === 0) {
-            this.callbacks.execute("onMethodRemoved", method);
+            this.callbacks.execute("onMethodRemoved", clientMethodDefinition);
         }
 
-        this.callbacks.execute("onServerMethodRemoved", server.instance, method);
+        this.callbacks.execute("onServerMethodRemoved", server.instance, clientMethodDefinition);
     }
 
     public getMethods(): ClientMethodInfo[] {
-        const allMethods: { [key: string]: ClientMethodInfo } = {};
-        Object.keys(this.servers).forEach((serverId) => {
-            const server = this.servers[serverId];
-            Object.keys(server.methods).forEach((methodId) => {
-                const method: ClientMethodInfo = server.methods[methodId];
-                allMethods[method.identifier] = method;
-            });
-        });
-
-        const methodsAsArray = Object.keys(allMethods).map((id) => {
-            return allMethods[id];
-        });
-
-        return methodsAsArray;
+        return this.extractMethodsFromServers(Object.values(this.servers)).map(hideMethodSystemFlags);
     }
 
     public getServers(): ServerInfo[] {
-        const allServers: ServerInfo[] = [];
-        Object.keys(this.servers).forEach((serverId) => {
-            const server = this.servers[serverId];
-            allServers.push(server);
-        });
-
-        return allServers;
-    }
-
-    public getServerMethodsById(serverId: string): ClientMethodInfo[] {
-        const server = this.servers[serverId];
-
-        return Object.keys(server.methods).map((id) => {
-            return server.methods[id];
-        });
+        return Object.values(this.servers).map(this.hideServerMethodSystemFlags);
     }
 
     public onServerAdded(callback: (server: Glue42Core.Interop.Instance) => void): UnsubscribeFunction {
@@ -238,7 +223,7 @@ export default class ClientRepository {
     }
 
     public getServerById(id: string) {
-        return this.servers[id];
+        return this.hideServerMethodSystemFlags(this.servers[id]);
     }
 
     public reset() {
@@ -260,11 +245,9 @@ export default class ClientRepository {
 
     private getServersByMethod(identifier: string): Glue42Core.AGM.Instance[] {
         const allServers: Glue42Core.AGM.Instance[] = [];
-        Object.keys(this.servers).forEach((serverId) => {
-            const server = this.servers[serverId];
-            Object.keys(server.methods).forEach((methodId) => {
-                const methodInfo = server.methods[methodId];
-                if (methodInfo.identifier === identifier) {
+        Object.values(this.servers).forEach((server) => {
+            Object.values(server.methods).forEach((method) => {
+                if (method.identifier === identifier) {
                     allServers.push(server.instance);
                 }
             });
@@ -291,5 +274,26 @@ export default class ClientRepository {
             unsubCalled = true;
             unsubscribeFunc();
         };
+    }
+
+    private hideServerMethodSystemFlags(server: ServerInfo): ServerInfo {
+        const clientMethods: { [name: string]: ClientMethodInfo } = {};
+
+        Object.entries(server.methods).forEach(([name, method]) => {
+            clientMethods[name] = hideMethodSystemFlags(method);
+        });
+
+        return {
+            ...server,
+            methods: clientMethods
+        };
+    }
+
+    private extractMethodsFromServers(servers: ServerInfo[]): ClientMethodInfo[] {
+        const methods = Object.values(servers).reduce<ClientMethodInfo[]>((clientMethods, server) => {
+            return [...clientMethods, ...Object.values(server.methods)];
+        }, []);
+
+        return methods;
     }
 }
