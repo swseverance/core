@@ -1,4 +1,4 @@
-describe.skip('restoreWorkspace() Should', function () {
+describe('restoreWorkspace() Should', function () {
 
     const basicConfig = {
         children: [
@@ -39,7 +39,9 @@ describe.skip('restoreWorkspace() Should', function () {
 
     beforeEach(async () => {
         workspace = await glue.workspaces.createWorkspace(basicConfig);
+        await workspace.saveLayout(layoutName);
         let secondWorkspace = await glue.workspaces.createWorkspace(secondBasicConfig);
+        await secondWorkspace.saveLayout(secondLayoutName);
         await secondWorkspace.close();
     });
 
