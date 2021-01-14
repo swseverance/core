@@ -524,23 +524,6 @@ describe('createWorkspace() ', function () {
             expect(secondWorkspaceContext).to.eql(secondContext);
         });
 
-        it('reject and not open a workspace when called with no data', (done) => {
-            glue.workspaces.createWorkspace()
-                .then(() => {
-                    done('Should not have resolved, because the method is called with no arguments');
-                })
-                .catch(() => {
-                    return glue.workspaces.getAllWorkspacesSummaries();
-                })
-                .then((summaries) => {
-                    expect(summaries.length).to.eql(0);
-                    done();
-                })
-                .catch((err) => {
-                    done(err);
-                });
-        });
-
         it('not trigger workspace opened', (done) => {
             let unSubFunc;
             let workspace;

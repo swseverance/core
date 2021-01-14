@@ -375,7 +375,6 @@ class WorkspacesManager {
         this.subscribeForLayout();
 
         this._isLayoutInitialized = true;
-        console.log("WAITING ENDED");
 
         await Promise.all(config.workspaceConfigs.map(c => {
             return this._glue.contexts.set(getWorkspaceContextName(c.id), c.config?.workspacesOptions?.context || {});
