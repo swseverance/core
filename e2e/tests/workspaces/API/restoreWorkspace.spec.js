@@ -7,7 +7,7 @@ describe.skip('restoreWorkspace() Should', function () {
                 children: [
                     {
                         type: "window",
-                        appName: "dummyApp"
+                        appName: "noGlueApp"
                     }
                 ]
             }
@@ -21,11 +21,11 @@ describe.skip('restoreWorkspace() Should', function () {
                 children: [
                     {
                         type: "window",
-                        appName: "dummyApp"
+                        appName: "noGlueApp"
                     },
                     {
                         type: "window",
-                        appName: "dummyApp"
+                        appName: "noGlueApp"
                     }
                 ]
             }
