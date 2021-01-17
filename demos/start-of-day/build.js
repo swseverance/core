@@ -28,7 +28,7 @@ const build = async () => {
     const outDir = path.join(__dirname, "/dist/");
     await Promise.all([
         copyDirectory(path.join(__dirname, "/common/"), path.join(outDir, "/common")),
-        copyDirectory(path.join(__dirname, "/glue/"), path.join(outDir, "/glue"))
+        copyDirectory(path.join(__dirname, "/workspaces/"), path.join(outDir, "/workspaces"))
     ])
 };
 

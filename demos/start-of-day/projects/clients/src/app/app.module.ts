@@ -19,7 +19,7 @@ import GlueWorkspaces from "@glue42/workspaces-api";
     NgbModule,
     HttpClientModule,
     DataModule.forRoot(),
-    Glue42Ng.forRoot({ factory: GlueWeb, config: { libraries: [GlueWorkspaces], application: "clients" } }),
+    Glue42Ng.forRoot({ web: { factory: GlueWeb, config: { libraries: [GlueWorkspaces] } } }),
     ComponentsModule
   ],
   providers: [],

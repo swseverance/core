@@ -154,7 +154,7 @@ export class GlueService {
     }
 
     public async openWindow(name: string, url: string, context: any): Promise<void> {
-        await this.glue.windows.open(name, url, { url, context });
+        await this.glue.windows.open(name, url, { context });
     }
 
     public async isInWorkspace(): Promise<boolean> {
@@ -221,7 +221,7 @@ export class GlueService {
     }
 
     private get glue(): Glue42Web.API {
-        return this.glueStore.glue;
+        return this.glueStore.getGlue();
     }
 
     private waitForContextId(handleContext: (context: any) => any): Promise<{ contextId: string, globalUnsubscribe: () => void }> {

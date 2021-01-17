@@ -9,8 +9,49 @@ import { ComponentsModule } from '../../../../shared/components/components.modul
 import { ClickOutsideModule } from 'ng-click-outside';
 
 import { Glue42Ng } from "@glue42/ng";
-import GlueWeb from "@glue42/web";
+import GlueWebPlatform, { Glue42WebPlatform } from "@glue42/web-platform";
 import GlueWorkspaces from "@glue42/workspaces-api";
+
+const config: Glue42WebPlatform.Config = {
+  glue: {
+    libraries: [GlueWorkspaces]
+  },
+  workspaces: {
+    src: "/workspaces"
+  },
+  applications: {
+    local: [
+      {
+        name: "clients",
+        type: "window",
+        details: {
+          url: "/clients"
+        }
+      },
+      {
+        name: "news",
+        type: "window",
+        details: {
+          url: "/news"
+        }
+      },
+      {
+        name: "portfolio",
+        type: "window",
+        details: {
+          url: "/portfolio"
+        }
+      },
+      {
+        name: "transactions",
+        type: "window",
+        details: {
+          url: "/transactions"
+        }
+      }
+    ]
+  }
+};
 
 @NgModule({
   declarations: [
@@ -20,7 +61,7 @@ import GlueWorkspaces from "@glue42/workspaces-api";
     BrowserModule,
     NgbModule,
     HttpClientModule,
-    Glue42Ng.forRoot({ factory: GlueWeb, config: { libraries: [GlueWorkspaces], application: "welcome" } }),
+    Glue42Ng.forRoot({ webPlatform: { factory: GlueWebPlatform, config: config } }),
     DataModule.forRoot(),
     ComponentsModule,
     ClickOutsideModule
