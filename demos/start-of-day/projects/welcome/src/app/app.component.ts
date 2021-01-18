@@ -34,6 +34,7 @@ export class AppComponent implements OnInit {
     this.clients = this.allData.clients;
     this.news = this.getSortedAllNews();
     this.stocks = this.allData.stocks;
+    console.log(this.glueService.glue.version);
   }
 
   public async handleClientSelect(client?: Client) {

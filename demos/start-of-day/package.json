@@ -7,11 +7,11 @@
         "test": "ng test",
         "lint": "ng lint",
         "e2e": "ng e2e",
-        "build:all": "concurrently \"ng build welcome\" \"ng build clients\" \"ng build news\" \"ng build portfolio\" \"ng build transactions\"",
         "build:allW": "concurrently \"ng build --watch welcome\" \"ng build --watch clients\" \"ng build --watch news\" \"ng build --watch portfolio\" \"ng build --watch transactions\"",
         "build:allP": "concurrently \"ng build --prod welcome\" \"ng build --prod clients\" \"ng build --prod news\" \"ng build --prod portfolio\" \"ng build --prod transactions\"",
         "build:prod": "npm run build:allP && node build.js",
-        "start": "npm run build:all"
+        "start": "npm run build:prod && npm run serve",
+        "serve": "http-server -- ./dist/"
     },
     "private": true,
     "dependencies": {
@@ -49,6 +49,7 @@
         "@types/jasminewd2": "~2.0.3",
         "@types/node": "^12.11.1",
         "codelyzer": "^5.1.2",
+        "http-server": "^0.12.3",
         "jasmine-core": "~3.5.0",
         "jasmine-spec-reporter": "~4.2.1",
         "karma": "^5.1.1",

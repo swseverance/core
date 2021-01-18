@@ -35,7 +35,6 @@ export class AppComponent implements OnInit, OnDestroy {
       })
 
     await this.glueService.setMyWorkspaceId();
-    (window as any).glue = this.glueService.glue;
   }
 
   public ngOnDestroy(): void {

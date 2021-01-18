@@ -14,7 +14,13 @@ import GlueWorkspaces from "@glue42/workspaces-api";
 
 const config: Glue42WebPlatform.Config = {
   glue: {
-    libraries: [GlueWorkspaces]
+    libraries: [GlueWorkspaces],
+    systemLogger: {
+      level: "warn"
+    }
+  },
+  gateway: {
+    logging: { level: "warn" }
   },
   workspaces: {
     src: "/workspaces"
