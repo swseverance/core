@@ -57,6 +57,7 @@ export const appHelloDecoder: Decoder<AppHello> = object({
 
 export const applicationStartConfigDecoder: Decoder<ApplicationStartConfig> = object({
     name: nonEmptyStringDecoder,
+    id: optional(nonEmptyStringDecoder),
     context: optional(anyJson()),
     top: optional(number()),
     left: optional(number()),

@@ -79,6 +79,7 @@ export class AppManagerController implements LibController {
     }
 
     public async startApplication(appName: string, context?: object, options?: Glue42Web.AppManager.ApplicationStartOptions): Promise<Glue42Web.AppManager.Instance> {
+        // reuseId is a hidden property for workspaces-only use
         const startOptions: ApplicationStartConfig = {
             name: appName,
             waitForAGMReady: options?.waitForAGMReady ?? true,
@@ -88,7 +89,8 @@ export class AppManagerController implements LibController {
             width: options?.width,
             height: options?.height,
             relativeTo: options?.relativeTo,
-            relativeDirection: options?.relativeDirection
+            relativeDirection: options?.relativeDirection,
+            id: (options as any)?.reuseId
         };
 
         const openResult = await this.bridge.send<ApplicationStartConfig, InstanceData>("appManager", operations.applicationStart, startOptions);

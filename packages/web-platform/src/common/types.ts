@@ -77,6 +77,7 @@ export interface ModeExecutor {
 
 export interface ApplicationStartConfig {
     name: string;
+    id?: string;
     context?: any;
     top?: number;
     left?: number;

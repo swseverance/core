@@ -61,6 +61,7 @@ export interface AppHelloSuccess {
 export interface ApplicationStartConfig {
     name: string;
     waitForAGMReady: boolean;
+    id?: string;
     context?: any;
     top?: number;
     left?: number;

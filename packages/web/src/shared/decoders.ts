@@ -239,6 +239,7 @@ export const basicInstanceDataDecoder: Decoder<BasicInstanceData> = object({
 export const applicationStartConfigDecoder: Decoder<ApplicationStartConfig> = object({
     name: nonEmptyStringDecoder,
     waitForAGMReady: boolean(),
+    id: optional(nonEmptyStringDecoder),
     context: optional(anyJson()),
     top: optional(number()),
     left: optional(number()),

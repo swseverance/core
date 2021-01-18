@@ -142,7 +142,7 @@ export class ApplicationsController implements LibController {
         }
 
         const instance: InstanceData = {
-            id: generate(),
+            id: config.id ?? generate(),
             applicationName: config.name
         };
 
