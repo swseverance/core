@@ -222,6 +222,15 @@ class WorkspacesManager {
         const context = webWindow ? await webWindow.getContext() : workspaceContext;
         this.closeItem(idAsString(item.config.id));
 
+        // If an appName is available it should be used instead of just opening the window with glue.windows.open
+        // in order to be as close as possible to a real eject
+        if (appName) {
+            const options = (windowId ? { reuseId: windowId } : undefined) as any; // making sure that the invokation is robust and can't fail easily due to corrupted state
+            const ejectedInstance = await this._glue.appManager.application(appName).start(context, options);
+
+            return { windowId: ejectedInstance.id };
+        }
+
         const ejectedWindowUrl = this.getUrlByAppName(appName) || url;
         const ejectedWindow = await this._glue.windows.open(`${appName}_${windowId}`, ejectedWindowUrl, { context, windowId } as Glue42Web.Windows.Settings);
 
@@ -389,11 +398,19 @@ class WorkspacesManager {
             let { windowId } = componentState;
             const componentId = idAsString(component.config.id);
             const applicationTitle = this.getTitleByAppName(appName);
-            const windowTitle = title || applicationTitle || appName;
+            const windowTitle = title || applicationTitle || appName || "Glue";
             const windowContext = component?.config.componentState?.context;
             let url = this.getUrlByAppName(componentState.appName) || componentState.url;
 
             const isNewWindow = !store.getWindow(componentId);
+
+            store.addWindow({
+                id: componentId,
+                bounds: newWindowBounds,
+                windowId,
+                url,
+                appName
+            }, workspace.id);
 
             if (!url && windowId) {
                 const win = this._glue.windows.list().find((w) => w.id === windowId);
@@ -405,14 +422,6 @@ class WorkspacesManager {
             }
 
             windowId = windowId || generate();
-
-            store.addWindow({
-                id: componentId,
-                bounds: newWindowBounds,
-                windowId,
-                url,
-                appName
-            }, workspace.id);
 
             if (component.config.componentState?.context) {
                 delete component.config.componentState.context;
@@ -464,6 +473,17 @@ class WorkspacesManager {
                             windowSummary: await this.stateResolver.getWindowSummary(componentId)
                         }
                     });
+                }
+
+                if (!appName) {
+                    const appNameToUse = this.getAppNameByWindowId(windowId);
+                    if (!component.config.componentState) {
+                        throw new Error(`Invalid state - the created component ${componentId} with windowId ${windowId} is missing its state object`);
+                    }
+                    component.config.componentState.appName = appNameToUse;
+
+                    const newlyAddedWindow = store.getWindow(componentId) as WorkspacesWindow;
+                    newlyAddedWindow.appName = appNameToUse;
                 }
 
             } catch (error) {
@@ -885,11 +905,21 @@ class WorkspacesManager {
     }
 
     private getUrlByAppName(appName: string): string {
+        if (!appName) {
+            return undefined;
+        }
         return this._glue.appManager?.application(appName)?.userProperties?.details?.url;
     }
 
     private getTitleByAppName(appName: string): string {
+        if (!appName) {
+            return undefined;
+        }
         return this._glue.appManager?.application(appName)?.title;
+    }
+
+    private getAppNameByWindowId(windowId: string): string {
+        return this._glue.appManager?.instances()?.find(i => i.id === windowId)?.application?.name;
     }
 
     private notifyFrameWillStart(windowId: string, appName?: string, context?: any, title?: string) {

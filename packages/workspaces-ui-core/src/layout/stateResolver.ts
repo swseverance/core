@@ -173,7 +173,7 @@ export class LayoutStateResolver {
         const isFocused = windowContentItem.parent.getActiveContentItem().config.id === windowContentItem.config.id;
         const isLoaded = windowContentItem.config.componentState.windowId !== undefined;
         const positionIndex = this.getWindowPositionIndex(windowContentItem);
-        const workspaceId = store.getByWindowId(winId).id;
+        const workspaceId = store.getByWindowId(winId)?.id;
         const { appName, url, windowId } = windowContentItem.config.componentState;
 
         const userFriendlyParent = this.getUserFriendlyParent(windowContentItem);
