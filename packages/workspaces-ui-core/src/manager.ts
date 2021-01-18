@@ -455,7 +455,10 @@ class WorkspacesManager {
             try {
                 await this.notifyFrameWillStart(windowId, appName, windowContext, title);
                 await this._frameController.startFrame(componentId, url, undefined, windowId);
+                const newlyAddedWindow = store.getWindow(componentId) as WorkspacesWindow;
+
                 component.config.componentState.windowId = windowId;
+                newlyAddedWindow.windowId = windowId;
 
                 const newlyOpenedWindow = this._glue.windows.findById(windowId);
                 newlyOpenedWindow.getTitle().then((winTitle) => {
@@ -482,7 +485,7 @@ class WorkspacesManager {
                     }
                     component.config.componentState.appName = appNameToUse;
 
-                    const newlyAddedWindow = store.getWindow(componentId) as WorkspacesWindow;
+
                     newlyAddedWindow.appName = appNameToUse;
                 }
 
