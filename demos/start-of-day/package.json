@@ -24,7 +24,7 @@
         "@angular/platform-browser": "~9.1.0",
         "@angular/platform-browser-dynamic": "~9.1.0",
         "@angular/router": "~9.1.0",
-        "@glue42/ng": "^2.0.5",
+        "@glue42/ng": "^2.0.6",
         "@glue42/workspaces-api": "^1.4.1",
         "@ng-bootstrap/ng-bootstrap": "^7.0.0",
         "ag-grid-angular": "^23.2.1",
