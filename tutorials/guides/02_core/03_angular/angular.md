@@ -601,8 +601,6 @@ The latest requirement from the users is to be able work with multiple clients a
 
 The [Main Application](../../../core/core-concepts/web-platform/overview/index.html) (the **Clients** app in this project) handles the configuration of the Glue42 environment. The `webPlatform` property of the config object in `Glue42Ng` accepts an optional configuration object that allows you to enable, disable and configure various Glue42 features. Here you will use it to define the available Glue42 Channels.
 
-First, you need to enable the Channels API and add channel definitions to the [Glue42 Environment](../../../core/core-concepts/environment/overview/index.html). Add the following configuration to the `glue.config.json` file located at the base directory of your project. After that, restart the Glue42 CLI by quitting it and running the `gluec serve` command again for the changes to take effect:
-
 ```javascript
 // in app.module.ts
 

@@ -22,6 +22,7 @@ const config = {
         local: [
             {
                 name: "my-app",
+                type: "window",
                 title: "My App",
                 details: {
                     url: "https://my-domain.com/my-app"
@@ -29,6 +30,7 @@ const config = {
             },
             {
                 name: "my-other-app",
+                type: "window",
                 title: "My Other App",
                 details: {
                     url: "https://my-domain.com/my-other-app"
