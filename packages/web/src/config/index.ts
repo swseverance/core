@@ -1,7 +1,7 @@
 import { Glue42Web } from "../../web";
 
 const defaultConfig = {
-    logger: "trace",
+    logger: "info",
     gateway: { webPlatform: {} },
     libraries: []
 };
@@ -11,7 +11,7 @@ export const parseConfig = (config?: Glue42Web.Config): any => {
     const combined = Object.assign({}, defaultConfig, config);
 
     if (combined.systemLogger) {
-        combined.logger = combined.systemLogger.level ?? "trace";
+        combined.logger = combined.systemLogger.level ?? "info";
     }
 
     return combined;

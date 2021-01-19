@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Glue42WebPlatform } from "../platform";
-import { glueConfigDecoder, platformConfigDecoder } from "./shared/decoders";
+import { platformConfigDecoder } from "./shared/decoders";
 import { defaultPlatformConfig } from "./common/defaultConfig";
 import deepMerge from "deepmerge";
 import { version } from "../package.json";
