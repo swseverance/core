@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "baseHref": "/clients/",
+            "baseHref": "/",
             "outputPath": "dist/clients",
             "index": "src/index.html",
             "main": "src/main.ts",

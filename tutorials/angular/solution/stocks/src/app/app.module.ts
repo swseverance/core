@@ -25,7 +25,7 @@ import { ChannelSelectModule } from './channel-select/channel-select.module';
     AppRoutingModule,
     NgbModule,
     HttpClientModule,
-    Glue42Ng.forRoot({ factory: GlueWeb }),
+    Glue42Ng.forRoot({ web: { factory: GlueWeb } }),
     ChannelSelectModule
   ],
   providers: [DataService, GlueService],

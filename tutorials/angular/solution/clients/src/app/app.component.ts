@@ -27,7 +27,8 @@ export class AppComponent implements OnInit {
     ]);
   }
 
-  public handleClientClick(client: Client): void {
+  public async handleClientClick(client: Client): Promise<void> {
+    this.glueService.openStockWindow();
     this.glueService.sendSelectedClient(client).catch(console.log);
   }
 
