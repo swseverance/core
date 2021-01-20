@@ -1,7 +1,0 @@
-{
-  "view": "browser",
-  "template": "node",
-  "container": {
-    "port": 8080
-  }
-}
