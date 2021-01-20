@@ -10,7 +10,7 @@ window.startApp({ appName: APP_NAME })
   .catch(console.error);
 
 function openWindow({ name, ...createOptions }) {
-  return glue.windows.open(name, `${window.location.origin}/new-window/index.html`, createOptions);
+  return glue.windows.open(name, `/new-window/index.html`, createOptions);
 }
 function openWindowHandler(event) {
   event.preventDefault();

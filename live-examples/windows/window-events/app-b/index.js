@@ -9,12 +9,19 @@ window.startApp({ appName: APP_NAME })
   .catch(console.error);
 
 function subscribeToWindowEvents() {
-  const isMyWindow = (windowId) => windowId === glue.windows.myWindow.id;
+  const isMyWindow = (windowId) => windowId === glue.windows.my().id;
 
   glue.windows.onWindowAdded((webWindow) => {
     // When it is my window - do not log. Keep the logs list clean.
     if (isMyWindow(webWindow.id) === false) {
       logger.info(`Window with name "${webWindow.id}" opened.`);
+    }
+  });
+
+  glue.windows.onWindowRemoved((webWindow) => {
+    // When it is my window - do not log. Keep the logs list clean.
+    if (isMyWindow(webWindow.id) === false) {
+      logger.info(`Window with name "${webWindow.id}" closed.`);
     }
   });
 }

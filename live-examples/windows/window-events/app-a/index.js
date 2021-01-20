@@ -12,7 +12,7 @@ window.startApp({ appName: APP_NAME })
   .catch(console.error);
 
 function subscribeToWindowEvents() {
-  const isMyWindow = (windowId) => windowId === glue.windows.myWindow.id;
+  const isMyWindow = (windowId) => windowId === glue.windows.my().id;
 
   glue.windows.onWindowAdded((webWindow) => {
     // When it is my window - do not log. Keep the logs list clean.
@@ -30,7 +30,7 @@ function subscribeToWindowEvents() {
 }
 
 function openWindow({ name, ...createOptions }) {
-  return glue.windows.open(name, `${window.location.origin}/new-window/index.html`, createOptions);
+  return glue.windows.open(name, `/new-window/index.html`, createOptions);
 }
 
 function openWindowHandler(event) {
