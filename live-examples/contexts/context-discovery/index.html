@@ -7,12 +7,22 @@
   <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico" />
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <link rel="stylesheet" href="/assets/style.css" />
+  <link rel="stylesheet" href="https://docs.glue42.com/vendor/style/style.css" />
+  <script src="/glue/platform.web.umd.js"></script>
 </head>
 
 <body class="d-flex h-100 flex-grow-1 overflow-auto justify-content-between px-2 py-4">
-  <iframe class="border rounded flex-grow-1 mr-3" src="https://wpdr7.csb.app/app-a/index.html"></iframe>
-  <iframe class="border rounded flex-grow-1" src="https://wpdr7.csb.app/app-b/index.html"></iframe>
+  <iframe class="border rounded flex-grow-1 mr-3" src="/app-a/index.html"></iframe>
+  <iframe class="border rounded flex-grow-1" src="/app-b/index.html"></iframe>
 </body>
+<script>
+  GlueWebPlatform()
+    .then((data) => {
+      console.log("done");
+    })
+    .catch((err) => {
+      console.warn(err);
+    });
+</script>
 
 </html>
