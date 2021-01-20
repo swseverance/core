@@ -122,5 +122,8 @@
       }
     }
   },
-  "defaultProject": "glue42-core-channels-angular-ui"
+  "defaultProject": "glue42-core-channels-angular-ui",
+  "cli": {
+    "analytics": false
+  }
 }
