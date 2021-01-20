@@ -1,0 +1,52 @@
+<body class="d-flex flex-column vh-100">
+  <nav class="navbar navbar-light bg-light py-3">
+    <h5 id="appNameHeading" class="mb-0">
+      Angular Material Select
+    </h5>
+    <button id="clearLogsBtn" type="button" class="btn btn-outline-primary btn-sm text-nowrap"
+      (click)="clearLogs()">Clear Logs</button>
+  </nav>
+  <div class="container-fluid d-flex flex-column flex-grow-1 overflow-auto">
+    <div class="row flex-grow-1">
+      <div class="col-10">
+        <div class="flex-column flex-grow-1 mt-2 overflow-auto row">
+          <div class="col-12 d-flex pr-0" style="overflow-y: scroll;">
+            <ul class="flex-grow-1 list-group" id="logs-list">
+
+              <li *ngFor="let message of messages"
+                class="d-flex justify-content-between align-items-center border-top py-1">
+                <div class="align-items-center d-flex flex-grow-1"><span
+                    class="bg-success d-inline-block mr-2 rounded-circle bg-"
+                    style="width: 10px; height: 10px; min-width: 10px; min-height: 10px;"></span>{{message.text}}
+                </div><span class="badge badge-pill">{{message.time}} </span>
+              </li>
+
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-2">
+        <div class="row mt-2">
+          <div class="col d-flex">
+            <mat-form-field>
+              <mat-label>Select a channel</mat-label>
+              <mat-select (selectionChange)="selectChannel($event)">
+                <mat-option [value]="NO_CHANNEL">No channel</mat-option>
+                <mat-option *ngFor="let channel of channels" [style.color]='channel.meta.color' [value]='channel.name'>
+                  {{channel.name}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="row">
+      <div class="align-items-center bg-light col d-flex py-2">
+        <img id="glueImg" [src]="glueConnectedBadgeSrc" width="16" height="16">
+        <span id="glueSpan" class="ml-1 small">{{glueConnectionStatus}}</span>
+      </div>
+    </footer>
+  </div>
+</body>
