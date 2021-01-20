@@ -1,0 +1,7 @@
+{
+  "view": "browser",
+  "template": "node",
+  "container": {
+    "port": 4200
+  }
+}
