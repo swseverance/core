@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "bash ./start.sh",
+    "start:ng": "ng serve",
     "build": "ng build --source-map=false",
     "test": "ng test",
     "lint": "ng lint",
