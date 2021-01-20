@@ -86,6 +86,10 @@ export class PortsBridge {
             if (data.type === Glue42CoreMessageTypes.platformPing.name) {
                 return this.handlePlatformPing(event.source as Window, event.origin);
             }
+
+            if (data.type === Glue42CoreMessageTypes.parentPing.name) {
+                return this.handleParentPing(event.source as Window, event.origin);
+            }
         });
     }
 
@@ -97,10 +101,13 @@ export class PortsBridge {
         const foundData = this.sessionStorage.getBridgeInstanceData(bridgeInstanceId);
         const appName = foundData?.appName;
 
+        const myWindowId = this.sessionStorage.getWindowDataByName("Platform")?.windowId;
+
         const message = {
             glue42core: {
                 type: Glue42CoreMessageTypes.connectionAccepted.name,
                 port: channel.port2,
+                parentWindowId: myWindowId,
                 appName, clientId, clientType
             }
         };
@@ -110,6 +117,16 @@ export class PortsBridge {
         }
 
         source.postMessage(message, origin, [channel.port2]);
+    }
+
+    private handleParentPing(source: Window, origin: string): void {
+        const message = {
+            glue42core: {
+                type: Glue42CoreMessageTypes.parentReady.name
+            }
+        };
+
+        source.postMessage(message, origin);
     }
 
     private handlePlatformPing(source: Window, origin: string): void {

@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "main": "index.html",
   "scripts": {
-    "start": "serve",
-    "build": "npx @glue42/cli-core build"
+    "start": "serve"
   },
   "license": "MIT",
   "dependencies": {},

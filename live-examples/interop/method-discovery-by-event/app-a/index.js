@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 const APP_NAME = 'Application A';
 
-const systemMethods = ['GC.Control', 'T42.HC.GetSaveContext'];
+const systemMethods = ['GC.Control', 'T42.HC.GetSaveContext', 'T42.Web.Client.Control', 'T42.Web.Platform.Stream', 'T42.Web.Platform.Control'];
 
 // Entry point. Initializes Glue42 Web. А Glue42 Web instance will be attached to the global window.
 window.startApp({ appName: APP_NAME })

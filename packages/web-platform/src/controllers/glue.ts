@@ -190,7 +190,7 @@ export class GlueController {
 
         const port = await this.portsBridge.createInternalClient();
 
-        const logLevel = config?.systemLogger?.level ?? "trace";
+        const logLevel = config?.systemLogger?.level ?? "info";
 
         return await GlueCore({
             application: "Platform",

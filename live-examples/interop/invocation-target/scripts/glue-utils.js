@@ -1,9 +1,6 @@
 /* eslint-disable no-undef */
 (function (window) {
   const startApp = async (options) => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/service-worker.js");
-    }
 
     if (options && options.appName) {
       window.setDocumentTitle(options.appName);

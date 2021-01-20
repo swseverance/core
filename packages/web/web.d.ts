@@ -814,8 +814,8 @@ export namespace Glue42Web {
             name: string;
 
             /**
-               * Type of the application - the only supported type in Glue42 Core is "window". More complex types are available in Glue42 Enterprise.
-               */
+              * Type of the application - the only supported type in Glue42 Core is "window". More complex types are available in Glue42 Enterprise.
+              */
             type: string;
 
             /**

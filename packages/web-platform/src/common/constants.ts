@@ -4,7 +4,9 @@ export const Glue42CoreMessageTypes = {
     platformPing: { name: "platformPing" },
     platformReady: { name: "platformReady" },
     platformUnload: { name: "platformUnload" },
-    clientUnload: { name: "clientUnload" }
+    clientUnload: { name: "clientUnload" },
+    parentPing: { name: "parentPing" },
+    parentReady: { name: "parentReady" }
 };
 
 export const GlueWebPlatformControlName = "T42.Web.Platform.Control";
