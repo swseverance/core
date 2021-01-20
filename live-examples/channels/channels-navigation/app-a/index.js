@@ -1,6 +1,51 @@
 /* eslint-disable no-undef */
 const APP_NAME = "Application A";
 
+const platformConfig = {
+  channels: {
+    definitions: [
+      {
+        name: "Red",
+        meta: {
+          color: "red"
+        },
+        data: {
+          clientId: "VVDvc6i99J",
+          clientName: "Vernon Mullen"
+        }
+      },
+      {
+        name: "Green",
+        meta: {
+          color: "green"
+        },
+        data: {
+          ticker: "AAPL",
+          Reuters: "AAPL.O",
+          Bloomberg: "AAPL US Equity"
+        }
+      },
+      {
+        name: "Blue",
+        meta: {
+          color: "#66ABFF"
+        },
+        data: {
+          client: {
+            clientId: "xZvXP2i93P",
+            clientName: "Alan Muller"
+          },
+          instrument: {
+            ticker: "GOOG",
+            Reuters: "GOOG.OQ",
+            Bloomberg: "GOOG:US"
+          }
+        }
+      }
+    ]
+  }
+};
+
 async function onJoinClicked(channelName) {
   try {
     await glue.channels.join(channelName);
@@ -46,7 +91,7 @@ async function onGetClicked(channelName) {
 
 // Entry point. Initializes Glue42 Web. А Glue42 Web instance will be attached to the global window.
 window
-  .startApp({ appName: APP_NAME })
+  .startApp({ appName: APP_NAME, platformConfig })
   .then(() => {
     return glue.channels.all();
   })

@@ -7,12 +7,47 @@
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Glue42 Core Channels Publish and Subscribe</title>
-  <link rel="stylesheet" href="/assets/style.css" />
+  <link rel="stylesheet" href="https://docs.glue42.com/vendor/style/style.css" />
+  <script src="/glue/platform.web.umd.js"></script>
 </head>
 
 <body class="d-flex h-100 flex-grow-1 overflow-auto justify-content-between px-2 py-4">
-  <iframe class="border rounded flex-grow-1 mr-3" src="https://wsdwe.csb.app/app-a/index.html"></iframe>
-  <iframe class="border rounded flex-grow-1" src="https://wsdwe.csb.app/app-b/index.html"></iframe>
+  <iframe class="border rounded flex-grow-1 mr-3" src="/app-a/index.html"></iframe>
+  <iframe class="border rounded flex-grow-1" src="/app-b/index.html"></iframe>
 </body>
+<script>
+  const config = {
+    channels: {
+      definitions: [
+        {
+          name: "Red",
+          meta: {
+            color: "red"
+          }
+        },
+        {
+          name: "Green",
+          meta: {
+            color: "green"
+          }
+        },
+        {
+          name: "Blue",
+          meta: {
+            color: "#66ABFF"
+          }
+        }
+      ]
+    }
+  };
+
+  GlueWebPlatform(config)
+    .then((data) => {
+      console.log("done");
+    })
+    .catch((err) => {
+      console.warn(err);
+    });
+</script>
 
 </html>

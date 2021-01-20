@@ -18,6 +18,6 @@ export class GlueService {
     }
 
     private get glue() {
-        return this.glueStore.glue;
+        return this.glueStore.getGlue();
     }
 }

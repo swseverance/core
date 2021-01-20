@@ -1,6 +1,73 @@
 /* eslint-disable no-undef */
 const APP_NAME = "Application A";
 
+const platformConfig = {
+  channels: {
+    definitions: [
+      {
+        name: "Red",
+        meta: {
+          color: "red"
+        }
+      },
+      {
+        name: "Green",
+        meta: {
+          color: "green"
+        }
+      },
+      {
+        name: "Blue",
+        meta: {
+          color: "#66ABFF"
+        }
+      },
+      {
+        name: "Pink",
+        meta: {
+          color: "#F328BB"
+        }
+      },
+      {
+        name: "Yellow",
+        meta: {
+          color: "#FFE733"
+        }
+      },
+      {
+        name: "DarkYellow",
+        meta: {
+          color: "#b09b00"
+        }
+      },
+      {
+        name: "Orange",
+        meta: {
+          color: "#fa5a28"
+        }
+      },
+      {
+        name: "Purple",
+        meta: {
+          color: "#c873ff"
+        }
+      },
+      {
+        name: "Lime",
+        meta: {
+          color: "#8af59e"
+        }
+      },
+      {
+        name: "Cyan",
+        meta: {
+          color: "#80f3ff"
+        }
+      }
+    ]
+  }
+};
+
 // The value that will be displayed inside the channel selector widget to leave the current channel.
 const NO_CHANNEL_VALUE = "No channel";
 
@@ -62,7 +129,7 @@ const onChannelSelected = (channelName) => {
 
 // Entry point. Initializes Glue42 Web. А Glue42 Web instance will be attached to the global window.
 window
-  .startApp({ appName: APP_NAME })
+  .startApp({ appName: APP_NAME, platformConfig })
   .then(getChannelNamesAndColours)
   .then((channelNamesAndColors) => {
 
