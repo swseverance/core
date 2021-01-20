@@ -225,10 +225,10 @@ export const applicationsConfigDecoder: Decoder<Glue42WebPlatform.Applications.C
 });
 
 export const layoutsConfigDecoder: Decoder<Glue42WebPlatform.Layouts.Config> = object({
-    mode: oneOf<"idb" | "session">(
+    mode: optional(oneOf<"idb" | "session">(
         constant("idb"),
         constant("session")
-    ),
+    )),
     local: optional(array(glueLayoutDecoder))
 });
 

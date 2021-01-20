@@ -10,7 +10,8 @@
     }
 
     try {
-      const glue = await window.GlueWeb({ libraries: [GlueWorkspaces], application: options.application });
+      const glue = options?.platformConfig ? (await window.GlueWebPlatform(options.platformConfig)).glue :
+        await window.GlueWeb({ libraries: [GlueWorkspaces], application: options.application });
       window.glue = glue;
       window.toggleGlueAvailable();
 

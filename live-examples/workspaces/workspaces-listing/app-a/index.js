@@ -14,9 +14,10 @@ const init = async () => {
   const url = await glue.windows.my().getURL();
   document.getElementById('urlText').textContent = url;
 
-  glue.windows.my().onContextUpdated((ctx) => {
-    document.getElementById('contextText').textContent = ctx.data;
-  });
+  const myWsp = await glue.workspaces.getMyWorkspace();
+  const ctx = await myWsp.getContext();
+  document.getElementById('contextText').textContent = ctx.data;
+
 };
 
 init().catch(console.error);
