@@ -11,10 +11,7 @@
     }
 
     try {
-      const glue = await window.GlueWeb({
-        application: options.appName,
-        appManager: true
-      });
+      const glue = await window.GlueWeb();
       window.glue = glue;
       window.toggleGlueAvailable();
 
