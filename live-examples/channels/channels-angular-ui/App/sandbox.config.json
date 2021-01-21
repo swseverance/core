@@ -1,0 +1,7 @@
+{
+  "view": "browser",
+  "template": "angular-cli",
+  "container": {
+    "port": 4200
+  }
+}
