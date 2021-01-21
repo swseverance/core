@@ -1,6 +1,6 @@
 {
   "view": "browser",
-  "template": "angular-cli",
+  "template": "node",
   "container": {
     "port": 4200
   }
