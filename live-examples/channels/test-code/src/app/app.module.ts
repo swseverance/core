@@ -1,78 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { Glue42Ng } from '@glue42/ng';
-import GlueWebPlatform from '@glue42/web-platform';
-import { GlueService } from './glue.service';
+
 import { AppComponent } from './app.component';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSelectModule } from '@angular/material/select';
-
-const config = {
-  channels: {
-    definitions: [
-      {
-        name: "Red",
-        meta: {
-          color: "red"
-        }
-      },
-      {
-        name: "Green",
-        meta: {
-          color: "green"
-        }
-      },
-      {
-        name: "Blue",
-        meta: {
-          color: "#66ABFF"
-        }
-      },
-      {
-        name: "Pink",
-        meta: {
-          color: "#F328BB"
-        }
-      },
-      {
-        name: "Yellow",
-        meta: {
-          color: "#FFE733"
-        }
-      },
-      {
-        name: "DarkYellow",
-        meta: {
-          color: "#b09b00"
-        }
-      },
-      {
-        name: "Orange",
-        meta: {
-          color: "#fa5a28"
-        }
-      },
-      {
-        name: "Purple",
-        meta: {
-          color: "#c873ff"
-        }
-      },
-      {
-        name: "Lime",
-        meta: {
-          color: "#8af59e"
-        }
-      },
-      {
-        name: "Cyan",
-        meta: {
-          color: "#80f3ff"
-        }
-      }
-    ]
-  }
-};
 
 @NgModule({
   declarations: [
@@ -80,11 +12,11 @@ const config = {
   ],
   imports: [
     BrowserModule,
-    Glue42Ng.forRoot({ webPlatform: { factory: GlueWebPlatform, config } }),
+    NoopAnimationsModule,
     BrowserAnimationsModule,
     MatSelectModule
   ],
-  providers: [GlueService],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
