@@ -23,8 +23,7 @@ On load, Application B registers a method called "G42Core.Basic". Click the "Inv
         <path fill="#000000" d="M 115.498 261.088 L 115.498 154.479 L 23.814 101.729 L 23.814 162.502 L 65.8105 186.849 L 65.8105 232.549 L 115.498 261.088 Z M 139.312 261.715 L 189.917 232.564 L 189.917 185.78 L 232.186 161.285 L 232.186 101.274 L 139.312 154.895 L 139.312 261.715 Z M 219.972 80.8277 L 171.155 52.5391 L 128.292 77.4107 L 85.104 52.5141 L 35.8521 81.1812 L 127.766 134.063 L 219.972 80.8277 Z M 0 222.212 L 0 74.4949 L 127.987 0 L 256 74.182 L 256 221.979 L 127.984 295.723 L 0 222.212 Z" style="pointer-events: auto;"></path>
 </svg> Open in CodeSandbox</a>
 <div class="d-flex">
-    <iframe src="https://fmzr7.csb.app/app-a/index.html"></iframe>
-    <iframe src="https://fmzr7.csb.app/app-b/index.html"></iframe>
+    <iframe src="https://fmzr7.csb.app" style="border: none;"></iframe>
 </div>
 
 ## Targeting
@@ -37,9 +36,7 @@ On load, Applications B and C register a method with the same name. Click one of
         <path fill="#000000" d="M 115.498 261.088 L 115.498 154.479 L 23.814 101.729 L 23.814 162.502 L 65.8105 186.849 L 65.8105 232.549 L 115.498 261.088 Z M 139.312 261.715 L 189.917 232.564 L 189.917 185.78 L 232.186 161.285 L 232.186 101.274 L 139.312 154.895 L 139.312 261.715 Z M 219.972 80.8277 L 171.155 52.5391 L 128.292 77.4107 L 85.104 52.5141 L 35.8521 81.1812 L 127.766 134.063 L 219.972 80.8277 Z M 0 222.212 L 0 74.4949 L 127.987 0 L 256 74.182 L 256 221.979 L 127.984 295.723 L 0 222.212 Z" style="pointer-events: auto;"></path>
 </svg> Open in CodeSandbox</a>
 <div class="d-flex">
-    <iframe src="https://nsjxl.csb.app/app-a/index.html"></iframe>
-    <iframe src="https://nsjxl.csb.app/app-b/index.html"></iframe>
-    <iframe src="https://nsjxl.csb.app/app-c/index.html"></iframe>
+    <iframe src="https://nsjxl.csb.app" style="border: none;"></iframe>
 </div>
 
 ## Discovery
@@ -56,9 +53,7 @@ Use Application B and Application C to register Interop methods by providing a m
         <path fill="#000000" d="M 115.498 261.088 L 115.498 154.479 L 23.814 101.729 L 23.814 162.502 L 65.8105 186.849 L 65.8105 232.549 L 115.498 261.088 Z M 139.312 261.715 L 189.917 232.564 L 189.917 185.78 L 232.186 161.285 L 232.186 101.274 L 139.312 154.895 L 139.312 261.715 Z M 219.972 80.8277 L 171.155 52.5391 L 128.292 77.4107 L 85.104 52.5141 L 35.8521 81.1812 L 127.766 134.063 L 219.972 80.8277 Z M 0 222.212 L 0 74.4949 L 127.987 0 L 256 74.182 L 256 221.979 L 127.984 295.723 L 0 222.212 Z" style="pointer-events: auto;"></path>
 </svg> Open in CodeSandbox</a>
 <div class="d-flex">
-    <iframe src="https://whkfw.csb.app/app-a/index.html"></iframe>
-    <iframe src="https://whkfw.csb.app/app-b/index.html"></iframe>
-    <iframe src="https://whkfw.csb.app/app-c/index.html"></iframe>
+    <iframe src="https://whkfw.csb.app" style="border: none;"></iframe>
 </div>
 
 - #### Method Events
@@ -71,9 +66,7 @@ On load, Application A subscribes to the `serverMethodAdded()` and `serverMethod
         <path fill="#000000" d="M 115.498 261.088 L 115.498 154.479 L 23.814 101.729 L 23.814 162.502 L 65.8105 186.849 L 65.8105 232.549 L 115.498 261.088 Z M 139.312 261.715 L 189.917 232.564 L 189.917 185.78 L 232.186 161.285 L 232.186 101.274 L 139.312 154.895 L 139.312 261.715 Z M 219.972 80.8277 L 171.155 52.5391 L 128.292 77.4107 L 85.104 52.5141 L 35.8521 81.1812 L 127.766 134.063 L 219.972 80.8277 Z M 0 222.212 L 0 74.4949 L 127.987 0 L 256 74.182 L 256 221.979 L 127.984 295.723 L 0 222.212 Z" style="pointer-events: auto;"></path>
 </svg> Open in CodeSandbox</a>
 <div class="d-flex">
-    <iframe src="https://b6t8l.csb.app/app-a/index.html"></iframe>
-    <iframe src="https://b6t8l.csb.app/app-b/index.html"></iframe>
-    <iframe src="https://b6t8l.csb.app/app-c/index.html"></iframe>
+    <iframe src="https://b6t8l.csb.app" style="border: none;"></iframe>
 </div>
 
 ### Servers
@@ -86,9 +79,7 @@ Use Application B and Application C to register Interop methods by providing a m
         <path fill="#000000" d="M 115.498 261.088 L 115.498 154.479 L 23.814 101.729 L 23.814 162.502 L 65.8105 186.849 L 65.8105 232.549 L 115.498 261.088 Z M 139.312 261.715 L 189.917 232.564 L 189.917 185.78 L 232.186 161.285 L 232.186 101.274 L 139.312 154.895 L 139.312 261.715 Z M 219.972 80.8277 L 171.155 52.5391 L 128.292 77.4107 L 85.104 52.5141 L 35.8521 81.1812 L 127.766 134.063 L 219.972 80.8277 Z M 0 222.212 L 0 74.4949 L 127.987 0 L 256 74.182 L 256 221.979 L 127.984 295.723 L 0 222.212 Z" style="pointer-events: auto;"></path>
 </svg> Open in CodeSandbox</a>
 <div class="d-flex">
-    <iframe src="https://p9lot.csb.app/app-a/index.html"></iframe>
-    <iframe src="https://p9lot.csb.app/app-b/index.html"></iframe>
-    <iframe src="https://p9lot.csb.app/app-c/index.html"></iframe>
+    <iframe src="https://p9lot.csb.app" style="border: none;"></iframe>
 </div>
 
 ## Streaming
@@ -103,8 +94,7 @@ On load, Application B registers an Interop stream called "G42Core.Stream.Basic"
         <path fill="#000000" d="M 115.498 261.088 L 115.498 154.479 L 23.814 101.729 L 23.814 162.502 L 65.8105 186.849 L 65.8105 232.549 L 115.498 261.088 Z M 139.312 261.715 L 189.917 232.564 L 189.917 185.78 L 232.186 161.285 L 232.186 101.274 L 139.312 154.895 L 139.312 261.715 Z M 219.972 80.8277 L 171.155 52.5391 L 128.292 77.4107 L 85.104 52.5141 L 35.8521 81.1812 L 127.766 134.063 L 219.972 80.8277 Z M 0 222.212 L 0 74.4949 L 127.987 0 L 256 74.182 L 256 221.979 L 127.984 295.723 L 0 222.212 Z" style="pointer-events: auto;"></path>
 </svg> Open in CodeSandbox</a>
 <div class="d-flex">
-    <iframe src="https://6zwf8.csb.app/app-a/index.html"></iframe>
-    <iframe src="https://6zwf8.csb.app/app-b/index.html"></iframe>
+    <iframe src="https://6zwf8.csb.app" style="border: none;"></iframe>
 </div>
 
 ### Events
@@ -119,8 +109,7 @@ Click the "Unsubscribe" button in Application A to close the subscription to the
         <path fill="#000000" d="M 115.498 261.088 L 115.498 154.479 L 23.814 101.729 L 23.814 162.502 L 65.8105 186.849 L 65.8105 232.549 L 115.498 261.088 Z M 139.312 261.715 L 189.917 232.564 L 189.917 185.78 L 232.186 161.285 L 232.186 101.274 L 139.312 154.895 L 139.312 261.715 Z M 219.972 80.8277 L 171.155 52.5391 L 128.292 77.4107 L 85.104 52.5141 L 35.8521 81.1812 L 127.766 134.063 L 219.972 80.8277 Z M 0 222.212 L 0 74.4949 L 127.987 0 L 256 74.182 L 256 221.979 L 127.984 295.723 L 0 222.212 Z" style="pointer-events: auto;"></path>
 </svg> Open in CodeSandbox</a>
 <div class="d-flex">
-    <iframe src="https://fv3wc.csb.app/app-a/index.html"></iframe>
-    <iframe src="https://fv3wc.csb.app/app-b/index.html"></iframe>
+    <iframe src="https://fv3wc.csb.app" style="border: none;"></iframe>
 </div>
 
 ### Managing Subscriptions
@@ -141,7 +130,5 @@ Use the "Push" and "Push to Private" buttons to push stream data to the default 
         <path fill="#000000" d="M 115.498 261.088 L 115.498 154.479 L 23.814 101.729 L 23.814 162.502 L 65.8105 186.849 L 65.8105 232.549 L 115.498 261.088 Z M 139.312 261.715 L 189.917 232.564 L 189.917 185.78 L 232.186 161.285 L 232.186 101.274 L 139.312 154.895 L 139.312 261.715 Z M 219.972 80.8277 L 171.155 52.5391 L 128.292 77.4107 L 85.104 52.5141 L 35.8521 81.1812 L 127.766 134.063 L 219.972 80.8277 Z M 0 222.212 L 0 74.4949 L 127.987 0 L 256 74.182 L 256 221.979 L 127.984 295.723 L 0 222.212 Z" style="pointer-events: auto;"></path>
 </svg> Open in CodeSandbox</a>
 <div class="d-flex mb-3">
-    <iframe src="https://t88ys.csb.app/app-a/index.html"></iframe>
-    <iframe src="https://t88ys.csb.app/app-b/index.html"></iframe>
-    <iframe src="https://t88ys.csb.app/app-c/index.html"></iframe>
+    <iframe src="https://t88ys.csb.app" style="border: none;"></iframe>
 </div>
