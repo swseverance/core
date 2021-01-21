@@ -268,8 +268,8 @@ export const componentTypeDecoder: Decoder<Glue42Web.Layouts.ComponentType> = on
 );
 
 export const windowLayoutComponentDecoder: Decoder<Glue42Web.Layouts.WindowComponent> = object({
-    type: constant("window"),
-    componentType: componentTypeDecoder,
+    type: nonEmptyStringDecoder.where((s) => s === "window", "Expected a value of window"),
+    componentType: optional(componentTypeDecoder),
     state: object({
         name: anyJson(),
         context: anyJson(),

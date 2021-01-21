@@ -406,10 +406,10 @@ export namespace Glue42Web {
         export type ComponentType = "application" | "activity";
 
         export interface WindowComponent {
-            type: "window";
+            type: string;
 
             /** Type of the component - can be application or activity. */
-            componentType: ComponentType;
+            componentType?: ComponentType;
 
             /** Object describing the application bounds, name, context, etc. */
             state: LayoutComponentState;
@@ -433,10 +433,10 @@ export namespace Glue42Web {
             type: LayoutType;
 
             /** Context object passed when the layout was saved. */
-            context: any;
+            context?: any;
 
             /** Metadata passed when the layout was saved. */
-            metadata: any;
+            metadata?: any;
         }
 
         /**
