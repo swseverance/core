@@ -126,11 +126,11 @@ export class LayoutsManager {
         if (title) {
             workspaceConfig.config.title = title;
         }
-        let workspaceContext = {};
+        let workspaceContext = undefined;
 
         if (saveContext) {
             try {
-                workspaceContext = await this.getWorkspaceContext(workspace.id) || {}
+                workspaceContext = await this.getWorkspaceContext(workspace.id);
             } catch (error) {
                 // can throw an exception when reloading
             }

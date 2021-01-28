@@ -178,6 +178,7 @@ export interface RestoreWorkspaceConfig {
     title?: string;
     context?: object;
     noTabHeader?: boolean;
+    reuseWorkspaceId?: string;
 }
 
 export interface AddWindowArguments {
@@ -199,7 +200,8 @@ export interface AddWorkspaceChildrenArguments {
 
 export interface CreateWorkspaceArguments extends WorkspaceItem {
     // add the save config
-    saveConfig: object;
+    saveConfig?: object;
+    context?: object;
 }
 
 export interface MoveFrameArguments {

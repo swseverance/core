@@ -86,7 +86,7 @@ describe('saveLayout() Should ', function () {
         const layouts = await glue.workspaces.layouts.export();
         const layoutUnderTest = layouts.find(l => l.name === layoutName);
 
-        expect(layoutUnderTest.components[0].state.context).to.be.a("object").that.is.empty;
+        expect(layoutUnderTest.components[0].state.context).to.not.exist;
     });
 
     it("save the layout without context when the options object is undefined", async () => {
@@ -99,7 +99,7 @@ describe('saveLayout() Should ', function () {
         const layouts = await glue.workspaces.layouts.export();
         const layoutUnderTest = layouts.find(l => l.name === layoutName);
 
-        expect(layoutUnderTest.components[0].state.context).to.be.a("object").that.is.empty;
+        expect(layoutUnderTest.components[0].state.context).to.not.exist;
     });
 
     Array.from([[], {}, 42, undefined, null]).forEach((input) => {

@@ -198,7 +198,8 @@ export class WorkspacesController implements LibController {
 
         const frameInstanceConfig = {
             frameId: config.frame?.reuseFrameId,
-            newFrame: config.frame?.newFrame
+            newFrame: config.frame?.newFrame,
+            itemId: config.config?.reuseWorkspaceId
         };
 
         const frame = await this.framesController.getFrameInstance(frameInstanceConfig);
@@ -296,7 +297,13 @@ export class WorkspacesController implements LibController {
     private async openWorkspace(config: OpenWorkspaceConfig, commandId: string): Promise<WorkspaceSnapshotResult> {
         this.logger?.trace(`[${commandId}] handling openWorkspace command for name: ${config.name}`);
 
-        const frame = await this.framesController.getFrameInstance({ frameId: config.restoreOptions?.frameId, newFrame: config.restoreOptions?.newFrame });
+        const frameQueryConfig = {
+            frameId: config.restoreOptions?.frameId,
+            newFrame: config.restoreOptions?.newFrame,
+            itemId: config.restoreOptions?.reuseWorkspaceId
+        };
+        
+        const frame = await this.framesController.getFrameInstance(frameQueryConfig);
 
         const result = await this.glueController.callFrame<OpenWorkspaceConfig, WorkspaceSnapshotResult>(this.operations.openWorkspace, config, frame.windowId);
 

@@ -13,6 +13,7 @@ export interface WorkspaceItem {
     config?: {
         name?: string;
         context?: object;
+        reuseWorkspaceId?: string;
         [k: string]: object | string;
     };
 }
