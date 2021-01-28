@@ -21,6 +21,7 @@ import {
     MoveFrameArguments,
     MoveWindowToArguments,
     GenerateLayoutArguments,
+    WorkspaceSelector,
 } from "./types";
 import manager from "../manager";
 import store from "../store";
@@ -180,6 +181,13 @@ export class GlueFacade {
                     break;
                 case "ping":
                     successCallback(this.handlePing());
+                    break;
+                case "hibernateWorkspace":
+                    await this.handleHibernateWorkspace(args.operationArguments);
+                    successCallback(undefined);
+                    break;
+                case "resumeWorkspace":
+                    successCallback(await this.handleResumeWorkspace(args.operationArguments));
                     break;
                 default:
                     errorCallback(`Invalid operation - ${((args as unknown) as { operation: string }).operation}`);
@@ -405,6 +413,14 @@ export class GlueFacade {
 
     private handlePing() {
         return { live: !this._inDisposing };
+    }
+
+    private async handleHibernateWorkspace(operationArguments: WorkspaceSelector) {
+        return manager.hibernateWorkspace(operationArguments.workspaceId);
+    }
+
+    private async handleResumeWorkspace(operationArguments: WorkspaceSelector) {
+        return manager.resumeWorkspace(operationArguments.workspaceId);
     }
 
     private publishEventData(action: EventActionType, payload: EventPayload, type: "workspace" | "frame" | "box" | "window") {

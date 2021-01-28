@@ -345,6 +345,12 @@ class WorkspacesManager {
         return this._layoutsManager.generateLayout(name, workspace);
     }
 
+    public async resumeWorkspace(workspaceId: string) {
+    }
+
+    public async hibernateWorkspace(workspaceId: string) {
+    }
+
     public unmount() {
         try {
             this._popupManager.hidePopup();

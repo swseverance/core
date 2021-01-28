@@ -132,6 +132,16 @@ export interface PingRequest {
     operationArguments: {}
 }
 
+export interface HibernateWorkspaceRequest {
+    operation: "hibernateWorkspace";
+    operationArguments: WorkspaceSelector;
+}
+
+export interface ResumeWorkspaceRequest {
+    operation: "resumeWorkspace";
+    operationArguments: WorkspaceSelector;
+}
+
 //#endregion
 
 //#region Arguments
@@ -253,6 +263,9 @@ export interface GenerateLayoutArguments {
     workspaceId: string;
     name: string;
 }
+export interface WorkspaceSelector {
+    workspaceId: string;
+}
 
 //#endregion
 
@@ -261,4 +274,4 @@ export type ControlArguments = SaveLayoutRequest | DeleteLayoutRequest |
     CloseItemRequest | MaximizeItemRequest | RestoreItemRequest | AddWindowRequest | AddContainerRequest | SetItemTitleRequest |
     AddWorkspaceChildrenRequest | EjectRequest | CreateWorkspaceRequest | ForceLoadWindowRequest | FocusItemRequest |
     BundleWorkspaceRequest | IsWindowInWorkspaceRequest | GetFrameSummaryRequest | MoveFrameRequest | GetFrameSnapshotRequest |
-    GetSnapshotRequest | MoveWindowToRequest | GenerateLayoutRequest | PingRequest;
+    GetSnapshotRequest | MoveWindowToRequest | GenerateLayoutRequest | PingRequest | HibernateWorkspaceRequest | ResumeWorkspaceRequest;
