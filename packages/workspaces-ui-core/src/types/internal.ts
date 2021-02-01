@@ -74,6 +74,7 @@ export interface WorkspaceConfig {
     positionIndex: number;
     name: string;
     layoutName?: string;
+    isHibernated: boolean;
 }
 
 export interface WindowSummary {
@@ -140,7 +141,9 @@ export interface Window {
 export interface Workspace {
     id: string;
     windows: Window[];
+    hibernatedWindows: Window[];
     layout: GoldenLayout;
+    hibernateConfig?: GoldenLayout.Config;
     context?: object;
 }
 

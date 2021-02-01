@@ -187,7 +187,8 @@ export class GlueFacade {
                     successCallback(undefined);
                     break;
                 case "resumeWorkspace":
-                    successCallback(await this.handleResumeWorkspace(args.operationArguments));
+                    await this.handleResumeWorkspace(args.operationArguments)
+                    successCallback(undefined);
                     break;
                 default:
                     errorCallback(`Invalid operation - ${((args as unknown) as { operation: string }).operation}`);
@@ -356,7 +357,7 @@ export class GlueFacade {
         if (!operationArguments.config) {
             operationArguments.config = {};
         }
-        
+
         operationArguments.config.context = operationArguments.config.context || operationArguments.context;
         const config = this._converter.convertToRendererConfig(operationArguments);
 

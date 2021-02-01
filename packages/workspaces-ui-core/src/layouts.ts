@@ -116,10 +116,11 @@ export class LayoutsManager {
 
     public async save(options: SaveWorkspaceConfig): Promise<WorkspaceLayout> {
         const { workspace, title, name, saveContext } = options;
-        if (!workspace.layout) {
+        if (!workspace.layout && !workspace.hibernateConfig) {
             throw new Error("An empty layout cannot be saved");
         }
-        workspace.layout.config.workspacesOptions.name = name;
+
+        (workspace.layout?.config || workspace.hibernateConfig).workspacesOptions.name = name;
 
         const workspaceConfig = await this.saveWorkspaceCore(workspace);
 
@@ -189,7 +190,7 @@ export class LayoutsManager {
     }
 
     private async saveWorkspaceCore(workspace: Workspace): Promise<WorkspaceItem> {
-        if (!workspace.layout) {
+        if (!workspace.layout && !workspace.hibernateConfig) {
             return undefined;
         }
         const workspaceConfig = this.resolver.getWorkspaceConfig(workspace.id);
@@ -208,7 +209,7 @@ export class LayoutsManager {
     }
 
     private saveWorkspaceCoreSync(workspace: Workspace): WorkspaceItem {
-        if (!workspace.layout) {
+        if (!workspace.layout && !workspace.hibernateConfig) {
             return undefined;
         }
         const workspaceConfig = this.resolver.getWorkspaceConfig(workspace.id);

@@ -87,13 +87,6 @@ export class LayoutController {
 
         const emptyVisibleWindow = contentItem.getComponentsByName(this._emptyVisibleWindowName)[0];
 
-        // store.addWindow({
-        //     id: idAsString(placementId),
-        //     appName,
-        //     url,
-        //     windowId
-        // }, workspace.id);
-
         return new Promise<void>((res) => {
             const unsub = this.emitter.onContentComponentCreated((component) => {
                 if (component.config.id === placementId) {
@@ -428,6 +421,32 @@ export class LayoutController {
         const parentStack = contentItem.parent;
 
         return parentStack.getActiveContentItem().config.id === placementId;
+    }
+
+    public showHibernationIcon(workspaceId: string) {
+        const tab = store.getWorkspaceContentItem(workspaceId)?.tab;
+
+        if (!tab) {
+            return;
+        }
+
+        const saveButton = tab.element.children(".lm_saveButton");
+
+        saveButton.addClass("lm_hibernationIcon");
+        saveButton.attr("title", "hibernated");
+    }
+
+    public showSaveIcon(workspaceId: string) {
+        const tab = store.getWorkspaceContentItem(workspaceId)?.tab;
+
+        if (!tab) {
+            return;
+        }
+
+        const saveButton = tab.element.children(".lm_saveButton");
+        saveButton.removeClass("lm_hibernationIcon");
+
+        saveButton.attr("title", "save");
     }
 
     private initWorkspaceContents(id: string, config: GoldenLayout.Config | GoldenLayout.ItemConfig) {

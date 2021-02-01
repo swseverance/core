@@ -43,7 +43,9 @@ export type WorkspacesOperationsTypes = "isWindowInWorkspace" |
     "bundleWorkspace" |
     "changeFrameState" |
     "getFrameState" |
-    "frameHello";
+    "frameHello" |
+    "hibernateWorkspace" |
+    "resumeWorkspace";
 
 export interface FrameQueryConfig {
     frameId?: string;
@@ -245,6 +247,11 @@ export interface BundleConfig {
     type: "row" | "column";
     workspaceId: string;
 }
+
+export interface WorkspaceSelector {
+    workspaceId: string;
+}
+
 // #endregion
 
 export interface FrameStreamData {

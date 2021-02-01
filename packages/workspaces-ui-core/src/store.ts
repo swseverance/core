@@ -68,7 +68,8 @@ class WorkspaceStore {
         this._idToLayout[id] = {
             id,
             windows,
-            layout
+            layout,
+            hibernatedWindows: []
         };
     }
 
