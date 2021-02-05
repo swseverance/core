@@ -12,9 +12,9 @@ import { GlueController } from "../../controllers/glue";
 import { IoC } from "../../shared/ioc";
 import { WindowMoveResizeConfig } from "../windows/types";
 import { StateController } from "../../controllers/state";
+import { WorkspaceHibernationWatcher } from "./hibernation/watcher";
 
 export class WorkspacesController implements LibController {
-
     private started = false;
     private settings!: Glue42WebPlatform.Workspaces.Config;
 
@@ -56,6 +56,7 @@ export class WorkspacesController implements LibController {
         private readonly framesController: FramesController,
         private readonly glueController: GlueController,
         private readonly stateController: StateController,
+        private readonly hibernationWatcher: WorkspaceHibernationWatcher,
         private readonly ioc: IoC
     ) { }
 
@@ -66,6 +67,8 @@ export class WorkspacesController implements LibController {
         }
 
         this.settings = config.workspaces;
+
+        // this.hibernationWatcher.start(this.settings.hibernation, this);
 
         await Promise.all([
             this.glueController.createWorkspacesStream(),
@@ -169,6 +172,18 @@ export class WorkspacesController implements LibController {
         this.logger?.trace(`[${commandId}] frame ${frame.windowId} gave a success signal, responding to caller`);
     }
 
+    public async hibernateWorkspace(config: WorkspaceSelector, commandId: string): Promise<void> {
+        this.logger?.trace(`[${commandId}] handling hibernateWorkspace request with config ${JSON.stringify(config)}`);
+
+        const frame = await this.framesController.getFrameInstance({ itemId: config.workspaceId });
+
+        this.logger?.trace(`[${commandId}] targeting frame ${frame.windowId}`);
+
+        await this.glueController.callFrame<WorkspaceSelector, void>(this.operations.hibernateWorkspace, config, frame.windowId);
+
+        this.logger?.trace(`[${commandId}] frame ${frame.windowId} gave a success signal, responding to caller`);
+    }
+
     private async handleFrameHello(config: FrameHello, commandId: string): Promise<void> {
         this.logger?.trace(`[${commandId}] handling handleFrameHello command with config: ${JSON.stringify(config)}`);
 
@@ -247,7 +262,7 @@ export class WorkspacesController implements LibController {
         return summary;
     }
 
-    private async getAllWorkspacesSummaries(config: unknown, commandId: string): Promise<WorkspaceSummariesResult> {
+    public async getAllWorkspacesSummaries(config: unknown, commandId: string): Promise<WorkspaceSummariesResult> {
         this.logger?.trace(`[${commandId}] handling getAllWorkspacesSummaries request`);
 
         const allFrames = this.framesController.getAll();
@@ -270,7 +285,7 @@ export class WorkspacesController implements LibController {
         return { summaries };
     }
 
-    private async getWorkspaceSnapshot(config: SimpleItemConfig, commandId: string): Promise<WorkspaceSnapshotResult> {
+    public async getWorkspaceSnapshot(config: SimpleItemConfig, commandId: string): Promise<WorkspaceSnapshotResult> {
         this.logger?.trace(`[${commandId}] handling getWorkspaceSnapshot for config: ${JSON.stringify(config)}`);
 
         const frame = await this.framesController.getFrameInstance(config);
@@ -517,18 +532,6 @@ export class WorkspacesController implements LibController {
         this.logger?.trace(`[${commandId}] targeting frame ${frame.windowId}`);
 
         await this.glueController.callFrame<BundleConfig, void>(this.operations.bundleWorkspace, config, frame.windowId);
-
-        this.logger?.trace(`[${commandId}] frame ${frame.windowId} gave a success signal, responding to caller`);
-    }
-
-    private async hibernateWorkspace(config: WorkspaceSelector, commandId: string): Promise<void> {
-        this.logger?.trace(`[${commandId}] handling hibernateWorkspace request with config ${JSON.stringify(config)}`);
-
-        const frame = await this.framesController.getFrameInstance({ itemId: config.workspaceId });
-
-        this.logger?.trace(`[${commandId}] targeting frame ${frame.windowId}`);
-
-        await this.glueController.callFrame<WorkspaceSelector, void>(this.operations.hibernateWorkspace, config, frame.windowId);
 
         this.logger?.trace(`[${commandId}] frame ${frame.windowId} gave a success signal, responding to caller`);
     }

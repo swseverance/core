@@ -61,6 +61,10 @@ export class LayoutController {
         parentId = parentId || idAsString(store.workspaceLayout.root.contentItems[0].getActiveContentItem().config.id);
         const workspace = store.getByContainerId(parentId);
 
+        if (this._stateResolver.isWorkspaceHibernated(workspace.id)) {
+            throw new Error(`Could not add window to ${workspace.id} because its hibernated`);
+        }
+
         if (!workspace.layout) {
             this.hideAddButton(workspace.id);
             await this.initWorkspaceContents(workspace.id, config);
@@ -120,6 +124,9 @@ export class LayoutController {
 
     public async addContainer(config: GoldenLayout.RowConfig | GoldenLayout.ColumnConfig | GoldenLayout.StackConfig, parentId: string): Promise<string> {
         const workspace = store.getByContainerId(parentId);
+        if (this._stateResolver.isWorkspaceHibernated(workspace.id)) {
+            throw new Error(`Could not add container to ${workspace.id} because its hibernated`);
+        }
         if (!workspace.layout) {
             const containerId = config.id || this._configFactory.getId();
             if (config) {
@@ -205,6 +212,11 @@ export class LayoutController {
 
     public closeContainer(itemId: string) {
         const workspace = store.getByContainerId(itemId) || store.getByWindowId(itemId);
+
+        if (!workspace) {
+            throw new Error(`Could not find container ${itemId} to close in any workspace`);
+        }
+
         const contentItem = workspace.layout.root.getItemsById(itemId)[0];
 
         contentItem.remove();
@@ -349,6 +361,10 @@ export class LayoutController {
     public setWindowTitle(windowId: string, title: string) {
         const item = store.getWindowContentItem(windowId);
 
+        if (!item) {
+            throw new Error(`Could not find window ${windowId} to change its title to ${title}`);
+        }
+
         item.setTitle(title);
         item.config.componentState.title = title;
     }
@@ -364,6 +380,10 @@ export class LayoutController {
 
         if (!layoutWithWindow) {
             throw new Error(`Could not find workspace for window ${windowId}`);
+        }
+
+        if (this._stateResolver.isWorkspaceHibernated(layoutWithWindow.id)) {
+            throw new Error(`Could not focus window ${windowId} because the workspace ${layoutWithWindow.id} is hibernated`);
         }
 
         const item = layoutWithWindow.layout.root.getItemsById(windowId)[0];
@@ -382,6 +402,10 @@ export class LayoutController {
             throw new Error(`Could not find workspace for window ${windowId}`);
         }
 
+        if (this._stateResolver.isWorkspaceHibernated(layoutWithWindow.id)) {
+            throw new Error(`Could not maximize window ${windowId} because the workspace ${layoutWithWindow.id} is hibernated`);
+        }
+
         const item = layoutWithWindow.layout.root.getItemsById(windowId)[0];
         if (item.parent.hasId(this._maximizedId)) {
             return;
@@ -394,6 +418,10 @@ export class LayoutController {
 
         if (!layoutWithWindow) {
             throw new Error(`Could not find workspace for window ${windowId}`);
+        }
+
+        if (this._stateResolver.isWorkspaceHibernated(layoutWithWindow.id)) {
+            throw new Error(`Could not restore window ${windowId} because the workspace ${layoutWithWindow.id} is hibernated`);
         }
 
         const item = layoutWithWindow.layout.root.getItemsById(windowId)[0];
@@ -440,6 +468,7 @@ export class LayoutController {
         const tab = store.getWorkspaceContentItem(workspaceId)?.tab;
 
         if (!tab) {
+            console.error("Could not find the tab for", workspaceId);
             return;
         }
 

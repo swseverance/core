@@ -69,7 +69,8 @@ class WorkspaceStore {
             id,
             windows,
             layout,
-            hibernatedWindows: []
+            hibernatedWindows: [],
+            lastActive: Date.now()
         };
     }
 

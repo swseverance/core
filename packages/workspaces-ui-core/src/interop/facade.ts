@@ -43,7 +43,7 @@ export class GlueFacade {
     private _inDisposing = false;
     private _frameId: string;
     private _converter: ConfigConverter;
-    private _controlPromise: Promise<any>;
+    private _controlPromise: Promise<any> = Promise.resolve();
 
     public async init(glue: Glue42Web.API, frameId: string): Promise<void> {
         this._frameId = frameId;

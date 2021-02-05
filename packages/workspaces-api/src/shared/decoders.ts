@@ -230,7 +230,8 @@ export const workspaceConfigResultDecoder: Decoder<WorkspaceConfigResult> = obje
     positionIndex: nonNegativeNumberDecoder,
     name: nonEmptyStringDecoder,
     layoutName: optional(nonEmptyStringDecoder),
-    isHibernated: boolean()
+    isHibernated: boolean(),
+    isSelected: boolean(),
 });
 
 // todo: remove number positionIndex when fixed

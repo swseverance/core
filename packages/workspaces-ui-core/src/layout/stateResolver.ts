@@ -42,6 +42,8 @@ export class LayoutStateResolver {
         glConfig.workspacesOptions.frameId = this._frameId;
         glConfig.workspacesOptions.positionIndex = this.getWorkspaceTabIndex(workspaceId);
         glConfig.workspacesOptions.isHibernated = typeof workspace.hibernateConfig === "object";
+        glConfig.workspacesOptions.isSelected = this.isWorkspaceSelected(workspaceId);
+        glConfig.workspacesOptions.lastActive = workspace.lastActive;
 
         if (!glConfig.workspacesOptions.title) {
             glConfig.workspacesOptions.title = store.getWorkspaceTitle(workspaceId);
@@ -64,7 +66,9 @@ export class LayoutStateResolver {
             positionIndex: workspaceIndex,
             title: store.getWorkspaceTitle(workspaceId),
             name: config.workspacesOptions.name || store.getWorkspaceTitle(workspaceId),
-            isHibernated: typeof workspace.hibernateConfig === "object"
+            isHibernated: typeof workspace.hibernateConfig === "object",
+            isSelected: this.isWorkspaceSelected(workspaceId),
+            lastActive: workspace.lastActive
         };
 
         if ((config.workspacesOptions as WorkspaceOptionsWithLayoutName).layoutName) {
@@ -87,7 +91,19 @@ export class LayoutStateResolver {
         const placementId = idAsString(id);
         const windowContentItem = store.getWindowContentItem(placementId);
 
-        return windowContentItem?.parent.getActiveContentItem().config.id === placementId;
+        return windowContentItem?.parent?.getActiveContentItem()?.config.id === placementId;
+    }
+
+    public isWorkspaceSelected(id: string): boolean {
+        const workspaceContentItem = store.getWorkspaceContentItem(id);
+
+        return workspaceContentItem?.parent?.getActiveContentItem()?.config.id === id;
+    }
+
+    public isWorkspaceHibernated(id: string): boolean {
+        const workspace = store.getById(id);
+
+        return typeof workspace.hibernateConfig === "object";;
     }
 
     public getContainerSummary(containerId: string | string[]): ContainerSummary {
@@ -102,7 +118,7 @@ export class LayoutStateResolver {
             config: {
                 workspaceId: workspace.id,
                 frameId: this._frameId,
-                positionIndex: containerPositionIndex || 0
+                positionIndex: containerPositionIndex || 0,
             }
         };
     }

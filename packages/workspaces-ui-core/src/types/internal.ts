@@ -75,6 +75,8 @@ export interface WorkspaceConfig {
     name: string;
     layoutName?: string;
     isHibernated: boolean;
+    isSelected: boolean;
+    lastActive: number;
 }
 
 export interface WindowSummary {
@@ -145,6 +147,7 @@ export interface Workspace {
     layout: GoldenLayout;
     hibernateConfig?: GoldenLayout.Config;
     context?: object;
+    lastActive: number;
 }
 
 export interface WorkspaceLayout {

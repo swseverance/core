@@ -86,6 +86,9 @@ export interface WorkspaceConfigResult {
     name: string;
     positionIndex: number;
     layoutName: string | undefined;
+    isSelected: boolean;
+    isHibernated: boolean;
+    lastActive: number;
 }
 
 export interface BaseChildSnapshotConfig {

@@ -250,8 +250,22 @@ export const gatewayConfigDecoder: Decoder<Glue42WebPlatform.Gateway.Config> = o
 // todo: proper implement when the config has been finalized
 export const glueConfigDecoder: Decoder<Glue42Web.Config> = anyJson();
 
+export const hibernationRuleDecoder: Decoder<Glue42WebPlatform.Workspaces.HibernationRule> = object({
+    enabled: boolean(),
+    threshold: number(),
+    type: oneOf(constant("MaximumActiveWorkspaces"), constant("WorkspaceIdleTime"))
+});
+
+export const hibernationConfigDecoder: Decoder<Glue42WebPlatform.Workspaces.HibernationConfig> = object({
+    rules: array(hibernationRuleDecoder),
+    enabled: optional(boolean()),
+    interval: optional(number()),
+    workspacesToClose: optional(number()),
+});
+
 export const workspacesConfigDecoder: Decoder<Glue42WebPlatform.Workspaces.Config> = object({
-    src: nonEmptyStringDecoder
+    src: nonEmptyStringDecoder,
+    hibernation: optional(hibernationConfigDecoder)
 });
 
 export const windowsConfigDecoder: Decoder<Glue42WebPlatform.Windows.Config> = object({

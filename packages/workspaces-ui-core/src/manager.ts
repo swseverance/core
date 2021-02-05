@@ -202,6 +202,9 @@ export class WorkspacesManager {
             store.workspaceIds.forEach((wid) => this.closeWorkspace(store.getById(wid)));
         } else if (win) {
             const windowContentItem = store.getWindowContentItem(itemId);
+            if (!windowContentItem) {
+                throw new Error(`Could not find item ${itemId} to close`);
+            }
             this.closeTab(windowContentItem);
         } else if (container) {
             this._controller.closeContainer(itemId);
@@ -286,6 +289,9 @@ export class WorkspacesManager {
 
     public async loadWindow(itemId: string) {
         let contentItem = store.getWindowContentItem(itemId);
+        if (!contentItem) {
+            throw new Error(`Could not find window ${itemId} to load`);
+        }
         let { windowId } = contentItem.config.componentState;
         if (!windowId) {
             await this.waitForFrameLoaded(itemId);
@@ -326,7 +332,7 @@ export class WorkspacesManager {
         const workspace = store.getById(itemId);
 
         if (this._frameId === itemId) {
-            await this._glue.windows.my().focus();
+            // do nothing
         } else if (workspace) {
             if (workspace.hibernateConfig) {
                 await this.resumeWorkspace(workspace.id);
@@ -338,6 +344,9 @@ export class WorkspacesManager {
     }
 
     public bundleWorkspace(workspaceId: string, type: "row" | "column") {
+        if (this._stateResolver.isWorkspaceHibernated(workspaceId)) {
+            throw new Error(`Could not bundle workspace ${workspaceId} because its hibernated`);
+        }
         this._controller.bundleWorkspace(workspaceId, type);
     }
 
@@ -359,6 +368,10 @@ export class WorkspacesManager {
             throw new Error(`Could not find container ${containerId} in frame ${this._frameId}`);
         }
 
+        if (this._stateResolver.isWorkspaceHibernated(targetWorkspace.id)) {
+            throw new Error(`Could not move window ${itemId} to workspace ${targetWorkspace.id} because its hibernated`);
+        }
+
         const targetWindow = store.getWindowContentItem(itemId);
         if (!targetWindow) {
             throw new Error(`Could not find window ${itemId} in frame ${this._frameId}`);
@@ -377,8 +390,7 @@ export class WorkspacesManager {
     }
 
     public async resumeWorkspace(workspaceId: string) {
-        const workspace = await store.getById(workspaceId);
-        console.log("RESUMING WORKSPACE", workspaceId);
+        const workspace = store.getById(workspaceId);
         if (!workspace) {
             throw new Error(`Could not find workspace ${workspaceId} in any of the frames`);
         }
@@ -736,6 +748,16 @@ export class WorkspacesManager {
 
             this._frameController.selectionChangedDeep([], workspace.windows.map(w => w.id));
         });
+
+        this.workspacesEventEmitter.onWorkspaceEvent((action, payload) => {
+            const workspace = store.getById(payload.workspaceSummary.id);
+
+            if (!workspace) {
+                return;
+            }
+
+            workspace.lastActive = Date.now();
+        });
     }
 
     private subscribeForPopups() {
@@ -798,8 +820,6 @@ export class WorkspacesManager {
             throw new Error("Could not find a workspace to close");
         }
 
-        console.log("TRYING TO STOP WORKSPACE", workspace);
-
         if (workspace.hibernateConfig) {
             this.closeHibernatedWorkspaceCore(workspace);
         } else {
@@ -844,7 +864,6 @@ export class WorkspacesManager {
     private async closeHibernatedWorkspaceCore(workspace: Workspace) {
         const workspaceSummary = this.stateResolver.getWorkspaceSummary(workspace.id);
         const snapshot = this.stateResolver.getSnapshot(workspace.id) as GoldenLayout.Config;
-        console.log("THE SNAPSHOT IS", snapshot);
         const windowSummaries = this.stateResolver.extractWindowSummariesFromSnapshot(snapshot);
 
         workspace.windows.forEach((w) => this._frameController.remove(w.id));
@@ -881,10 +900,8 @@ export class WorkspacesManager {
     private checkForEmptyWorkspace(workspace: Workspace): boolean {
         // Closing all workspaces except the last one
         if (store.layouts.length === 1) {
-            console.log("PASSED", workspace);
             try {
                 if (this._isLayoutInitialized) {
-                    console.log("QUEUEING WINDOW CLOSE", workspace);
                     this._facade.executeAfterControlIsDone(() => {
                         window.close();
                     });

@@ -223,8 +223,33 @@ export namespace Glue42WebPlatform {
     }
 
     export namespace Workspaces {
+        export interface HibernationRule {
+            enabled: boolean;
+            type: "MaximumActiveWorkspaces" | "WorkspaceIdleTime";
+            threshold: number;
+        }
+
+        export interface HibernationConfig {
+            /**
+                * If `true`, will enable workspace hibernation. Workspaces will be hibernated based on the configuration of predefined built-in rules.
+                */
+            enabled?: boolean;
+            /**
+             * At what interval (in minutes) to check whether workspaces should be hibernated based on the configured rules.
+             */
+            interval?: number;
+            /**
+             * How many workspaces to hibernate.
+             */
+            workspacesToClose?: number;
+            /**
+             * Rules which should be used for conditions for workspace hibernation
+             */
+            rules: HibernationRule[];
+        }
         export interface Config {
             src: string;
+            hibernation?: HibernationConfig;
         }
     }
 
