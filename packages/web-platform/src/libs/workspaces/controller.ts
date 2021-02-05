@@ -68,7 +68,7 @@ export class WorkspacesController implements LibController {
 
         this.settings = config.workspaces;
 
-        // this.hibernationWatcher.start(this.settings.hibernation, this);
+        this.hibernationWatcher.start(this.settings.hibernation, this);
 
         await Promise.all([
             this.glueController.createWorkspacesStream(),

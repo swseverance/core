@@ -32,7 +32,7 @@ export class ApplicationFactory {
         let { windowId } = componentState;
         const componentId = idAsString(component.config.id);
         const applicationTitle = this.getTitleByAppName(appName);
-        const windowTitle = title || applicationTitle || appName || "Glue";
+        const windowTitle = title || component.config.title || applicationTitle || appName || "Glue";
         const windowContext = component?.config.componentState?.context;
         let url = this.getUrlByAppName(componentState.appName) || componentState.url;
 

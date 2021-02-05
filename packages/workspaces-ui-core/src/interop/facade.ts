@@ -357,7 +357,6 @@ export class GlueFacade {
         if (!operationArguments.config) {
             operationArguments.config = {};
         }
-
         operationArguments.config.context = operationArguments.config.context || operationArguments.context;
         const config = this._converter.convertToRendererConfig(operationArguments);
 

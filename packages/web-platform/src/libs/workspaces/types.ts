@@ -277,3 +277,5 @@ export interface WindowStreamData {
         config: SwimlaneWindowSnapshotConfig;
     };
 }
+
+export type WorkspaceConfigWithReuseWorkspaceId = Glue42Workspaces.WorkspaceConfig & { reuseWorkspaceId: string };

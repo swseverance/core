@@ -94,6 +94,8 @@ export namespace Glue42Workspaces {
             appName: string;
             /** The url of the window, in case it is not a defined as an application. */
             url?: string;
+            /** The title of the window */
+            title?: string;
         };
     }
 

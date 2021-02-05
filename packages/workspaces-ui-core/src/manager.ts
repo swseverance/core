@@ -106,7 +106,7 @@ export class WorkspacesManager {
         const result = await this._layoutsManager.save({
             name,
             workspace,
-            title: name,
+            title: store.getWorkspaceTitle(workspace.id),
             saveContext
         });
 
@@ -115,7 +115,7 @@ export class WorkspacesManager {
         if (config.workspacesOptions.noTabHeader) {
             delete config.workspacesOptions.noTabHeader;
         }
-        store.getWorkspaceLayoutItemById(id).setTitle(name);
+
         return result;
     }
 
