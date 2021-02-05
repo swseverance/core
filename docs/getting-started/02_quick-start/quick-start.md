@@ -60,4 +60,4 @@ Congratulations, you have created your very first **Glue42 Core** project!
 
 *For more information on the Web Platform and Web Client apps, see the [Web Platform](../../developers/core-concepts/web-platform/overview/index.html) and [Web Client](../../developers/core-concepts/web-client/overview/index.html) sections.*
 
-*For more information on the **Glue42 Web** library, see the [Reference](../../../reference/core/latest/glue42%20web/index.html) section.*
+*For more information on the **Glue42 Web** library, see the [Reference](../../reference/core/latest/glue42%20web/index.html) section.*

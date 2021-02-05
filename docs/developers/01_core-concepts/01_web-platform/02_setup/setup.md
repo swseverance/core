@@ -47,14 +47,14 @@ Use this configuration object to set various important aspects of your **Glue42 
 
 | Property | Description |
 |----------|-------------|
-| `windows` | Override various timeouts for the [Window Management](../../../capabilities/windows/window-management/index.html) operations. |
+| `windows` | Override various timeouts for the [Window Management](../../../../capabilities/windows/window-management/index.html) operations. |
 | `applications` | Set a source for application definitions by passing an array of application definition objects to the `local` property of this object. |
 | `layouts` | Set a source for Layout definitions by passing an array of Layout definition objects to the `local` property of this object. Set the mode of the Layouts library (`"idb"` or `"session"`) with the `mode` property. |
-| `channels` | Configure the Glue42 [Channels](../../../capabilities/data-sharing-between-apps/channels/index.html) that will be available in your project. |
-| `workspaces` | Set a location of your [Workspaces App](../../../capabilities/windows/workspaces/index.html#workspaces_concepts-frame) and other options for [Workspaces](../../../capabilities/windows/workspaces/index.html). |
+| `channels` | Configure the Glue42 [Channels](../../../../capabilities/data-sharing-between-apps/channels/index.html) that will be available in your project. |
+| `workspaces` | Set a location of your [Workspaces App](../../../../capabilities/windows/workspaces/index.html#workspaces_concepts-frame) and other options for [Workspaces](../../../../capabilities/windows/workspaces/index.html). |
 | `plugins` | Provide your custom Glue42-specific logic, which will be included in the boot sequence of the Main app. |
 | `glue` | A standard configuration object for the [Glue42 Web](https://www.npmjs.com/package/@glue42/web) library that will be used when registering the Main app as a Glue42 client in **Glue42 Enterprise**. |
 | `gluefactory` |The Glue42 [Web Platform](https://www.npmjs.com/package/@glue42/web-platform) library will always initialize the latest version of [Glue42 Web](https://www.npmjs.com/package/@glue42/web) internally, but you can override this by passing your own Glue42 factory function. This is especially helpful if you want your Main app to run with a specific [`@glue42/web`](https://www.npmjs.com/package/@glue42/web) package version and not the latest. |
 | `gateway` | Override the logging levels and handlers of the Glue42 Gateway for advanced control and debugging. |
 
-For detailed explanations and examples of each setting, see the corresponding sections in [Capabilities](../../../capabilities/application-management/index.html).
+For detailed explanations and examples of each setting, see the corresponding sections in [Capabilities](../../../../capabilities/application-management/index.html).
