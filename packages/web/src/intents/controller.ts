@@ -114,9 +114,16 @@ export class IntentsController implements LibController {
                 }
             }
         };
-        const flags = typeof intent === "string" ? { intent } : intent;
 
-        this.interop.register({ name: methodName, flags }, (args: Glue42Web.Intents.IntentContext) => {
+        let intentFlag: Omit<Glue42Web.Intents.AddIntentListenerRequest, "intent"> = {};
+
+        if (typeof intent === "object") {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { intent: removed, ...rest } = intent;
+            intentFlag = rest;
+        }
+
+        this.interop.register({ name: methodName, flags: { intent: intentFlag } }, (args: Glue42Web.Intents.IntentContext) => {
             if (subscribed) {
                 return handler(args);
             }

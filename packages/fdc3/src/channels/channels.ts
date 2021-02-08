@@ -18,7 +18,7 @@ interface PendingSubscription {
 }
 
 const createChannelsAgent = (): ChannelsAPI => {
-    let currentChannel: Channel | null;
+    let currentChannel: Channel | null = null;
     let pendingSubscription: PendingSubscription | null;
 
     const channels: { [name: string]: Channel } = {};
