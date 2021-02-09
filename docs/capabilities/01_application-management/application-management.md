@@ -6,7 +6,7 @@ The Application Management API provides a way to manage **Glue42 Core** applicat
 
 - **Instance** - a running copy of an application. The Application Management API provides facilities for starting/stopping application instances and tracking application and instance related events;
 
-*For detailed information on the Application Management API, see the [Application Management](../../../glue42-concepts/application-management/javascript/index.html) documentation.*
+*For detailed information on the Application Management API, see the [Application Management](https://docs.glue42.com/glue42-concepts/application-management/javascript/index.html) documentation.*
 
 ## Application Definitions
 

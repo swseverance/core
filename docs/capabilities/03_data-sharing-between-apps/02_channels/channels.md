@@ -37,7 +37,7 @@ Different applications on the same Channel may use different parts of the data:
 
 A "Client List" app, for example, may update the context object with data for the selected user (`ids`, `displayName`, etc.). A "Portfolio" app may use the `ids` to load the portfolio of the client that the user has selected in the "Client List" app.
 
-*For detailed information on the Channels API, see the [Channels](../../../glue42-concepts/data-sharing-between-apps/channels/javascript/index.html) documentation.*
+*For detailed information on the Channels API, see the [Channels](https://docs.glue42.com/glue42-concepts/data-sharing-between-apps/channels/javascript/index.html) documentation.*
 
 ## Configuration
 

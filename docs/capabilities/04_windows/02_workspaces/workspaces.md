@@ -4,7 +4,7 @@ The [Workspaces](../../../reference/core/latest/workspaces/index.html) library o
 
 The Glue42 Workspaces enable the users to compose a custom arrangement of applications by treating each application as an individual building block that can be added, removed, moved or resized within a Workspace. The Frame can hold multiple Workspaces (as tabs) and can also be maximized, minimized or resized. 
 
-*For detailed information on the Workspaces API, see the [Workspaces](../../../glue42-concepts/windows/workspaces/javascript/index.html) documentation.*
+*For detailed information on the Workspaces API, see the [Workspaces](https://docs.glue42.com/glue42-concepts/windows/workspaces/javascript/index.html) documentation.*
 
 ## Workspaces Concepts
 
@@ -12,7 +12,7 @@ The Glue42 Workspaces enable the users to compose a custom arrangement of applic
 
 The Frame is a web application also called Workspaces App. This application is the shell that can hold multiple Workspaces as tabs in a single or multiple windows (frames). The Frame application is a vital element in the Workspaces functionality as it handles opening and closing Workspaces, arranging windows in a Workspace, adding or removing Workspaces and windows.
 
-A fully functioning Workspaces App is available in **Glue42 Enterprise**. For **Glue42 Core** projects, however, you have to create your own Workspaces App. This is extremely simple, as the Workspaces App functionality is provided as a single React component by the [@glue42/workspaces-ui-react](https://www.npmjs.com/package/@glue42/workspaces-ui-react) library. For more details on how to create and customize your own Workspaces App, see the [Extending Workspaces](../../../glue42-concepts/windows/workspaces/overview/index.html#extending_workspaces) documentation.
+A fully functioning Workspaces App is available in **Glue42 Enterprise**. For **Glue42 Core** projects, however, you have to create your own Workspaces App. This is extremely simple, as the Workspaces App functionality is provided as a single React component by the [@glue42/workspaces-ui-react](https://www.npmjs.com/package/@glue42/workspaces-ui-react) library. For more details on how to create and customize your own Workspaces App, see the [Extending Workspaces](https://docs.glue42.com/glue42-concepts/windows/workspaces/overview/index.html#extending_workspaces) documentation.
 
 *It is important to note that the `<Workspaces>` component provided by the library is not meant to be used as a typical React component. Besides its rendering responsibilities, it also contains heavy logic. This component is meant to allow you to create a dedicated Workspaces App which must function as a standalone window - you must never use it as a part of another application, as this will lead to malfunctioning. The Workspaces App should be customized only using the available extensibility points.*
 

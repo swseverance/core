@@ -8,7 +8,7 @@ Using the [Window Management API](../../../reference/core/latest/windows/index.h
 - listen for and handle events related to opening and closing windows;
 - automatically save and restore the positions and contexts of your application windows;
 
-*For detailed information on the Window Management API, see the [Window Management](../../../glue42-concepts/windows/window-management/javascript/index.html) documentation.* 
+*For detailed information on the Window Management API, see the [Window Management](https://docs.glue42.com/glue42-concepts/windows/window-management/javascript/index.html) documentation.* 
 
 ## Configuration
 

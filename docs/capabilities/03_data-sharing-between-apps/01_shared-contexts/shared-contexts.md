@@ -7,7 +7,7 @@ The [Shared Contexts API](../../../reference/core/latest/shared%20contexts/index
 - instruct the "Clients" app to publish updates to a context object holding the `id` of the currently selected client;
 - instruct the "Stocks" app to subscribe for updates of that same context object and specify how the "Stocks" app should handle the received data in order to update its current state;
 
-*For detailed information on the Shared Contexts API, see the [Shared Contexts](../../../glue42-concepts/data-sharing-between-apps/shared-contexts/javascript/index.html) documentation.*
+*For detailed information on the Shared Contexts API, see the [Shared Contexts](https://docs.glue42.com/glue42-concepts/data-sharing-between-apps/shared-contexts/javascript/index.html) documentation.*
 
 The examples in the next sections demonstrate using the Shared Contexts API. To see the code and experiment with it, open the embedded examples directly in [CodeSandbox](https://codesandbox.io). 
 

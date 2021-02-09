@@ -9,7 +9,7 @@ The [Interop API](../../../reference/core/latest/interop/index.html) enables app
 
 Applications which offer methods and streams are called *Interop servers*, and applications which consume them - *Interop clients*, and collectively - **Interop instances**.
 
-*For detailed information on the Interop API (methods, streams, discovery and more), see the [Interop](../../../glue42-concepts/data-sharing-between-apps/interop/javascript/index.html) documentation.*
+*For detailed information on the Interop API (methods, streams, discovery and more), see the [Interop](https://docs.glue42.com/glue42-concepts/data-sharing-between-apps/interop/javascript/index.html) documentation.*
 
 The examples in the next sections demonstrate using the Interop API. To see the code and experiment with it, open the embedded examples directly in [CodeSandbox](https://codesandbox.io). 
 

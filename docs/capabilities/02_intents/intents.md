@@ -61,6 +61,6 @@ const { glue } = await GlueWebPlatform(config);
 | `displayName` | The human readable name of the Intent. Can be used in context menus, etc., to visualize the Intent. |
 | `contexts` | The type of predefined data structures with which the application can work. |
 
-*For detailed information on the Intents API, see the [Intents](../../../glue42-concepts/intents/javascript/index.html) documentation.*
+*For detailed information on the Intents API, see the [Intents](https://docs.glue42.com/glue42-concepts/intents/javascript/index.html) documentation.*
 
 *Live examples for Intents coming soon.*

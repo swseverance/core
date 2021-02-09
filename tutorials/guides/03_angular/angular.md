@@ -1,6 +1,6 @@
 ## Overview
 
-This tutorial is designed to walk you through every aspect of **Glue42 Core** - setting up a project, initializing a [Main Application](../../../developers/core-concepts/web-platform/overview/index.html), multiple [Web Client](../../../developers/core-concepts/web-client/overview/index.html) apps and extending your applications with [Shared Contexts](../../../capabilities/data-sharing-between-apps/shared-contexts/index.html), [Interop](../../../capabilities/data-sharing-between-apps/interop/index.html), [Window Management](../../../capabilities/windows/window-management/index.html), [Channels](../../../capabilities/data-sharing-between-apps/channels/index.html), [Application Management](../../../capabilities/application-management/index.html) and [Workspaces](../../../capabilities/windows/workspaces/index.html) capabilities.
+This tutorial is designed to walk you through every aspect of **Glue42 Core** - setting up a project, initializing a [Main Application](../../developers/core-concepts/web-platform/overview/index.html), multiple [Web Client](../../developers/core-concepts/web-client/overview/index.html) apps and extending your applications with [Shared Contexts](../../capabilities/data-sharing-between-apps/shared-contexts/index.html), [Interop](../../capabilities/data-sharing-between-apps/interop/index.html), [Window Management](../../capabilities/windows/window-management/index.html), [Channels](../../capabilities/data-sharing-between-apps/channels/index.html), [Application Management](../../capabilities/application-management/index.html) and [Workspaces](../../capabilities/windows/workspaces/index.html) capabilities.
 
 This guide will show you how to use **Glue42 Core** in an Angular application using the [`@glue42/ng`](https://www.npmjs.com/package/@glue42/ng) library. If you haven't checked out the [Vanilla JS](../javascript/index.html) tutorial, we recommend going through that one first, as there you will get a better understanding of Glue42 Core without the added complexity level of a web framework. 
 
@@ -18,7 +18,7 @@ As an end result, the users want to be able to run two apps as Progressive Web A
 
 This tutorial assumes that you are familiar with Angular 2+ and the concepts of JavaScript and asynchronous programming.
 
-It is also recommended to have the [Web Platform](../../../developers/core-concepts/web-platform/overview/index.html), [Web Client](../../../developers/core-concepts/glue42-client/overview/index.html) and [Glue42 Web](../../../reference/core/latest/glue42%20web/index.html) documentation available for reference.
+It is also recommended to have the [Web Platform](../../developers/core-concepts/web-platform/overview/index.html), [Web Client](../../developers/core-concepts/glue42-client/overview/index.html) and [Glue42 Web](../../reference/core/latest/glue42%20web/index.html) documentation available for reference.
 
 ## Tutorial Structure
 
@@ -114,7 +114,7 @@ This will launch the server at port 8080.
 
 ### 2.1. Main Application
 
-Every **Glue42 Core** project *must have a single* central application called [Main Application](../../../developers/core-concepts/web-platform/overview/index.html) or Web Platform app. In a real-world scenario this would be an application used for discovering and listing available applications, Workspaces, handling notifications and much more. However, your goal now is to learn about all these aspects with as little complexity as possible. That's why the **Clients** app will serve as your Main application. The users will open the **Clients** app and from there they will be able to click on a client and see their stocks and so on.
+Every **Glue42 Core** project *must have a single* central application called [Main Application](../../developers/core-concepts/web-platform/overview/index.html) or Web Platform app. In a real-world scenario this would be an application used for discovering and listing available applications, Workspaces, handling notifications and much more. However, your goal now is to learn about all these aspects with as little complexity as possible. That's why the **Clients** app will serve as your Main application. The users will open the **Clients** app and from there they will be able to click on a client and see their stocks and so on.
 
 Setting up a Main application is just as simple as installing a new npm package and calling a function. Go to the **Clients** app base directory and run:
 
@@ -154,7 +154,7 @@ This is everything you need to do to define your Angular applications as a `Main
 
 ### 2.2. Web Clients
 
-Now that you have a fully functional Main application, you need to initialize the [Glue42 Web](../../../reference/core/latest/glue42%20web/index.html) library in the **Stocks** app. This will allow both apps to connect and communicate with each other.
+Now that you have a fully functional Main application, you need to initialize the [Glue42 Web](../../reference/core/latest/glue42%20web/index.html) library in the **Stocks** app. This will allow both apps to connect and communicate with each other.
 
 This process is almost identical to setting up a Main application. The only difference is that you need to import the `GlueWeb` factory function and the config object must have a single property `web`, not `webPlatform`.
 
@@ -213,7 +213,7 @@ public async ngOnInit(): Promise<void> {
 
 If everything is correct, when you open the apps, you should see in the top left corner "Glue42 is available".
 
-*Note that when you refresh the Stocks app on it's own, you will see that the Glue42 initialization is unsuccessful. This is because it cannot currently connect to the Glue42 environment provided by the [Main application](../../../developers/core-concepts/web-platform/overview/index.html) and therefore cannot discover the Main app. To be able to connect to Glue42, all [Web Client](../../../developers/core-concepts/web-client/overview/index.html) apps **must** be opened by the [Web Platform application](../../../developers/core-concepts/web-platform/overview/index.html)) or by another [Web Client](../../../developers/core-concepts/web-client/overview/index.html) application already connected to the Glue42 environment.*
+*Note that when you refresh the Stocks app on it's own, you will see that the Glue42 initialization is unsuccessful. This is because it cannot currently connect to the Glue42 environment provided by the [Main application](../../developers/core-concepts/web-platform/overview/index.html) and therefore cannot discover the Main app. To be able to connect to Glue42, all [Web Client](../../developers/core-concepts/web-client/overview/index.html) apps **must** be opened by the [Web Platform application](../../developers/core-concepts/web-platform/overview/index.html)) or by another [Web Client](../../developers/core-concepts/web-client/overview/index.html) application already connected to the Glue42 environment.*
 
 To verify that the initializations are correct, open the browser console of the **Clients** app (press `F12`) and execute the following:
 
@@ -221,7 +221,7 @@ To verify that the initializations are correct, open the browser console of the 
 await glue.windows.open("stocks", "http://localhost:4100/").catch(console.error);
 ```
 
-This will instruct the **Clients** app to open the **Stocks** app using the Glue42 [Window Management API](../../../capabilities/windows/window-management/index.html). The **Stocks** app will now be able to connect to the Glue42 environment and initialize the [Glue42 Web](../../../reference/core/latest/glue42%20web/index.html) library correctly.
+This will instruct the **Clients** app to open the **Stocks** app using the Glue42 [Window Management API](../../capabilities/windows/window-management/index.html). The **Stocks** app will now be able to connect to the Glue42 environment and initialize the [Glue42 Web](../../reference/core/latest/glue42%20web/index.html) library correctly.
 
 Next, you will begin to add Glue42 functionalities to the apps.
 
@@ -229,7 +229,7 @@ Next, you will begin to add Glue42 functionalities to the apps.
 
 The goal of this chapter is to stat building the user flow of the entire project. The end users will open the **Clients** app and will be able to open the **Stocks** app from the "Stocks" button in it. Clicking on a stock in the **Stocks** app will open the **Stock Details** app.
 
-Currently, the only way for the user to open the **Stocks** app is to manually enter its URL in the address bar. This, however, prevents the app from connecting to the Glue42 environment. Also, the **Stock Details** app is currently a separate view of the **Stocks** app. The end users have multiple monitors and would like to take advantage of that - they want clicking on a stock to open a new window with the respective app. The new window for the selected stock must also have specific dimensions and position. To achieve all this, you will use the [Window Management API](../../../reference/core/latest/windows/index.html).
+Currently, the only way for the user to open the **Stocks** app is to manually enter its URL in the address bar. This, however, prevents the app from connecting to the Glue42 environment. Also, the **Stock Details** app is currently a separate view of the **Stocks** app. The end users have multiple monitors and would like to take advantage of that - they want clicking on a stock to open a new window with the respective app. The new window for the selected stock must also have specific dimensions and position. To achieve all this, you will use the [Window Management API](../../reference/core/latest/windows/index.html).
 
 ### 3.1. Opening Windows at Runtime
 
@@ -350,7 +350,7 @@ Now, when you click on a stock, the new window will open with the specified posi
 
 ## 4. Interop
 
-In this section you will use some of the functionalities provided by the **Glue42 Core** [**Interop API**](../../../reference/core/latest/interop/index.html).
+In this section you will use some of the functionalities provided by the **Glue42 Core** [**Interop API**](../../reference/core/latest/interop/index.html).
 
 ### 4.1. Registering Interop Methods and Streams
 
@@ -523,7 +523,7 @@ Now the **Stocks Details** should display live price updates for the selected st
 
 ## 5. Shared Contexts
 
-The next request of the users is to be able to see in the **Stock Details** app whether the selected client has the selected stock in their portfolio. This time, you will use the [**Shared Contexts API**](../../../reference/core/latest/shared%20contexts/index.html) to connect the **Clients**, **Stocks** and **Stock Details** apps.
+The next request of the users is to be able to see in the **Stock Details** app whether the selected client has the selected stock in their portfolio. This time, you will use the [**Shared Contexts API**](../../reference/core/latest/shared%20contexts/index.html) to connect the **Clients**, **Stocks** and **Stock Details** apps.
 
 ### 5.1. Updating a Context
 
@@ -594,11 +594,11 @@ Now all three apps are connected through the same shared context object and a si
 
 ## 6. Channels
 
-The latest requirement from the users is to be able work with multiple clients at a time by having multiple instances of the **Stocks** app show the portfolios of different clients. Currently, no matter how many instances of the **Stocks** app are running, they are all listening for updates to the same context and therefore all show information about the same selected client. Here, you will use the [Channels API](../../../reference/core/latest/channels/index.html) to allow each instance of the **Stocks** app to subscribe for updates to the context of a selected channel. The different channels are color coded and the user will be able to select a channel from a Channel Selector UI. The **Clients** app will update the context of the currently selected channel when the user clicks on a client.
+The latest requirement from the users is to be able work with multiple clients at a time by having multiple instances of the **Stocks** app show the portfolios of different clients. Currently, no matter how many instances of the **Stocks** app are running, they are all listening for updates to the same context and therefore all show information about the same selected client. Here, you will use the [Channels API](../../reference/core/latest/channels/index.html) to allow each instance of the **Stocks** app to subscribe for updates to the context of a selected channel. The different channels are color coded and the user will be able to select a channel from a Channel Selector UI. The **Clients** app will update the context of the currently selected channel when the user clicks on a client.
 
 ### 6.1. Channels Configuration
 
-The [Main Application](../../../developers/core-concepts/web-platform/overview/index.html) (the **Clients** app in this project) handles the configuration of the Glue42 environment. The `webPlatform` property of the config object in `Glue42Ng` accepts an optional configuration object that allows you to enable, disable and configure various Glue42 features. Here you will use it to define the available Glue42 Channels.
+The [Main Application](../../developers/core-concepts/web-platform/overview/index.html) (the **Clients** app in this project) handles the configuration of the Glue42 environment. The `webPlatform` property of the config object in `Glue42Ng` accepts an optional configuration object that allows you to enable, disable and configure various Glue42 features. Here you will use it to define the available Glue42 Channels.
 
 ```javascript
 // in app.module.ts
