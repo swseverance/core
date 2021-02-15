@@ -32,7 +32,7 @@ export class ApplicationFactory {
         let { windowId } = componentState;
         const componentId = idAsString(component.config.id);
         const applicationTitle = this.getTitleByAppName(appName);
-        const windowTitle = title || component.config.title || applicationTitle || appName || "Glue";
+        const windowTitle = this.vaidateTitle(title) || this.vaidateTitle(applicationTitle) || this.vaidateTitle(appName) || "Glue";
         const windowContext = component?.config.componentState?.context;
         let url = this.getUrlByAppName(componentState.appName) || componentState.url;
 
@@ -88,7 +88,7 @@ export class ApplicationFactory {
         }
 
         try {
-            await this.notifyFrameWillStart(windowId, appName, windowContext, title);
+            await this.notifyFrameWillStart(windowId, appName, windowContext, windowTitle);
             await this._frameController.startFrame(componentId, url, undefined, windowId);
             const newlyAddedWindow = store.getWindow(componentId) as Window;
 
@@ -254,5 +254,13 @@ export class ApplicationFactory {
             },
             () => triggersActivated
         ]
+    }
+
+    private vaidateTitle(title: string) {
+        if (!title?.length) {
+            return undefined;
+        }
+
+        return title;
     }
 }

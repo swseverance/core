@@ -90,7 +90,7 @@ describe("properties: ", () => {
         });
     });
 
-    describe("title: ", () => {
+    describe("title: Should", () => {
         const layoutName = "unique.layout.name";
         const windowTitle = "unique.window.name";
         const configWithTitle = {
@@ -113,29 +113,55 @@ describe("properties: ", () => {
                                         title: windowTitle
                                     }
                                 }],
-                                "config": {}
+                                config: {}
                             }],
-                            "config": {}
+                            config: {}
                         }],
-                        "config": {}
+                        config: {}
                     }],
-                    "config": {
-                        "name": layoutName,
-                        "title": "Untitled 1"
+                    config: {
+                        name: layoutName,
+                        title: "Untitled 1"
                     },
-                    "context": {}
+                    context: {}
                 }
             }]
-        }
+        };
 
-        after(() => {
-            return glue.workspaces.layouts.delete(layoutName);
+        afterEach(async () => {
+            const frames = await glue.workspaces.getAllFrames();
+            await Promise.all(frames.map((f) => f.close()));
+
+            workspace = await glue.workspaces.createWorkspace(threeContainersConfig);
         });
 
-        it(`Should not be undefined`, () => {
+        it(`not be undefined`, () => {
             const window = workspace.getAllWindows()[0];
             expect(window.title).to.not.be.undefined;
             expect(window.title.length).to.not.eql(0);
+        });
+
+        it(`be equal to to the appName when the window doesn't have glue`, async () => {
+            const window = await workspace.addWindow({
+                type: "window",
+                appName: "noGlueApp"
+            });
+
+            await window.forceLoad();
+
+            expect(window.title).to.eql(window.appName);
+        });
+
+        it("be equal to the title from the layout when the window is from a restored layout and doesn't have glue", async () => {
+            await glue.workspaces.layouts.import([configWithTitle]);
+            const restoredWorkspace = await glue.workspaces.restoreWorkspace(layoutName);
+
+            const allWindows = restoredWorkspace.getAllWindows();
+            const firstWindow = allWindows[0];
+
+            await firstWindow.forceLoad();
+
+            expect(firstWindow.title).eql(windowTitle);
         });
     });
 
