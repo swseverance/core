@@ -1,34 +1,33 @@
 import { HibernationRule } from "./rules/shape";
 import { WorkspaceIdleTimeRule } from "./rules/time";
 import { MaximumActiveWorkspacesRule } from "./rules/workspaces";
-import { WorkspaceSnapshotResult } from "../types";
+import { WorkspaceConfigResult, WorkspaceEventPayload, WorkspaceSnapshotResult, WorkspaceStreamData, WorkspaceSummariesResult } from "../types";
 import { WorkspacesController } from "../controller";
 import { generate } from "shortid";
 import { Glue42WebPlatform } from "../../../../platform";
-import { IoC } from "../../../shared/ioc";
 import logger from "../../../shared/logger";
 import { Glue42Web } from "@glue42/web";
+import { UnsubscribeFunction } from "callback-registry";
 
 export class WorkspaceHibernationWatcher {
-    private timer: NodeJS.Timer | undefined;
     private isStarted = false;
-    private rules!: HibernationRule[];
     private workspacesController!: WorkspacesController;
     private settings: Glue42WebPlatform.Workspaces.HibernationConfig | undefined;
+    private workspaceEventUnsub: UnsubscribeFunction | undefined;
+    private windowEventUnsub: UnsubscribeFunction | undefined;
     private get logger(): Glue42Web.Logger.API | undefined {
         return logger.get("workspaces.controller");
     }
+    private readonly workspaceIdToTimer: { [wid: string]: number } = {};
 
     public start(
         settings: Glue42WebPlatform.Workspaces.HibernationConfig | undefined,
         workspacesController: WorkspacesController): void {
         this.workspacesController = workspacesController;
         this.settings = settings;
-        this.rules = this.getRules(settings?.rules);
-
         try {
             this.logger?.trace(`starting the hibernation watcher with following settings: ${JSON.stringify(this.settings)}`);
-            if (this.settings?.enabled && !this.isStarted) {
+            if (!this.isStarted && this.settings) {
                 this.startCore();
                 this.logger?.trace(`The hibernation watcher has started successfully`);
             }
@@ -42,7 +41,7 @@ export class WorkspaceHibernationWatcher {
     public stop(): void {
         try {
             this.logger?.trace(`trying to stop the hibernation watcher`);
-            if (this.settings?.enabled && this.isStarted) {
+            if (this.isStarted) {
                 this.stopCore();
                 this.logger?.trace(`The hibernation watcher was stopped successfully`);
             }
@@ -54,43 +53,48 @@ export class WorkspaceHibernationWatcher {
     }
 
     private startCore(): void {
-        let interval = this.settings?.interval || 10;
-        if (interval && interval > -1) {
-            interval = interval * 60_000;
-            this.timer = setInterval(this.tryHibernate, interval);
-        }
+        this.workspaceEventUnsub = this.workspacesController.subscribeForWorkspaceEvent((e) => {
+            const isWorkspaceOpened = e.action === "opened" || e.action === "added";
+            const isWorkspaceSelected = e.action === "selected";
+            const workspaceData = e.payload as WorkspaceStreamData;
+
+            if (isWorkspaceOpened) {
+                this.checkMaximumAmount();
+            }
+
+            if (isWorkspaceSelected) {
+                const timeout = this.workspaceIdToTimer[workspaceData.workspaceSummary.id];
+
+                if (timeout) {
+                    clearTimeout(timeout);
+                    delete this.workspaceIdToTimer[workspaceData.workspaceSummary.id];
+                }
+
+                this.addTimersForWorkspacesInFrame(e);
+                this.checkMaximumAmount();
+            }
+        });
+
+        this.windowEventUnsub = this.workspacesController.subscribeForWindowEvent((e) => {
+            const isWindowOpened = e.action === "opened" || e.action === "added";
+
+            if (isWindowOpened) {
+                this.checkMaximumAmount();
+            }
+        });
     }
 
     private stopCore(): void {
-        if (this.timer) {
-            clearInterval(this.timer);
-            this.timer = undefined;
+        if (this.workspaceEventUnsub) {
+            this.workspaceEventUnsub();
         }
-    }
 
-    private tryHibernate = async () => {
-        const workspaceSummaries = await this.workspacesController.getAllWorkspacesSummaries({}, generate());
-        const workspaces = await Promise.all(workspaceSummaries.summaries.map(ws => this.workspacesController.getWorkspaceSnapshot({ itemId: ws.id }, generate())));
-        const candidatePromises = await workspaces.reduce<Promise<[WorkspaceSnapshotResult, HibernationRule][]>>(async (acc, workspace) => {
-            const result = await acc;
-            const rule = await this.shouldHibernate(workspace);
-            if (rule) {
-                result.push([workspace, rule]);
-            }
-            return result;
-        }, Promise.resolve([]));
-
-        const hibernationCandidates = (await Promise.all(candidatePromises));
-
-        await Promise.all(this.tryHibernateWorkspaces(hibernationCandidates));
-    }
-
-    private tryHibernateWorkspaces(workspaces: Array<[WorkspaceSnapshotResult, HibernationRule]>) {
-        const workspacesToClose = this.settings?.workspacesToClose || 1;
-        return workspaces
-            .sort((ws1, ws2) => this.compare(ws1[0], ws2[0]))
-            .slice(0, workspacesToClose)
-            .map((workspaceToClose) => this.tryHibernateWorkspace(workspaceToClose));
+        if (this.windowEventUnsub) {
+            this.windowEventUnsub();
+        }
+        Object.values(this.workspaceIdToTimer).forEach((t) => {
+            clearTimeout(t);
+        });
     }
 
     private compare(ws1: WorkspaceSnapshotResult, ws2: WorkspaceSnapshotResult): number {
@@ -103,63 +107,82 @@ export class WorkspaceHibernationWatcher {
         return 0;
     }
 
-    private async tryHibernateWorkspace(tuple: [WorkspaceSnapshotResult, HibernationRule]): Promise<void> {
+    private async checkMaximumAmount() {
+        if (!this.settings?.maximumActiveWorkspaces?.threshold) {
+            return;
+        }
+
+        this.logger?.trace(`Checking for maximum active workspaces rule. The threshold is ${this.settings?.maximumActiveWorkspaces?.threshold}`);
+
+        const commandId = generate();
+        const result = await this.workspacesController.getAllWorkspacesSummaries({}, commandId);
+        const snapshotsPromises = result.summaries.map(s => this.workspacesController.getWorkspaceSnapshot({ itemId: s.id }, commandId));
+        const snapshots = await Promise.all(snapshotsPromises);
+
+        const eligibleForHibernation = snapshots.filter((s) => this.canBeHibernated(s));
+
+        if (eligibleForHibernation.length <= this.settings?.maximumActiveWorkspaces.threshold) {
+            return;
+        }
+
+        this.logger?.trace(`Found ${eligibleForHibernation.length} eligible for hibernation workspaces`);
+
+        const hibernationPromises = eligibleForHibernation
+            .sort(this.compare)
+            .slice(0, eligibleForHibernation.length - this.settings.maximumActiveWorkspaces.threshold)
+            .map((w) => this.tryHibernateWorkspace(w.id));
+
+        await Promise.all(hibernationPromises);
+    }
+
+    private async tryHibernateWorkspace(workspaceId: string): Promise<void> {
+        const snapshot = await this.workspacesController.getWorkspaceSnapshot({ itemId: workspaceId }, generate());
+
+        if (!await this.canBeHibernated(snapshot)) {
+            return;
+        }
+
         try {
-            const workspace = tuple[0];
-            const rule = tuple[1];
-            const workspaceId = workspace.id;
-            this.logger?.trace(`trying to hibernate workspace ${workspaceId}, rule ${rule.name}`);
+            const workspaceId = snapshot.id;
+            this.logger?.trace(`trying to hibernate workspace ${workspaceId}`);
             await this.workspacesController.hibernateWorkspace({ workspaceId }, generate());
             this.logger?.trace(`workspace ${workspaceId} was hibernated successfully`);
         } catch (error) {
-            this.logger?.error(error);
+            this.logger?.trace(error);
         }
     }
 
-    private async shouldHibernate(workspace: WorkspaceSnapshotResult): Promise<HibernationRule | undefined> {
-        const snapshot = await this.workspacesController.getWorkspaceSnapshot({ itemId: workspace.id }, generate());
-
-        const isWorkspaceHibernated = await this.isWorkspaceHibernated(snapshot);
-        const isWorkspaceSelected = await this.isWorkspaceSelected(snapshot);
+    private async canBeHibernated(snapshot: WorkspaceSnapshotResult) {
+        const isWorkspaceHibernated = await this.isWorkspaceHibernated(snapshot.config);
+        const isWorkspaceSelected = await this.isWorkspaceSelected(snapshot.config);
         const isWorkspaceEmpty = await this.isWorkspaceEmpty(snapshot);
 
-        if (!workspace ||
-            isWorkspaceHibernated ||
-            isWorkspaceSelected ||
-            isWorkspaceEmpty) {
-            return;
-        }
-        return await this.rules.reduce(async (acc, r) => {
-            const result = await acc;
-            if (result) {
-                return result;
-            } else if (r.enabled && await r.shouldHibernate(workspace)) {
-                return r;
-            }
-        }, Promise.resolve(undefined as HibernationRule | undefined));
+        return !isWorkspaceHibernated && !isWorkspaceSelected && !isWorkspaceEmpty;
     }
 
-    private async isWorkspaceHibernated(workspaceId: string | WorkspaceSnapshotResult) {
-        let snapshot: WorkspaceSnapshotResult;
+    private async isWorkspaceHibernated(workspaceId: string | WorkspaceConfigResult) {
+        let config: WorkspaceConfigResult;
 
         if (typeof workspaceId === "string") {
-            snapshot = await this.workspacesController.getWorkspaceSnapshot({ itemId: workspaceId }, generate());
+            const snapshot = await this.workspacesController.getWorkspaceSnapshot({ itemId: workspaceId }, generate());
+            config = snapshot.config;
         } else {
-            snapshot = workspaceId;
+            config = workspaceId;
         }
 
-        return snapshot.config.isHibernated;
+        return config.isHibernated;
     }
 
-    private async isWorkspaceSelected(workspaceId: string | WorkspaceSnapshotResult) {
-        let snapshot: WorkspaceSnapshotResult;
+    private async isWorkspaceSelected(workspaceId: string | WorkspaceConfigResult) {
+        let config: WorkspaceConfigResult;
 
         if (typeof workspaceId === "string") {
-            snapshot = await this.workspacesController.getWorkspaceSnapshot({ itemId: workspaceId }, generate());
+            const snapshot = await this.workspacesController.getWorkspaceSnapshot({ itemId: workspaceId }, generate());
+            config = snapshot.config;
         } else {
-            snapshot = workspaceId;
+            config = workspaceId;
         }
-        return snapshot.config.isSelected;
+        return config.isSelected;
     }
 
     private async isWorkspaceEmpty(workspaceId: string | WorkspaceSnapshotResult) {
@@ -174,30 +197,41 @@ export class WorkspaceHibernationWatcher {
         return !snapshot.children.length;
     }
 
-    private getHibernationRule(ruleConfig: Glue42WebPlatform.Workspaces.HibernationRule): HibernationRule {
-        switch (ruleConfig.type) {
-            case "MaximumActiveWorkspaces": {
-                return new MaximumActiveWorkspacesRule(this.workspacesController, ruleConfig.enabled, ruleConfig.threshold);
+    private async getWorkspacesInFrame(frameId: string) {
+        const result = await this.workspacesController.getAllWorkspacesSummaries({}, generate());
+
+        const snapshotPromises = result.summaries.reduce((acc, s) => {
+            if (s.config.frameId === frameId) {
+                acc.push(this.workspacesController.getWorkspaceSnapshot({ itemId: s.id }, generate()));
             }
-            case "WorkspaceIdleTime": {
-                return new WorkspaceIdleTimeRule(ruleConfig.enabled, ruleConfig.threshold);
-            }
-            default: {
-                throw new Error(`Unsupported hibernation rule type ${ruleConfig.type}`);
-            }
-        }
+
+            return acc;
+        }, [] as Array<Promise<WorkspaceSnapshotResult>>);
+
+        return await Promise.all(snapshotPromises);
     }
 
-    private getRules(rulesConfig: Glue42WebPlatform.Workspaces.HibernationRule[] | undefined) {
-        if (!rulesConfig) {
-            return [];
+    private async addTimersForWorkspacesInFrame(data: WorkspaceEventPayload) {
+        if (!this.settings?.idleWorkspaces?.idleMSThreshold) {
+            return;
         }
 
-        const uniqueRules = rulesConfig.filter((r, i, s) => {
-            return s.indexOf(r) === i;
-        });
+        const workspaceData = data.payload as WorkspaceStreamData;
+        const workspacesInFrame = await this.getWorkspacesInFrame(workspaceData.frameSummary.id);
 
+        await Promise.all(workspacesInFrame.map(async (w) => {
+            if (!await this.canBeHibernated(w) || this.workspaceIdToTimer[w.id]) {
+                return;
+            }
+            const timeout = setTimeout(() => {
+                this.logger?.trace(`Timer triggered will try to hibernated ${w.id}`);
+                this.tryHibernateWorkspace(w.id);
+                delete this.workspaceIdToTimer[w.id];
+            }, this.settings?.idleWorkspaces?.idleMSThreshold);
 
-        return uniqueRules.map((r) => this.getHibernationRule(r));
+            this.workspaceIdToTimer[w.id] = timeout;
+
+            this.logger?.trace(`Starting workspace idle timer ( ${this.settings?.idleWorkspaces?.idleMSThreshold}ms ) for workspace ${w.id}`);
+        }));
     }
 }

@@ -13,7 +13,11 @@ export interface WorkspaceWindowData {
 export type WorkspaceEventType = "frame" | "workspace" | "container" | "window";
 export type WorkspaceEventScope = "global" | "frame" | "workspace" | "window";
 export type WorkspaceEventAction = "opened" | "closing" | "closed" | "focus" | "added" | "loaded" | "removed" | "childrenUpdate" | "containerChange" | "maximized" | "minimized" | "normal" | "selected";
-export type WorkspacePayload = FrameStreamData | WorkspaceStreamData | ContainerStreamData | WindowStreamData;
+export interface WorkspaceEventPayload {
+    action: WorkspaceEventAction,
+    type: WorkspaceEventType,
+    payload: FrameStreamData | WorkspaceStreamData | ContainerStreamData | WindowStreamData
+}
 
 export type WorkspacesOperationsTypes = "isWindowInWorkspace" |
     "createWorkspace" |

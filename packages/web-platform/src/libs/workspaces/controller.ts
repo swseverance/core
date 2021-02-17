@@ -5,7 +5,7 @@ import { Glue42Workspaces } from "@glue42/workspaces-api";
 import { BridgeOperation, CoreClientData, InternalPlatformConfig, LibController } from "../../common/types";
 import { addContainerConfigDecoder, addItemResultDecoder, addWindowConfigDecoder, bundleConfigDecoder, deleteLayoutConfigDecoder, exportedLayoutsResultDecoder, frameHelloDecoder, frameSnapshotResultDecoder, frameStateConfigDecoder, frameStateResultDecoder, frameSummariesResultDecoder, frameSummaryDecoder, getFrameSummaryConfigDecoder, isWindowInSwimlaneResultDecoder, layoutSummariesDecoder, moveFrameConfigDecoder, moveWindowConfigDecoder, openWorkspaceConfigDecoder, resizeItemConfigDecoder, setItemTitleConfigDecoder, simpleItemConfigDecoder, simpleWindowOperationSuccessResultDecoder, voidResultDecoder, workspaceCreateConfigDecoder, workspaceLayoutDecoder, workspaceLayoutSaveConfigDecoder, workspaceSelectorDecoder, workspacesLayoutImportConfigDecoder, workspaceSnapshotResultDecoder, workspacesOperationDecoder, workspaceSummariesResultDecoder } from "./decoders";
 import { FramesController } from "./frames";
-import { AddContainerConfig, AddItemResult, AddWindowConfig, BundleConfig, DeleteLayoutConfig, ExportedLayoutsResult, FrameHello, FrameSnapshotResult, FrameStateConfig, FrameStateResult, FrameSummariesResult, FrameSummaryResult, GetFrameSummaryConfig, IsWindowInSwimlaneResult, LayoutSummariesResult, LayoutSummary, MoveFrameConfig, MoveWindowConfig, OpenWorkspaceConfig, ResizeItemConfig, SetItemTitleConfig, SimpleItemConfig, SimpleWindowOperationSuccessResult, WorkspaceCreateConfigProtocol, WorkspaceSelector, WorkspacesLayoutImportConfig, WorkspaceSnapshotResult, WorkspacesOperationsTypes, WorkspaceSummariesResult, WorkspaceSummaryResult } from "./types";
+import { AddContainerConfig, AddItemResult, AddWindowConfig, BundleConfig, DeleteLayoutConfig, ExportedLayoutsResult, FrameHello, FrameSnapshotResult, FrameStateConfig, FrameStateResult, FrameSummariesResult, FrameSummaryResult, GetFrameSummaryConfig, IsWindowInSwimlaneResult, LayoutSummariesResult, LayoutSummary, MoveFrameConfig, MoveWindowConfig, OpenWorkspaceConfig, ResizeItemConfig, SetItemTitleConfig, SimpleItemConfig, SimpleWindowOperationSuccessResult, WorkspaceCreateConfigProtocol, WorkspaceEventPayload, WorkspaceSelector, WorkspacesLayoutImportConfig, WorkspaceSnapshotResult, WorkspacesOperationsTypes, WorkspaceStreamData, WorkspaceSummariesResult, WorkspaceSummaryResult } from "./types";
 import logger from "../../shared/logger";
 import { Glue42WebPlatform } from "../../../platform";
 import { GlueController } from "../../controllers/glue";
@@ -13,10 +13,12 @@ import { IoC } from "../../shared/ioc";
 import { WindowMoveResizeConfig } from "../windows/types";
 import { StateController } from "../../controllers/state";
 import { WorkspaceHibernationWatcher } from "./hibernation/watcher";
+import callbackRegistry from "callback-registry";
 
 export class WorkspacesController implements LibController {
     private started = false;
     private settings!: Glue42WebPlatform.Workspaces.Config;
+    private readonly registry = callbackRegistry();
 
     private operations: { [key in WorkspacesOperationsTypes]: BridgeOperation } = {
         frameHello: { name: "frameHello", dataDecoder: frameHelloDecoder, execute: this.handleFrameHello.bind(this) },
@@ -133,8 +135,21 @@ export class WorkspacesController implements LibController {
         }
     }
 
-    public handleWorkspaceEvent(data: any): void {
+    public handleWorkspaceEvent(data: WorkspaceEventPayload): void {
         this.glueController.pushWorkspacesMessage(data);
+        this.handleWorkspaceEventCore(data);
+    }
+   
+    public subscribeForFrameEvent(callback: (data: WorkspaceEventPayload) => void) {
+        return this.registry.add("frame", callback);
+    }
+
+    public subscribeForWorkspaceEvent(callback: (data: WorkspaceEventPayload) => void) {
+        return this.registry.add("workspace", callback);
+    }
+
+    public subscribeForWindowEvent(callback: (data: WorkspaceEventPayload) => void) {
+        return this.registry.add("window", callback);
     }
 
     public async closeItem(config: SimpleItemConfig, commandId: string): Promise<void> {
@@ -572,5 +587,9 @@ export class WorkspacesController implements LibController {
         await this.glueController.callWindow<WindowMoveResizeConfig, void>(this.ioc.windowsController.moveResizeOperation, moveConfig, frame.windowId);
 
         this.logger?.trace(`[${commandId}] frame with id ${frame.windowId} was successfully moved, responding to caller`);
+    }
+
+    private handleWorkspaceEventCore(data: WorkspaceEventPayload) {
+        this.registry.execute(data.type, data);
     }
 }

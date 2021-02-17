@@ -417,6 +417,10 @@ export class WorkspacesManager {
             throw new Error(`Cannot hibernate workspace ${workspace.id} because its active`);
         }
 
+        if (this.stateResolver.isWorkspaceHibernated(workspaceId)) {
+            throw new Error(`Cannot hibernate workspace ${workspaceId} because it has already been hibernated`);
+        }
+
         if (!workspace.layout) {
             throw new Error(`Cannot hibernate workspace ${workspace.id} because its empty`);
         }
