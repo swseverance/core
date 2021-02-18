@@ -12,7 +12,7 @@ import { GlueController } from "../../controllers/glue";
 import { IoC } from "../../shared/ioc";
 import { WindowMoveResizeConfig } from "../windows/types";
 import { StateController } from "../../controllers/state";
-import { WorkspaceHibernationWatcher } from "./hibernation/watcher";
+import { WorkspaceHibernationWatcher } from "./hibernationWatcher";
 import callbackRegistry from "callback-registry";
 
 export class WorkspacesController implements LibController {

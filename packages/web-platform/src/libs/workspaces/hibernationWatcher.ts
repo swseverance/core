@@ -1,11 +1,8 @@
-import { HibernationRule } from "./rules/shape";
-import { WorkspaceIdleTimeRule } from "./rules/time";
-import { MaximumActiveWorkspacesRule } from "./rules/workspaces";
-import { WorkspaceConfigResult, WorkspaceEventPayload, WorkspaceSnapshotResult, WorkspaceStreamData, WorkspaceSummariesResult } from "../types";
-import { WorkspacesController } from "../controller";
+import { WindowStreamData, WorkspaceConfigResult, WorkspaceEventPayload, WorkspaceSnapshotResult, WorkspaceStreamData } from "./types";
+import { WorkspacesController } from "./controller";
 import { generate } from "shortid";
-import { Glue42WebPlatform } from "../../../../platform";
-import logger from "../../../shared/logger";
+import { Glue42WebPlatform } from "../../../platform";
+import logger from "../../shared/logger";
 import { Glue42Web } from "@glue42/web";
 import { UnsubscribeFunction } from "callback-registry";
 
@@ -19,6 +16,7 @@ export class WorkspaceHibernationWatcher {
         return logger.get("workspaces.controller");
     }
     private readonly workspaceIdToTimer: { [wid: string]: number } = {};
+    private maximumAmountCheckInProgress = false;
 
     public start(
         settings: Glue42WebPlatform.Workspaces.HibernationConfig | undefined,
@@ -70,7 +68,7 @@ export class WorkspaceHibernationWatcher {
                     delete this.workspaceIdToTimer[workspaceData.workspaceSummary.id];
                 }
 
-                this.addTimersForWorkspacesInFrame(e);
+                this.addTimersForWorkspacesInFrame(workspaceData.frameSummary.id);
                 this.checkMaximumAmount();
             }
         });
@@ -80,6 +78,7 @@ export class WorkspaceHibernationWatcher {
 
             if (isWindowOpened) {
                 this.checkMaximumAmount();
+                this.addTimersForWorkspacesInFrame((e.payload as WindowStreamData).windowSummary.config.frameId);
             }
         });
     }
@@ -93,6 +92,9 @@ export class WorkspaceHibernationWatcher {
             this.windowEventUnsub();
         }
         Object.values(this.workspaceIdToTimer).forEach((t) => {
+            if (t === undefined || t === null) {
+                return;
+            }
             clearTimeout(t);
         });
     }
@@ -108,10 +110,22 @@ export class WorkspaceHibernationWatcher {
     }
 
     private async checkMaximumAmount() {
+        if (this.maximumAmountCheckInProgress) {
+            return;
+        }
         if (!this.settings?.maximumActiveWorkspaces?.threshold) {
             return;
         }
+        this.maximumAmountCheckInProgress = true;
 
+        try {
+            await this.checkMaximumAmountCore(this.settings.maximumActiveWorkspaces.threshold);
+        } finally {
+            this.maximumAmountCheckInProgress = false;
+        }
+    }
+
+    private async checkMaximumAmountCore(threshold: number) {
         this.logger?.trace(`Checking for maximum active workspaces rule. The threshold is ${this.settings?.maximumActiveWorkspaces?.threshold}`);
 
         const commandId = generate();
@@ -119,17 +133,25 @@ export class WorkspaceHibernationWatcher {
         const snapshotsPromises = result.summaries.map(s => this.workspacesController.getWorkspaceSnapshot({ itemId: s.id }, commandId));
         const snapshots = await Promise.all(snapshotsPromises);
 
-        const eligibleForHibernation = snapshots.filter((s) => this.canBeHibernated(s));
+        const eligibleForHibernation = await snapshots.reduce(async (acc, s) => {
+            const result = await acc;
+            if (!await this.isWorkspaceHibernated(s.config) && !await this.isWorkspaceEmpty(s)) {
+                result.push(s);
+            }
 
-        if (eligibleForHibernation.length <= this.settings?.maximumActiveWorkspaces.threshold) {
+            return result;
+        }, Promise.resolve([] as WorkspaceSnapshotResult[]));
+
+        if (eligibleForHibernation.length <= threshold) {
             return;
         }
 
+        console.log(`Found ${eligibleForHibernation.length} eligible for hibernation workspaces`);
         this.logger?.trace(`Found ${eligibleForHibernation.length} eligible for hibernation workspaces`);
 
         const hibernationPromises = eligibleForHibernation
             .sort(this.compare)
-            .slice(0, eligibleForHibernation.length - this.settings.maximumActiveWorkspaces.threshold)
+            .slice(0, eligibleForHibernation.length - threshold)
             .map((w) => this.tryHibernateWorkspace(w.id));
 
         await Promise.all(hibernationPromises);
@@ -211,13 +233,12 @@ export class WorkspaceHibernationWatcher {
         return await Promise.all(snapshotPromises);
     }
 
-    private async addTimersForWorkspacesInFrame(data: WorkspaceEventPayload) {
+    private async addTimersForWorkspacesInFrame(frameId: string) {
         if (!this.settings?.idleWorkspaces?.idleMSThreshold) {
             return;
         }
 
-        const workspaceData = data.payload as WorkspaceStreamData;
-        const workspacesInFrame = await this.getWorkspacesInFrame(workspaceData.frameSummary.id);
+        const workspacesInFrame = await this.getWorkspacesInFrame(frameId);
 
         await Promise.all(workspacesInFrame.map(async (w) => {
             if (!await this.canBeHibernated(w) || this.workspaceIdToTimer[w.id]) {

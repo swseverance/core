@@ -14,7 +14,7 @@ import { WorkspacesController } from "../libs/workspaces/controller";
 import { IntentsController } from "../libs/intents/controller";
 import { ChannelsController } from "../libs/channels/controller";
 import { FramesController } from "../libs/workspaces/frames";
-import { WorkspaceHibernationWatcher } from "../libs/workspaces/hibernation/watcher";
+import { WorkspaceHibernationWatcher } from "../libs/workspaces/hibernationWatcher";
 
 export class IoC {
     private _gatewayInstance!: Gateway;
