@@ -146,7 +146,6 @@ export class WorkspaceHibernationWatcher {
             return;
         }
 
-        console.log(`Found ${eligibleForHibernation.length} eligible for hibernation workspaces`);
         this.logger?.trace(`Found ${eligibleForHibernation.length} eligible for hibernation workspaces`);
 
         const hibernationPromises = eligibleForHibernation
