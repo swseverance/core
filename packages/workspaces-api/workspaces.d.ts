@@ -115,6 +115,8 @@ export namespace Glue42Workspaces {
 
         /** A setting used to declare that the workspace must be in a new frame and also provide options for that new frame */
         newFrame?: NewFrameConfig | boolean;
+
+        loadStrategy?: LoadStrategy;
     }
 
     /** An object describing the possible settings when defining a new frame. */
@@ -154,7 +156,7 @@ export namespace Glue42Workspaces {
     }
 
     /** The restore strategy used to open new workspaces from existing layouts. */
-    export type RestoreType = "direct" | "delayed" | "lazy";
+    export type LoadStrategy = "direct" | "delayed" | "lazy";
 
     /** An object which represent a workspace element. This is an element can be a box or a workspace window. */
     export type WorkspaceElement = WorkspaceBox | WorkspaceWindow;
@@ -187,6 +189,19 @@ export namespace Glue42Workspaces {
 
         /** Provides the opportunity to open a workspace with no tab header */
         noTabHeader?: boolean;
+
+        loadStrategy?: LoadStrategy;
+    }
+
+    export interface LoadingConfig {
+        defaultStrategy?: "lazy",
+        delayed?: {
+            batchSize?: number,
+            intervalMs?: number
+        },
+        showLoadingIndicator: boolean; // dev
+
+    // Zzz
     }
 
     /** An object describing the possible options when defining a new workspace */

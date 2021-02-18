@@ -104,7 +104,7 @@ export const newFrameConfigDecoder: Decoder<Glue42Workspaces.NewFrameConfig> = o
     }))
 });
 
-export const restoreTypeDecoder: Decoder<Glue42Workspaces.RestoreType> = oneOf<"direct" | "delayed" | "lazy">(
+export const loadStrategyDecoder: Decoder<Glue42Workspaces.LoadStrategy> = oneOf<"direct" | "delayed" | "lazy">(
     constant("direct"),
     constant("delayed"),
     constant("lazy")
@@ -113,7 +113,7 @@ export const restoreTypeDecoder: Decoder<Glue42Workspaces.RestoreType> = oneOf<"
 export const restoreWorkspaceConfigDecoder: Decoder<Glue42Workspaces.RestoreWorkspaceConfig> = optional(object({
     app: optional(nonEmptyStringDecoder),
     context: optional(anyJson()),
-    restoreType: optional(restoreTypeDecoder),
+    loadStrategy: optional(loadStrategyDecoder),
     title: optional(nonEmptyStringDecoder),
     reuseWorkspaceId: optional(nonEmptyStringDecoder),
     frameId: optional(nonEmptyStringDecoder),
@@ -143,7 +143,8 @@ export const workspaceDefinitionDecoder: Decoder<Glue42Workspaces.WorkspaceDefin
         position: optional(nonNegativeNumberDecoder),
         isFocused: optional(boolean()),
         noTabHeader: optional(boolean()),
-        reuseWorkspaceId: optional(nonEmptyStringDecoder)
+        reuseWorkspaceId: optional(nonEmptyStringDecoder),
+        loadStrategy: optional(loadStrategyDecoder)
     })),
     frame: optional(object({
         reuseFrameId: optional(nonEmptyStringDecoder),
