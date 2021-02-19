@@ -251,8 +251,22 @@ export const gatewayConfigDecoder: Decoder<Glue42WebPlatform.Gateway.Config> = o
 // todo: proper implement when the config has been finalized
 export const glueConfigDecoder: Decoder<Glue42Web.Config> = anyJson();
 
+export const maximumActiveWorkspacesDecoder: Decoder<Glue42WebPlatform.Workspaces.MaximumActiveWorkspacesRule> = object({
+    threshold: number().where((num) => num > 1, "Expected a number larger than 1")
+});
+
+export const idleWorkspacesDecoder: Decoder<Glue42WebPlatform.Workspaces.IdleWorkspacesRule> = object({
+    idleMSThreshold: number().where((num) => num > 100, "Expected a number larger than 100")
+});
+
+export const hibernationConfigDecoder: Decoder<Glue42WebPlatform.Workspaces.HibernationConfig> = object({
+    maximumActiveWorkspaces: optional(maximumActiveWorkspacesDecoder),
+    idleWorkspaces: optional(idleWorkspacesDecoder)
+});
+
 export const workspacesConfigDecoder: Decoder<Glue42WebPlatform.Workspaces.Config> = object({
-    src: nonEmptyStringDecoder
+    src: nonEmptyStringDecoder,
+    hibernation: optional(hibernationConfigDecoder)
 });
 
 export const windowsConfigDecoder: Decoder<Glue42WebPlatform.Windows.Config> = object({

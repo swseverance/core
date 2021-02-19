@@ -4,7 +4,7 @@ import { FrameLayoutConfig, APIWIndowSettings, WorkspaceOptionsWithTitle } from 
 import { TitleGenerator } from "./titleGenerator";
 import { idAsString } from "../utils";
 import store from "../store";
-import { EmptyVisibleWindowName } from "../constants";
+import { EmptyVisibleWindowName } from "../utils/constants";
 import { Glue42Web } from "@glue42/web";
 
 declare const window: { glue: Glue42Web.API };

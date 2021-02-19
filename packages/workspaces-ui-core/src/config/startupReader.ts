@@ -1,5 +1,5 @@
 import { StartupConfig } from "../types/internal";
-import { EmptyFrameQueryParam, DisableCustomButtonsQueryParam, WorkspaceNameQueryParam, WorkspaceNamesQueryParam, ContextQueryParam, BuildQueryParam } from "../constants";
+import { EmptyFrameQueryParam, DisableCustomButtonsQueryParam, WorkspaceNameQueryParam, WorkspaceNamesQueryParam, ContextQueryParam, BuildQueryParam } from "../utils/constants";
 
 class StartupReader {
     private _config: StartupConfig;

@@ -117,6 +117,8 @@ export namespace Glue42Workspaces {
         newFrame?: NewFrameConfig | boolean;
 
         loadStrategy?: LoadStrategy;
+        /** Used for replacing the specified workspace instead of creating a new one */
+        reuseWorkspaceId?: string;
     }
 
     /** An object describing the possible settings when defining a new frame. */
@@ -190,6 +192,9 @@ export namespace Glue42Workspaces {
         /** Provides the opportunity to open a workspace with no tab header */
         noTabHeader?: boolean;
 
+        /** Used for replacing the specified workspace instead of creating a new one */
+        reuseWorkspaceId?: string;
+
         loadStrategy?: LoadStrategy;
     }
 
@@ -200,8 +205,6 @@ export namespace Glue42Workspaces {
             intervalMs?: number
         },
         showLoadingIndicator: boolean; // dev
-
-    // Zzz
     }
 
     /** An object describing the possible options when defining a new workspace */

@@ -102,6 +102,26 @@ describe('saveLayout() Should ', function () {
         expect(layoutUnderTest.components[0].state.context).to.not.exist;
     });
 
+    it("resolve the promise when the workspace has been hibernated", async () => {
+        const layoutName = gtf.getWindowName("layout.integration");
+
+        await workspace.frame.createWorkspace(basicConfig);
+        await workspace.hibernate();
+
+        await workspace.saveLayout(layoutName, { saveContext: false });
+    });
+
+    it("save a layout that can be restored when the workspace has been hibernated", async () => {
+        const layoutName = gtf.getWindowName("layout.integration");
+
+        await workspace.frame.createWorkspace(basicConfig);
+        await workspace.hibernate();
+
+        await workspace.saveLayout(layoutName, { saveContext: false });
+
+        await workspace.frame.restoreWorkspace(layoutName);
+    });
+    
     it("save the layout with title which matches the one before the operation", async () => {
         const title = "myNewTitle";
         const layoutName = gtf.getWindowName("layout.integration");
