@@ -76,7 +76,7 @@ class WorkspaceStore {
 
     public getWindow(id: string | string[]) {
         const winId = idAsString(id);
-        return this.layouts.reduce((acc, l) => acc || l.windows.find((w) => w.id === winId || w.windowId === winId), undefined);
+        return this.layouts.reduce<Window>((acc, l) => acc || l.windows.find((w) => w.id === winId || w.windowId === winId), undefined);
     }
 
     public getActiveWorkspace(): Workspace {

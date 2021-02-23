@@ -266,3 +266,49 @@ export interface VisibilityState {
 export type WorkspaceOptionsWithTitle = GoldenLayout.WorkspacesOptions & { title?: string };
 export type WorkspaceOptionsWithLayoutName = GoldenLayout.WorkspacesOptions & { layoutName?: string };
 export type LayoutWithMaximizedItem = GoldenLayout & { _maximizedItem?: GoldenLayout.ContentItem };
+
+export interface MaximumActiveWorkspacesRule {
+    threshold: number;
+}
+
+export interface IdleWorkspacesRule {
+    idleMSThreshold: number;
+}
+
+export interface WorkspacesHibernationConfig {
+    maximumActiveWorkspaces?: MaximumActiveWorkspacesRule;
+    idleWorkspaces?: IdleWorkspacesRule;
+}
+
+export type LoadingStrategy = "direct" | "delayed" | "lazy";
+
+export interface WorkspacesLoadingConfig {
+    /**
+     * Default restore strategy when restoring Swimlane workspaces.
+     */
+    defaultStrategy?: LoadingStrategy;
+    delayed: {
+        /**
+         * Valid only in `delayed` mode. Initial period after which to start loading applications in batches.
+         */
+        initialOffsetInterval?: number;
+        /**
+         * Valid only in `delayed` mode. Interval in minutes at which to load the application batches.
+         */
+        interval?: number;
+        /**
+         * Valid only in `delayed` mode. Number of applications in a batch to be loaded at each interval.
+         */
+        batch?: number;
+    }
+    /**
+     * Visual indicator `Zzz` on tabs of apps which are not loaded yet. Useful for developing and testing purposes.
+     */
+    showDelayedIndicator?: boolean;
+}
+
+export interface WorkspacesSystemConfig {
+    src: string;
+    hibernation?: WorkspacesHibernationConfig;
+    loadingStrategy?: WorkspacesLoadingConfig;
+}

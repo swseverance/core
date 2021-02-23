@@ -83,12 +83,18 @@ export class IFrameController {
                 // console.warn(error);
             }
             frame.remove();
+
+            this._registry.execute("frame-removed", id);
         }
 
     }
 
     public onFrameLoaded(callback: (frameId: string) => void) {
         return this._registry.add("frameLoaded", callback);
+    }
+
+    public onFrameRemoved(callback: (frameId: string) => void) {
+        return this._registry.add("frame-removed", callback);
     }
 
     public onFrameContentClicked(callback: () => void) {
@@ -118,10 +124,6 @@ export class IFrameController {
         frame.style.height = "0px";
         frame.src = url;
         document.body.appendChild(frame);
-
-        frame.onload = () => {
-            console.log("WHY");
-        }
 
         this._registry.execute("frameLoaded", id);
 

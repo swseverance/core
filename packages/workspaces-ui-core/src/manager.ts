@@ -214,7 +214,7 @@ export class WorkspacesManager {
     }
 
     public async addContainer(config: GoldenLayout.RowConfig | GoldenLayout.StackConfig | GoldenLayout.ColumnConfig, parentId: string) {
-        await this._controller.addContainer(config, parentId);
+        const result = await this._controller.addContainer(config, parentId);
 
         const windowConfigs = getAllWindowsFromConfig(config.content);
         const workspace = store.getById(parentId) || store.getByContainerId(parentId);
@@ -224,6 +224,8 @@ export class WorkspacesManager {
 
             return this._applicationFactory.start(component, workspace.id);
         }));
+
+        return result;
     }
 
     public async addWindow(itemConfig: GoldenLayout.ItemConfig, parentId: string) {

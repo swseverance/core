@@ -14,6 +14,7 @@ import { WindowMoveResizeConfig } from "../windows/types";
 import { StateController } from "../../controllers/state";
 import { WorkspaceHibernationWatcher } from "./hibernationWatcher";
 import callbackRegistry from "callback-registry";
+import { workspacesConfigDecoder } from "../../shared/decoders";
 
 export class WorkspacesController implements LibController {
     private started = false;
@@ -51,7 +52,8 @@ export class WorkspacesController implements LibController {
         addContainer: { name: "addContainer", dataDecoder: addContainerConfigDecoder, resultDecoder: addItemResultDecoder, execute: this.addContainer.bind(this) },
         bundleWorkspace: { name: "bundleWorkspace", dataDecoder: bundleConfigDecoder, resultDecoder: voidResultDecoder, execute: this.bundleWorkspace.bind(this) },
         hibernateWorkspace: { name: "hibernateWorkspace", dataDecoder: workspaceSelectorDecoder, resultDecoder: voidResultDecoder, execute: this.hibernateWorkspace.bind(this) },
-        resumeWorkspace: { name: "resumeWorkspace", dataDecoder: workspaceSelectorDecoder, resultDecoder: voidResultDecoder, execute: this.resumeWorkspace.bind(this) }
+        resumeWorkspace: { name: "resumeWorkspace", dataDecoder: workspaceSelectorDecoder, resultDecoder: voidResultDecoder, execute: this.resumeWorkspace.bind(this) },
+        getWorkspacesConfig: { name: "getWorkspacesConfig", resultDecoder: workspacesConfigDecoder, execute: this.getWorkspacesConfiguration.bind(this) }
     }
 
     constructor(
@@ -139,7 +141,7 @@ export class WorkspacesController implements LibController {
         this.glueController.pushWorkspacesMessage(data);
         this.handleWorkspaceEventCore(data);
     }
-   
+
     public subscribeForFrameEvent(callback: (data: WorkspaceEventPayload) => void) {
         return this.registry.add("frame", callback);
     }
@@ -197,6 +199,12 @@ export class WorkspacesController implements LibController {
         await this.glueController.callFrame<WorkspaceSelector, void>(this.operations.hibernateWorkspace, config, frame.windowId);
 
         this.logger?.trace(`[${commandId}] frame ${frame.windowId} gave a success signal, responding to caller`);
+    }
+
+    public async getWorkspacesConfiguration(config: unknown, commandId: string): Promise<Glue42WebPlatform.Workspaces.Config> {
+        this.logger?.trace(`[${commandId}] handling getWorkspacesConfiguration request`);
+
+        return this.settings;
     }
 
     private async handleFrameHello(config: FrameHello, commandId: string): Promise<void> {

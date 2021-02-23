@@ -8,12 +8,14 @@ import { LayoutStateResolver } from "../layout/stateResolver";
 import store from "../store";
 import { getElementBounds, idAsString } from "../utils";
 import createRegistry from "callback-registry";
-import { Window, WindowSummary } from "../types/internal";
+import { Window, WindowSummary, Workspace, WorkspacesLoadingConfig, WorkspacesSystemConfig } from "../types/internal";
 import { DelayedExecutor } from "../utils/delayedExecutor";
 
 export class ApplicationFactory {
     private readonly registry = createRegistry();
     private readonly WAIT_FOR_WINDOWS_TIMEOUT = 30000;
+    private loadingSettings: WorkspacesLoadingConfig;
+    private readonly idToWindowPromise: { [itemId: string]: Promise<void> } = {};
 
     constructor(
         private readonly _glue: Glue42Web.API,
@@ -24,125 +26,36 @@ export class ApplicationFactory {
     ) { }
 
     public async start(component: GoldenLayout.Component, workspaceId: string) {
+        if (!this.loadingSettings) {
+            this.loadingSettings = await this.askForLoadingSettings();
+        }
+
         if (component.config.componentName === EmptyVisibleWindowName) {
             return;
         }
+
+        if (this.idToWindowPromise[idAsString(component.config.id)]) {
+            return this.idToWindowPromise[idAsString(component.config.id)];
+        }
+
         const workspace = store.getById(workspaceId);
-        const newWindowBounds = getElementBounds(component.element);
-        const { componentState } = component.config;
-        const { title, appName } = componentState;
-        let { windowId } = componentState;
-        const componentId = idAsString(component.config.id);
-        const applicationTitle = this.getTitleByAppName(appName);
-        const windowTitle = this.vaidateTitle(title) || this.vaidateTitle(applicationTitle) || this.vaidateTitle(appName) || "Glue";
-        const windowContext = component?.config.componentState?.context;
-        let url = this.getUrlByAppName(componentState.appName) || componentState.url;
 
-        const isNewWindow = !store.getWindow(componentId);
-        const isHibernatedWindow = workspace.hibernatedWindows.some(w => w.id === idAsString(component.config.id));
-
-        store.addWindow({
-            id: componentId,
-            bounds: newWindowBounds,
-            windowId,
-            url,
-            appName
-        }, workspace.id);
-
-        if (!url && windowId) {
-            const win = this._glue.windows.list().find((w) => w.id === windowId);
-
-            url = await win.getURL();
-            const newlyAddedWindow = store.getWindow(componentId) as Window;
-
-            newlyAddedWindow.url = url;
+        if (!workspace) {
+            return;
         }
 
-        windowId = windowId || generate();
+        const startPromise = this.startCore(component, workspace);
 
-        if (component.config.componentState?.context) {
-            delete component.config.componentState.context;
-        }
+        this.idToWindowPromise[idAsString(component.config.id)] = startPromise;
 
-        component.config.componentState.url = url;
-        if (windowTitle) {
-            component.setTitle(windowTitle);
-        }
-        if (isNewWindow && !isHibernatedWindow) {
-            const windowSummary = this._stateResolver.getWindowSummarySync(componentId, component);
-            this._manager.workspacesEventEmitter.raiseWindowEvent({
-                action: "added",
-                payload: {
-                    windowSummary
-                }
-            });
-
-            const glueWinOutsideOfWorkspace = this._glue.windows.findById(windowId);
-            if (glueWinOutsideOfWorkspace) {
-                try {
-                    // Glue windows with the given id should be closed
-                    await glueWinOutsideOfWorkspace.close();
-                } catch (error) {
-                    // because of chrome security policy this call can fail,
-                    // however the opening of a new window should continue
-                }
+        const unsub = this._frameController.onFrameRemoved((frameId) => {
+            if (frameId === idAsString(component.config.id)) {
+                unsub();
+                delete this.idToWindowPromise[frameId];
             }
-        }
+        });
 
-        try {
-            await this.notifyFrameWillStart(windowId, appName, windowContext, windowTitle);
-            await this._frameController.startFrame(componentId, url, undefined, windowId);
-            const newlyAddedWindow = store.getWindow(componentId) as Window;
-
-            component.config.componentState.windowId = windowId;
-            newlyAddedWindow.windowId = windowId;
-
-            const newlyOpenedWindow = this._glue.windows.findById(windowId);
-            newlyOpenedWindow.getTitle().then((winTitle) => {
-                component.setTitle(winTitle);
-            }).catch((e) => {
-                console.warn("Failed while setting the window title", e);
-            });
-
-            this._frameController.moveFrame(componentId, getElementBounds(component.element));
-
-            if (isNewWindow && !isHibernatedWindow) {
-                this._manager.workspacesEventEmitter.raiseWindowEvent({
-                    action: "loaded",
-                    payload: {
-                        windowSummary: await this._stateResolver.getWindowSummary(componentId)
-                    }
-                });
-            }
-
-            if (!appName) {
-                const appNameToUse = this.getAppNameByWindowId(windowId);
-                if (!component.config.componentState) {
-                    throw new Error(`Invalid state - the created component ${componentId} with windowId ${windowId} is missing its state object`);
-                }
-                component.config.componentState.appName = appNameToUse;
-
-
-                newlyAddedWindow.appName = appNameToUse;
-            }
-
-        } catch (error) {
-            this.raiseFailed(component, workspaceId);
-            // If a frame doesn't initialize properly remove its windowId
-            component.config.componentState.windowId = undefined;
-            if (url) {
-                this._frameController.moveFrame(componentId, getElementBounds(component.element));
-            } else {
-                this._manager.closeTab(component, false);
-            }
-            const wsp = store.getById(workspaceId);
-            if (!wsp) {
-                throw new Error(`Workspace ${workspaceId} failed ot initialize because none of the specified windows were able to load
-                Internal error: ${error}`);
-            }
-        } finally {
-            workspace.hibernatedWindows = workspace.hibernatedWindows.filter((hw) => hw.id !== idAsString(component.config.id));
-        }
+        return startPromise;
     }
 
     public async startLazy(workspaceId: string) {
@@ -314,6 +227,135 @@ export class ApplicationFactory {
         return {
             visibleComponents,
             notImmediatelyVisibleComponents
+        }
+    }
+
+    private async askForLoadingSettings() {
+        const result = await this._glue.interop.invoke<WorkspacesSystemConfig>(PlatformControlMethod, {
+            domain: "workspaces",
+            operation: "getWorkspacesConfig",
+            data: {
+            }
+        });
+
+        return result.returned.loadingStrategy;
+    }
+
+    private async startCore(component: GoldenLayout.Component, workspace: Workspace) {
+        const newWindowBounds = getElementBounds(component.element);
+        const { componentState } = component.config;
+        const { title, appName } = componentState;
+        let { windowId } = componentState;
+        const componentId = idAsString(component.config.id);
+        const applicationTitle = this.getTitleByAppName(appName);
+        const windowTitle = this.vaidateTitle(title) || this.vaidateTitle(applicationTitle) || this.vaidateTitle(appName) || "Glue";
+        const windowContext = component?.config.componentState?.context;
+        let url = this.getUrlByAppName(componentState.appName) || componentState.url;
+
+        const windowFromCollection = store.getWindow(componentId);
+        const isNewWindow = !windowFromCollection || !store.getWindow(componentId).windowId;
+        const isHibernatedWindow = workspace.hibernatedWindows.some(w => w.id === idAsString(component.config.id));
+
+        store.addWindow({
+            id: componentId,
+            bounds: newWindowBounds,
+            windowId,
+            url,
+            appName
+        }, workspace.id);
+
+        if (!url && windowId) {
+            const win = this._glue.windows.list().find((w) => w.id === windowId);
+
+            url = await win.getURL();
+            const newlyAddedWindow = store.getWindow(componentId) as Window;
+
+            newlyAddedWindow.url = url;
+        }
+
+        windowId = windowId || generate();
+
+        if (component.config.componentState?.context) {
+            delete component.config.componentState.context;
+        }
+
+        component.config.componentState.url = url;
+        if (windowTitle) {
+            component.setTitle(windowTitle);
+        }
+        if (isNewWindow && !isHibernatedWindow) {
+            const windowSummary = this._stateResolver.getWindowSummarySync(componentId, component);
+            this._manager.workspacesEventEmitter.raiseWindowEvent({
+                action: "added",
+                payload: {
+                    windowSummary
+                }
+            });
+
+            const glueWinOutsideOfWorkspace = this._glue.windows.findById(windowId);
+            if (glueWinOutsideOfWorkspace) {
+                try {
+                    // Glue windows with the given id should be closed
+                    await glueWinOutsideOfWorkspace.close();
+                } catch (error) {
+                    // because of chrome security policy this call can fail,
+                    // however the opening of a new window should continue
+                }
+            }
+        }
+
+        try {
+            await this.notifyFrameWillStart(windowId, appName, windowContext, windowTitle);
+            await this._frameController.startFrame(componentId, url, undefined, windowId);
+            const newlyAddedWindow = store.getWindow(componentId) as Window;
+
+            component.config.componentState.windowId = windowId;
+            newlyAddedWindow.windowId = windowId;
+
+            const newlyOpenedWindow = this._glue.windows.findById(windowId);
+            newlyOpenedWindow.getTitle().then((winTitle) => {
+                component.setTitle(winTitle);
+            }).catch((e) => {
+                console.warn("Failed while setting the window title", e);
+            });
+
+            this._frameController.moveFrame(componentId, getElementBounds(component.element));
+            if (isNewWindow && !isHibernatedWindow) {
+                this._manager.workspacesEventEmitter.raiseWindowEvent({
+                    action: "loaded",
+                    payload: {
+                        windowSummary: await this._stateResolver.getWindowSummary(componentId)
+                    }
+                });
+            }
+
+            if (!appName) {
+                const appNameToUse = this.getAppNameByWindowId(windowId);
+                if (!component.config.componentState) {
+                    throw new Error(`Invalid state - the created component ${componentId} with windowId ${windowId} is missing its state object`);
+                }
+                component.config.componentState.appName = appNameToUse;
+
+
+                newlyAddedWindow.appName = appNameToUse;
+            }
+
+        } catch (error) {
+            this.raiseFailed(component, workspace.id);
+            // If a frame doesn't initialize properly remove its windowId
+            component.config.componentState.windowId = undefined;
+            if (url) {
+                this._frameController.moveFrame(componentId, getElementBounds(component.element));
+            } else {
+                this._manager.closeTab(component, false);
+            }
+            const wsp = store.getById(workspace.id);
+            if (!wsp) {
+                throw new Error(`Workspace ${workspace.id} failed ot initialize because none of the specified windows were able to load
+                Internal error: ${error}`);
+            }
+        } finally {
+            workspace.hibernatedWindows = workspace.hibernatedWindows.filter((hw) => hw.id !== idAsString(component.config.id));
         }
     }
 }

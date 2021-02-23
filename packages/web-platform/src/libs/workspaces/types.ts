@@ -49,7 +49,8 @@ export type WorkspacesOperationsTypes = "isWindowInWorkspace" |
     "getFrameState" |
     "frameHello" |
     "hibernateWorkspace" |
-    "resumeWorkspace";
+    "resumeWorkspace" |
+    "getWorkspacesConfig";
 
 export interface FrameQueryConfig {
     frameId?: string;

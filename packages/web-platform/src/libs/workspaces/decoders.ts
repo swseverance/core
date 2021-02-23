@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { Glue42Workspaces } from "@glue42/workspaces-api";
 import { anyJson, array, boolean, constant, Decoder, intersection, lazy, number, object, oneOf, optional, string } from "decoder-validate";
+import { Glue42WebPlatform } from "../../../platform";
 import { nonEmptyStringDecoder, nonNegativeNumberDecoder, windowLayoutItemDecoder } from "../../shared/decoders";
 import { AddContainerConfig, AddItemResult, AddWindowConfig, BaseChildSnapshotConfig, BundleConfig, ChildSnapshotResult, ContainerStreamData, ContainerSummaryResult, DeleteLayoutConfig, ExportedLayoutsResult, FrameHello, FrameSnapshotResult, FrameStateConfig, FrameStateResult, FrameStreamData, FrameSummariesResult, FrameSummaryResult, GetFrameSummaryConfig, IsWindowInSwimlaneResult, LayoutSummariesResult, LayoutSummary, MoveFrameConfig, MoveWindowConfig, OpenWorkspaceConfig, ParentSnapshotConfig, PingResult, ResizeItemConfig, SetItemTitleConfig, SimpleItemConfig, SimpleWindowOperationSuccessResult, SwimlaneWindowSnapshotConfig, WindowStreamData, WorkspaceConfigResult, WorkspaceCreateConfigProtocol, WorkspaceEventAction, WorkspaceEventType, WorkspaceSelector, WorkspacesLayoutImportConfig, WorkspaceSnapshotResult, WorkspacesOperationsTypes, WorkspaceStreamData, WorkspaceSummariesResult, WorkspaceSummaryResult, WorkspaceWindowData } from "./types";
 
@@ -11,7 +12,7 @@ export const workspacesOperationDecoder: Decoder<WorkspacesOperationsTypes> = on
     "deleteLayout" | "saveLayout" | "importLayout" | "exportAllLayouts" | "restoreItem" | "maximizeItem" |
     "focusItem" | "closeItem" | "resizeItem" | "moveFrame" | "getFrameSnapshot" | "forceLoadWindow" |
     "ejectWindow" | "setItemTitle" | "moveWindowTo" | "addWindow" | "addContainer" |
-    "bundleWorkspace" | "changeFrameState" | "getFrameState" | "frameHello" | "hibernateWorkspace" | "resumeWorkspace"
+    "bundleWorkspace" | "changeFrameState" | "getFrameState" | "frameHello" | "hibernateWorkspace" | "resumeWorkspace" | "getWorkspacesConfig"
 >(
     constant("isWindowInWorkspace"),
     constant("createWorkspace"),
@@ -43,7 +44,8 @@ export const workspacesOperationDecoder: Decoder<WorkspacesOperationsTypes> = on
     constant("getFrameState"),
     constant("frameHello"),
     constant("hibernateWorkspace"),
-    constant("resumeWorkspace")
+    constant("resumeWorkspace"),
+    constant("getWorkspacesConfig")
 );
 
 export const frameHelloDecoder: Decoder<FrameHello> = object({
@@ -155,7 +157,7 @@ export const newFrameConfigDecoder: Decoder<Glue42Workspaces.NewFrameConfig> = o
     }))
 });
 
-export const loadStrategyDecoder: Decoder<Glue42Workspaces.LoadStrategy> = oneOf<"direct" | "delayed" | "lazy">(
+export const loadStrategyDecoder: Decoder<Glue42Workspaces.LoadingStrategy> = oneOf<"direct" | "delayed" | "lazy">(
     constant("direct"),
     constant("delayed"),
     constant("lazy")

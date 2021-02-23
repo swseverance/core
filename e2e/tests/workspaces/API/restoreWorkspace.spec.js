@@ -411,5 +411,159 @@ describe('restoreWorkspace() Should', function () {
             expect(allFrames.length).to.eql(3);
             expect(windowsInWorkspaceFour.length).to.eql(2);
         });
-    })
+    });
+
+    describe('loadingStrategy Should ', function () {
+        const config = {
+            children: [
+                {
+                    type: "column",
+                    children: [
+                        {
+                            type: "row", children: [{
+                                type: "group",
+                                children: [
+                                    { type: "window", appName: "dummyApp" },
+                                    { type: "window", appName: "dummyApp" }]
+                            }]
+                        },
+                        {
+                            type: "row", children: [{
+                                type: "group",
+                                children: [
+                                    { type: "window", appName: "dummyApp" },
+                                    { type: "window", appName: "dummyApp" }]
+                            }]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        beforeEach(async () => {
+            workspace = await glue.workspaces.createWorkspace(config);
+            await workspace.saveLayout(layoutName, { saveContext: false });
+            await workspace.frame.close();
+        });
+
+        afterEach(async () => {
+            const wsps = await glue.workspaces.getAllWorkspaces();
+            await Promise.all(wsps.map((wsp) => wsp.close()));
+        });
+
+        it("load all windows when the loadingStrategy is direct", async () => {
+            let resolve;
+            const promise = new Promise((res, rej) => {
+                resolve = res;
+            });
+
+            const ready = gtf.waitFor(4, () => resolve());
+
+            let unsub = await glue.workspaces.onWindowLoaded((w) => {
+                ready();
+            });
+
+            await glue.workspaces.restoreWorkspace(layoutName, { loadingStrategy: "direct" });
+
+            return promise;
+        });
+
+        it("load only the visible windows when the loadingStrategy is lazy", async () => {
+            let resolve;
+            const promise = new Promise((res, rej) => {
+                resolve = res;
+            });
+
+            const ready = gtf.waitFor(2, () => resolve());
+
+            let unsub = await glue.workspaces.onWindowLoaded(() => {
+                ready();
+            });
+
+            await glue.workspaces.restoreWorkspace(layoutName, { loadingStrategy: "lazy" });
+
+            return promise;
+        });
+
+        it("load all windows for 60 seconds when the loadingStrategy is delayed", async () => {
+            let resolve;
+            const promise = new Promise((res, rej) => {
+                resolve = res;
+            });
+
+            const ready = gtf.waitFor(4, () => resolve());
+
+            let unsub = await glue.workspaces.onWindowLoaded(() => {
+                ready();
+            });
+
+            await glue.workspaces.restoreWorkspace(layoutName, { loadingStrategy: "delayed" });
+
+            return promise;
+        });
+
+
+        [0, 100, 200, 300, 400, 500].forEach((delay) => {
+            it(`not start any new windows when the loadingStrategy is delayed and the frame has been closed with a delay of ${delay} before all windows can be loaded`, async () => {
+                let resolve;
+                let reject;
+                const promise = new Promise((res, rej) => {
+                    resolve = res;
+                    reject = rej;
+                });
+
+                let frameClosed = false;
+
+                let unsub = await glue.windows.onWindowAdded(() => {
+                    if (frameClosed) {
+                        reject("Should not be invoked after the frame has been stopped");
+                    }
+                });
+
+                const workspace = await glue.workspaces.restoreWorkspace(layoutName, { loadingStrategy: "delayed" });
+                await gtf.wait(delay);
+                await workspace.frame.close();
+                frameClosed = true;
+
+                gtf.wait(5000).then(() => {
+                    resolve();
+                });
+
+                return promise;
+            });
+        });
+
+        it.skip(`not start any new windows when the loadingStrategy is delayed and the frame is in parallel with its creation`, async () => {
+            let resolve;
+            let reject;
+            const promise = new Promise((res, rej) => {
+                resolve = res;
+                reject = rej;
+            });
+
+            let frameClosed = false;
+            const allFrames = await glue.workspaces.getAllFrames();
+
+            await Promise.all(allFrames.map(f => f.close()));
+
+            const frame = (await glue.workspaces.createWorkspace({ children: [] })).frame;
+
+            let unsub = await glue.windows.onWindowAdded((w) => {
+                if (frameClosed) {
+                    reject("Should not be invoked after the frame has been stopped" + " " + w.id);
+                }
+            });
+
+            glue.workspaces.restoreWorkspace(layoutName, { loadingStrategy: "delayed" });
+            frame.close().then(() => {
+                frameClosed = true;
+            });
+
+            gtf.wait(5000).then(() => {
+                resolve();
+            });
+
+            return promise;
+        });
+    });
 });

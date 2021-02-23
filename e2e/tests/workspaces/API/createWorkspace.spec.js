@@ -618,6 +618,142 @@ describe('createWorkspace() ', function () {
 
         });
     });
+
+    describe.only('loadingStrategy Should ', function () {
+        const config = {
+            children: [
+                {
+                    type: "column",
+                    children: [
+                        {
+                            type: "row", children: [{ type: "group", children: [{ type: "window", appName: "noGlueApp" }, { type: "window", appName: "noGlueApp" }] }]
+                        },
+                        {
+                            type: "row", children: [{ type: "group", children: [{ type: "window", appName: "noGlueApp" }, { type: "window", appName: "noGlueApp" }] }]
+                        }
+                    ]
+                }
+            ]
+        }
+
+        it("load all windows when the loadingStrategy is direct", async () => {
+            let resolve;
+            const promise = new Promise((res, rej) => {
+                resolve = res;
+            });
+
+            const ready = gtf.waitFor(4, () => resolve());
+
+            const directConfig = Object.assign(config, { config: { loadingStrategy: "direct" } });
+
+            let unsub = await glue.workspaces.onWindowLoaded(() => {
+                ready();
+            });
+
+            await glue.workspaces.createWorkspace(directConfig);
+
+
+            return promise;
+        });
+
+        it("load only the visible windows when the loadingStrategy is lazy", async () => {
+            let resolve;
+            const promise = new Promise((res, rej) => {
+                resolve = res;
+            });
+
+            const ready = gtf.waitFor(2, () => resolve());
+            const directConfig = Object.assign(config, { config: { loadingStrategy: "lazy" } });
+
+            let unsub = await glue.workspaces.onWindowLoaded(() => {
+                ready();
+            });
+
+            await glue.workspaces.createWorkspace(directConfig);
+
+            return promise;
+        });
+
+        it("load all windows for 60 seconds when the loadingStrategy is delayed", async () => {
+            let resolve;
+            const promise = new Promise((res, rej) => {
+                resolve = res;
+            });
+
+            const ready = gtf.waitFor(4, () => resolve());
+            const directConfig = Object.assign(config, { config: { loadingStrategy: "delayed" } });
+
+            let unsub = await glue.workspaces.onWindowLoaded(() => {
+                ready();
+            });
+
+            await glue.workspaces.createWorkspace(directConfig);
+
+            return promise;
+        });
+
+
+        [0, 100, 200, 300, 400, 500].forEach((delay) => {
+            it(`not start any new windows when the loadingStrategy is delayed and the frame has been closed with a delay of ${delay} before all windows can be loaded`, async () => {
+                let resolve;
+                let reject;
+                const promise = new Promise((res, rej) => {
+                    resolve = res;
+                    reject = rej;
+                });
+
+                let frameClosed = false;
+                const directConfig = Object.assign(config, { config: { loadingStrategy: "delayed" } });
+
+                let unsub = await glue.windows.onWindowAdded(() => {
+                    if (frameClosed) {
+                        reject("Should not be invoked after the frame has been stopped");
+                    }
+                });
+
+                const workspace = await glue.workspaces.createWorkspace(directConfig);
+                await gtf.wait(delay);
+                await workspace.frame.close();
+                frameClosed = true;
+
+                gtf.wait(5000).then(() => {
+                    resolve();
+                });
+
+                return promise;
+            });
+        });
+
+        it(`not start any new windows when the loadingStrategy is delayed and the frame is in parallel with its creation`, async () => {
+            let resolve;
+            let reject;
+            const promise = new Promise((res, rej) => {
+                resolve = res;
+                reject = rej;
+            });
+
+            let frameClosed = false;
+            const frame = (await glue.workspaces.createWorkspace({ children: [] })).frame;
+            const directConfig = Object.assign(config, { config: { loadingStrategy: "delayed" } });
+
+            let unsub = await glue.windows.onWindowAdded(() => {
+                if (frameClosed) {
+                    reject("Should not be invoked after the frame has been stopped");
+                }
+            });
+
+            glue.workspaces.createWorkspace(directConfig);
+            frame.close().then(() => {
+                frameClosed = true;
+            });
+
+            gtf.wait(5000).then(() => {
+                resolve();
+            });
+
+            return promise;
+        });
+    });
     // SAVE CONFIG
     // after resolve the layout should be present in the layouts collection when specified in the save config
     // after resolve the layout should NOT be present in the layouts collection when there is no save config
