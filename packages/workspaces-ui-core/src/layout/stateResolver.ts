@@ -4,10 +4,12 @@ import GoldenLayout, { ItemConfig } from "@glue42/golden-layout";
 import { LayoutEventEmitter } from "./eventEmitter";
 import { idAsString } from "../utils";
 import { EmptyVisibleWindowName } from "../utils/constants";
+import { IFrameController } from "../iframeController";
 
 export class LayoutStateResolver {
     constructor(private readonly _frameId: string,
-        private readonly _layoutEventEmitter: LayoutEventEmitter) { }
+        private readonly _layoutEventEmitter: LayoutEventEmitter,
+        private readonly frameController: IFrameController) { }
 
     public async getWindowSummary(windowId: string | string[]): Promise<WindowSummary> {
         windowId = Array.isArray(windowId) ? windowId[0] : windowId;
@@ -186,6 +188,10 @@ export class LayoutStateResolver {
         return result;
     }
 
+    public isWindowLoaded(id: string | string[]) {
+        return this.frameController.hasFrame(idAsString(id));
+    }
+
     private findElementInConfig(elementId: string, config: GoldenLayout.Config): GoldenLayout.ItemConfig {
         const search = (glConfig: GoldenLayout.Config | GoldenLayout.ItemConfig): Array<GoldenLayout.ItemConfig> => {
             if (glConfig.id === elementId) {
@@ -215,7 +221,7 @@ export class LayoutStateResolver {
 
     private getWindowSummaryCore(windowContentItem: GoldenLayout.Component, winId: string) {
         const isFocused = windowContentItem.parent.getActiveContentItem().config.id === windowContentItem.config.id;
-        const isLoaded = windowContentItem.config.componentState.windowId !== undefined;
+        const isLoaded = this.isWindowLoaded(windowContentItem.config.id);
         const positionIndex = this.getWindowPositionIndex(windowContentItem);
         const workspaceId = store.getByWindowId(winId)?.id;
         const { appName, url, windowId } = windowContentItem.config.componentState;

@@ -70,7 +70,7 @@ export class Bridge {
             operationResult = operationDefinition.resultDecoder.runWithException(operationResultRaw);
         } catch (error) {
             if (error.kind) {
-                throw new Error(`Unexpected internal incoming validation error: ${error.message}, for input: ${JSON.stringify(error.input)}, for operation ${operationName}`);
+                throw new Error(`args: ${JSON.stringify(operationArgs)} result: ${JSON.stringify(operationResult)}Unexpected internal incoming validation error: ${error.message}, for input: ${JSON.stringify(error.input)}, for operation ${operationName}`);
             }
             throw new Error(error.message);
         }

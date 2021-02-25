@@ -1,4 +1,4 @@
-import { WorkspaceItem, WorkspaceSnapshot, RowItem, ColumnItem, GroupItem, WindowDefinition } from "../types/internal";
+import { WorkspaceItem, WorkspaceSnapshot, RowItem, ColumnItem, GroupItem, WindowDefinition, LoadingStrategy } from "../types/internal";
 
 //#region Requests
 
@@ -179,6 +179,7 @@ export interface RestoreWorkspaceConfig {
     context?: object;
     noTabHeader?: boolean;
     reuseWorkspaceId?: string;
+    loadingStrategy?: LoadingStrategy;
 }
 
 export interface AddWindowArguments {
@@ -202,6 +203,7 @@ export interface CreateWorkspaceArguments extends WorkspaceItem {
     // add the save config
     saveConfig?: object;
     context?: object;
+    loadingStrategy: LoadingStrategy;
 }
 
 export interface MoveFrameArguments {

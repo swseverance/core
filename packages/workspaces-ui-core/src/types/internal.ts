@@ -161,6 +161,7 @@ export interface FrameLayoutConfig {
     workspaceLayout: GoldenLayout.Config;
     workspaceConfigs: Array<{ id: string; config: GoldenLayout.Config }>;
     frameId: string;
+    showLoadingIndicator?: boolean;
 }
 
 export interface WindowDefinition {

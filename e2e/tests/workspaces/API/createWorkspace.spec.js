@@ -5,7 +5,7 @@ describe('createWorkspace() ', function () {
 
     afterEach(async () => {
         const frames = await glue.workspaces.getAllFrames();
-        await Promise.all(frames.map((frame) => frame.close()));
+        // await Promise.all(frames.map((frame) => frame.close()));
     });
 
     // this should be iterated with different complexities configs
@@ -637,59 +637,49 @@ describe('createWorkspace() ', function () {
         }
 
         it("load all windows when the loadingStrategy is direct", async () => {
-            let resolve;
-            const promise = new Promise((res, rej) => {
-                resolve = res;
-            });
-
-            const ready = gtf.waitFor(4, () => resolve());
+            let loadedWindowsCount = 0;
 
             const directConfig = Object.assign(config, { config: { loadingStrategy: "direct" } });
 
             let unsub = await glue.workspaces.onWindowLoaded(() => {
-                ready();
+                loadedWindowsCount++;
             });
 
             await glue.workspaces.createWorkspace(directConfig);
+            await gtf.wait(3000);
 
-
-            return promise;
+            expect(loadedWindowsCount).to.eql(4);
         });
 
-        it("load only the visible windows when the loadingStrategy is lazy", async () => {
-            let resolve;
-            const promise = new Promise((res, rej) => {
-                resolve = res;
-            });
+        it.only("load only the visible windows when the loadingStrategy is lazy", async () => {
+            let loadedWindowsCount = 0;
 
-            const ready = gtf.waitFor(2, () => resolve());
             const directConfig = Object.assign(config, { config: { loadingStrategy: "lazy" } });
 
             let unsub = await glue.workspaces.onWindowLoaded(() => {
-                ready();
+                loadedWindowsCount++;
             });
 
             await glue.workspaces.createWorkspace(directConfig);
 
-            return promise;
+            await gtf.wait(3000);
+
+            expect(loadedWindowsCount).to.eql(2);
         });
 
-        it("load all windows for 60 seconds when the loadingStrategy is delayed", async () => {
-            let resolve;
-            const promise = new Promise((res, rej) => {
-                resolve = res;
-            });
-
-            const ready = gtf.waitFor(4, () => resolve());
+        it("load all windows for 30 seconds when the loadingStrategy is delayed", async () => {
+            let loadedWindowsCount = 0;
             const directConfig = Object.assign(config, { config: { loadingStrategy: "delayed" } });
 
             let unsub = await glue.workspaces.onWindowLoaded(() => {
-                ready();
+                loadedWindowsCount++;
             });
 
             await glue.workspaces.createWorkspace(directConfig);
 
-            return promise;
+            await gtf.wait(30000);
+
+            expect(loadedWindowsCount).to.eql(4);
         });
 
 

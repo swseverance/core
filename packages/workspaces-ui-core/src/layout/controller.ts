@@ -23,8 +23,13 @@ export class LayoutController {
     private readonly _stackMaximizeLabel = "maximize";
     private readonly _stackRestoreLabel = "restore";
     private readonly _configFactory: WorkspacesConfigurationFactory;
+    private _showLoadingIndicator: boolean;
 
-    constructor(emitter: LayoutEventEmitter, stateResolver: LayoutStateResolver, options: StartupConfig, configFactory: WorkspacesConfigurationFactory) {
+    constructor(emitter: LayoutEventEmitter,
+        stateResolver: LayoutStateResolver,
+        options: StartupConfig,
+        configFactory: WorkspacesConfigurationFactory
+    ) {
         this._options = options;
         this._emitter = emitter;
         this._stateResolver = stateResolver;
@@ -41,6 +46,7 @@ export class LayoutController {
 
     public async init(config: FrameLayoutConfig) {
         this._frameId = config.frameId;
+        this._showLoadingIndicator = config.showLoadingIndicator;
         const tabObserver = new TabObserver();
         tabObserver.init(this._workspaceLayoutElementId);
         await this.initWorkspaceConfig(config.workspaceLayout);
@@ -478,6 +484,15 @@ export class LayoutController {
         saveButton.attr("title", "save");
     }
 
+    public hideLoadingIndicator(itemId: string) {
+        const windowContentItem = store.getWindowContentItem(itemId);
+
+        if (windowContentItem) {
+            const hibernationIcon = windowContentItem.tab.element[0].getElementsByClassName("lm_hibernationIcon")[0];
+            hibernationIcon?.remove();
+        }
+    }
+
     private initWorkspaceContents(id: string, config: GoldenLayout.Config | GoldenLayout.ItemConfig) {
         if (!config || (config.type !== "component" && !config.content.length)) {
             store.addOrUpdate(id, []);
@@ -682,11 +697,17 @@ export class LayoutController {
                 this.emitter.raiseEvent("tab-drag-end", { tab });
             });
 
-            tab.element.mousedown(() => {
+            tab.element.on("mousedown", () => {
                 this.emitter.raiseEvent("tab-element-mouse-down", { tab });
             });
 
             this.refreshTabSizeClass(tab);
+
+            if (this._showLoadingIndicator && tab?.contentItem.type === "component" && this._stateResolver.isWindowLoaded(tab.contentItem.config.id)) {
+                const hibernationIcon = document.createElement("div");
+                hibernationIcon.classList.add("lm_saveButton", "lm_hibernationIcon");
+                tab.element[0].prepend(hibernationIcon);
+            }
         });
 
         layout.on("tabCloseRequested", (tab: GoldenLayout.Tab) => {

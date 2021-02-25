@@ -105,6 +105,10 @@ export class IFrameController {
         return this._registry.add("window-title-changed", callback);
     }
 
+    public hasFrame(id: string): boolean {
+        return !!this._idToFrame[id];
+    }
+
     private async startCore(id: string, url: string, layoutState?: object, windowId?: string) {
         windowId = windowId || generate();
         if (this._idToFrame[id]) {

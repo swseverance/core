@@ -1,5 +1,5 @@
 import { LayoutController } from "./layout/controller";
-import { WindowSummary, Workspace, WorkspaceOptionsWithTitle, WorkspaceOptionsWithLayoutName, ComponentFactory } from "./types/internal";
+import { WindowSummary, Workspace, WorkspaceOptionsWithTitle, WorkspaceOptionsWithLayoutName, ComponentFactory, LoadingStrategy } from "./types/internal";
 import { LayoutEventEmitter } from "./layout/eventEmitter";
 import { IFrameController } from "./iframeController";
 import store from "./store";
@@ -23,6 +23,7 @@ import { ComponentPopupManager } from "./popups/component";
 import { GlueFacade } from "./interop/facade";
 import { ApplicationFactory } from "./app/factory";
 import { DelayedExecutor } from "./utils/delayedExecutor";
+import systemSettings from "./config/system";
 
 export class WorkspacesManager {
     private _controller: LayoutController;
@@ -77,10 +78,10 @@ export class WorkspacesManager {
         this._configFactory = new WorkspacesConfigurationFactory(glue);
         const converter = new ConfigConverter(this._configFactory);
         componentStateMonitor.init(this._frameId, componentFactory);
-        const eventEmitter = new LayoutEventEmitter(registryFactory());
-        this._stateResolver = new LayoutStateResolver(this._frameId, eventEmitter);
-        this._controller = new LayoutController(eventEmitter, this._stateResolver, startupConfig, this._configFactory);
         this._frameController = new IFrameController(glue);
+        const eventEmitter = new LayoutEventEmitter(registryFactory());
+        this._stateResolver = new LayoutStateResolver(this._frameId, eventEmitter, this._frameController);
+        this._controller = new LayoutController(eventEmitter, this._stateResolver, startupConfig, this._configFactory);
         this._applicationFactory = new ApplicationFactory(glue, this.stateResolver, this._frameController, this, new DelayedExecutor());
         this._layoutsManager = new LayoutsManager(this.stateResolver, glue, this._configFactory, converter);
         this._popupManager = new PopupManagerComposer(new PopupManager(glue), new ComponentPopupManager(componentFactory, frameId), componentFactory);
@@ -219,10 +220,10 @@ export class WorkspacesManager {
         const windowConfigs = getAllWindowsFromConfig(config.content);
         const workspace = store.getById(parentId) || store.getByContainerId(parentId);
 
-        Promise.all(windowConfigs.map((itemConfig) => {
+        Promise.all(windowConfigs.map(async (itemConfig) => {
             const component = store.getWindowContentItem(idAsString(itemConfig.id));
 
-            return this._applicationFactory.start(component, workspace.id);
+            await this._applicationFactory.start(component, workspace.id);
         }));
 
         return result;
@@ -494,6 +495,7 @@ export class WorkspacesManager {
     }
 
     private async initLayout() {
+        const workspacesSystemSettings = await systemSettings.getSettings(this._glue);
         const config = await this._layoutsManager.getInitialConfig();
         this.subscribeForPopups();
         this.subscribeForLayout();
@@ -508,9 +510,14 @@ export class WorkspacesManager {
             frameId: this._frameId,
             workspaceLayout: config.workspaceLayout,
             workspaceConfigs: config.workspaceConfigs,
+            showLoadingIndicator: workspacesSystemSettings?.loadingStrategy?.showDelayedIndicator || false
         });
 
-        Promise.all(store.workspaceIds.map((wid) => this.handleWindows(wid)));
+        Promise.all(store.workspaceIds.map((wid) => {
+            const loadingStrategy = this._applicationFactory.getLoadingStrategy(workspacesSystemSettings, config.workspaceConfigs[0]);
+            console.log("SELECTED ", loadingStrategy, " FOR WORKSPACE ", wid);
+            return this.handleWindows(wid, loadingStrategy);
+        }));
 
         store.layouts.map((l) => l.layout).filter((l) => l).forEach((l) => this.reportLayoutStructure(l));
 
@@ -578,7 +585,10 @@ export class WorkspacesManager {
 
     private async reinitializeWorkspace(id: string, config: GoldenLayout.Config) {
         await this._controller.reinitializeWorkspace(id, config);
-        this.handleWindows(id);
+
+        const workspacesSystemSettings = await systemSettings.getSettings(this._glue);
+        const loadingStrategy = this._applicationFactory.getLoadingStrategy(workspacesSystemSettings, config);
+        this.handleWindows(id, loadingStrategy);
     }
 
     private subscribeForLayout() {
@@ -873,6 +883,10 @@ export class WorkspacesManager {
         this._frameController.onWindowTitleChanged((id, title) => {
             this.setItemTitle(id, title);
         });
+
+        this._frameController.onFrameLoaded((id) => {
+            this._controller.hideLoadingIndicator(id);
+        })
     }
 
     private cleanUp = () => {
@@ -1001,13 +1015,23 @@ export class WorkspacesManager {
         await this._glue.contexts.set(getWorkspaceContextName(id), config?.workspacesOptions?.context || {});
         await this._controller.addWorkspace(id, config);
 
-        this.handleWindows(id);
+        const workspacesSystemSettings = await systemSettings.getSettings(this._glue);
+        const loadingStrategy = this._applicationFactory.getLoadingStrategy(workspacesSystemSettings, config);
+        this.handleWindows(id, loadingStrategy);
     }
 
-    private async handleWindows(workspaceId: string) {
-        this._applicationFactory.startLazy(workspaceId);
-        this._applicationFactory.startDelayed(workspaceId);
-        this._applicationFactory.startDirect(workspaceId);
+    private async handleWindows(workspaceId: string, loadingStrategy: LoadingStrategy) {
+        switch (loadingStrategy) {
+            case "delayed":
+                await this._applicationFactory.startDelayed(workspaceId);
+                break;
+            case "direct":
+                await this._applicationFactory.startDirect(workspaceId);
+                break;
+            case "lazy":
+                await this._applicationFactory.startLazy(workspaceId);
+                break;
+        }
     }
 
     private checkForEmptyWorkspace(workspace: Workspace): boolean {

@@ -10,11 +10,12 @@ import { getElementBounds, idAsString } from "../utils";
 import createRegistry from "callback-registry";
 import { Window, WindowSummary, Workspace, WorkspacesLoadingConfig, WorkspacesSystemConfig } from "../types/internal";
 import { DelayedExecutor } from "../utils/delayedExecutor";
+import systemSettings from "../config/system";
+import { RestoreWorkspaceConfig } from "../interop/types";
 
 export class ApplicationFactory {
     private readonly registry = createRegistry();
     private readonly WAIT_FOR_WINDOWS_TIMEOUT = 30000;
-    private loadingSettings: WorkspacesLoadingConfig;
     private readonly idToWindowPromise: { [itemId: string]: Promise<void> } = {};
 
     constructor(
@@ -26,10 +27,6 @@ export class ApplicationFactory {
     ) { }
 
     public async start(component: GoldenLayout.Component, workspaceId: string) {
-        if (!this.loadingSettings) {
-            this.loadingSettings = await this.askForLoadingSettings();
-        }
-
         if (component.config.componentName === EmptyVisibleWindowName) {
             return;
         }
@@ -58,20 +55,38 @@ export class ApplicationFactory {
         return startPromise;
     }
 
+    public getLoadingStrategy(systemSettings: WorkspacesSystemConfig, contentConfig: GoldenLayout.Config, restoreConfig?: RestoreWorkspaceConfig) {
+        if (restoreConfig?.loadingStrategy) {
+            return restoreConfig.loadingStrategy;
+        } else if ((contentConfig.workspacesOptions as any)?.loadingStrategy) {
+            return (contentConfig.workspacesOptions as any).loadingStrategy;
+        } else if (systemSettings.loadingStrategy) {
+            return systemSettings.loadingStrategy.defaultStrategy;
+        }
+    }
+
     public async startLazy(workspaceId: string) {
         const workspace = store.getById(workspaceId);
-
+        if (!workspace?.layout) {
+            return;
+        }
         const allComponentsInWorkspace = workspace.layout.root.getItemsByType("component");
         const result = this.getComponentsByVisibility(allComponentsInWorkspace.map((c) => c as GoldenLayout.Component));
 
         return Promise.all(result.visibleComponents.map((c) => this.start(c, workspaceId)));
     }
 
-    public startDelayed(workspaceId: string) {
+    public async startDelayed(workspaceId: string) {
         const workspace = store.getById(workspaceId);
+        if (!workspace?.layout) {
+            return;
+        }
+
         const allComponentsInWorkspace = workspace.layout.root.getItemsByType("component");
         const result = this.getComponentsByVisibility(allComponentsInWorkspace.map((c) => c as GoldenLayout.Component));
         const visiblePromises = result.visibleComponents.map((c) => this.start(c, workspaceId));
+
+        const loadingStrategy = (await systemSettings.getSettings(this._glue)).loadingStrategy;
 
         const loadPromises = Promise.all(visiblePromises).then(() => {
             return this._delayedExecutor.startExecution(
@@ -80,9 +95,9 @@ export class ApplicationFactory {
                     action: () => this.start(c, workspaceId)
                 })),
                 {
-                    batchSize: 5,
-                    executionInterval: 5000,
-                    initialDelay: 50
+                    batchSize: loadingStrategy?.delayed?.batch || 1,
+                    executionInterval: loadingStrategy?.delayed?.interval || 5000,
+                    initialDelay: loadingStrategy?.delayed?.initialOffsetInterval || 1000
                 }
             );
         });
@@ -92,7 +107,9 @@ export class ApplicationFactory {
 
     public async startDirect(workspaceId: string) {
         const workspace = store.getById(workspaceId);
-
+        if (!workspace?.layout) {
+            return;
+        }
         const allComponentsInWorkspace = workspace.layout.root.getItemsByType("component");
         await Promise.all(allComponentsInWorkspace.map((c: GoldenLayout.Component) => {
             return this.start(c, workspaceId);
@@ -228,17 +245,6 @@ export class ApplicationFactory {
             visibleComponents,
             notImmediatelyVisibleComponents
         }
-    }
-
-    private async askForLoadingSettings() {
-        const result = await this._glue.interop.invoke<WorkspacesSystemConfig>(PlatformControlMethod, {
-            domain: "workspaces",
-            operation: "getWorkspacesConfig",
-            data: {
-            }
-        });
-
-        return result.returned.loadingStrategy;
     }
 
     private async startCore(component: GoldenLayout.Component, workspace: Workspace) {

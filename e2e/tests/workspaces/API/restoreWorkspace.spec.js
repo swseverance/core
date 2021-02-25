@@ -452,54 +452,43 @@ describe('restoreWorkspace() Should', function () {
         });
 
         it("load all windows when the loadingStrategy is direct", async () => {
-            let resolve;
-            const promise = new Promise((res, rej) => {
-                resolve = res;
-            });
-
-            const ready = gtf.waitFor(4, () => resolve());
+            let loadedWindowsCount = 0;
 
             let unsub = await glue.workspaces.onWindowLoaded((w) => {
-                ready();
+                loadedWindowsCount++;
             });
 
             await glue.workspaces.restoreWorkspace(layoutName, { loadingStrategy: "direct" });
+            await gtf.wait(3000);
 
-            return promise;
+            expect(loadedWindowsCount).to.eql(4);
         });
 
         it("load only the visible windows when the loadingStrategy is lazy", async () => {
-            let resolve;
-            const promise = new Promise((res, rej) => {
-                resolve = res;
-            });
-
-            const ready = gtf.waitFor(2, () => resolve());
+            let loadedWindowsCount = 0;
 
             let unsub = await glue.workspaces.onWindowLoaded(() => {
-                ready();
+                loadedWindowsCount++;
             });
 
             await glue.workspaces.restoreWorkspace(layoutName, { loadingStrategy: "lazy" });
 
-            return promise;
+            await gtf.wait(3000);
+
+            expect(loadedWindowsCount).to.eql(2);
         });
 
-        it("load all windows for 60 seconds when the loadingStrategy is delayed", async () => {
-            let resolve;
-            const promise = new Promise((res, rej) => {
-                resolve = res;
-            });
-
-            const ready = gtf.waitFor(4, () => resolve());
+        it("load all windows for 30 seconds when the loadingStrategy is delayed", async () => {
+            let loadedWindowsCount = 0;
 
             let unsub = await glue.workspaces.onWindowLoaded(() => {
-                ready();
+                loadedWindowsCount++;
             });
 
             await glue.workspaces.restoreWorkspace(layoutName, { loadingStrategy: "delayed" });
+            await gtf.wait(30000);
 
-            return promise;
+            expect(loadedWindowsCount).to.eql(4);
         });
 
 

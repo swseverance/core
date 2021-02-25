@@ -238,7 +238,7 @@ export namespace Glue42WebPlatform {
 
         export interface LoadingConfig {
             /**
-             * Default restore strategy when restoring Swimlane workspaces.
+             * Default restore strategy when opening Workspaces.
              */
             defaultStrategy?: "direct" | "delayed" | "lazy";
             delayed: {
