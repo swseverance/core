@@ -3,10 +3,11 @@ import { Glue42Web } from "@glue42/web";
 import { Glue42Workspaces } from "@glue42/workspaces-api";
 import { anyJson, array, boolean, constant, Decoder, fail, lazy, number, object, oneOf, optional, string } from "decoder-validate";
 import { Glue42WebPlatform } from "../../platform";
-import { LibDomains } from "../common/types";
+import { LibDomains, SystemOperationTypes } from "../common/types";
 
 export const nonNegativeNumberDecoder: Decoder<number> = number().where((num) => num >= 0, "Expected a non-negative number");
 export const nonEmptyStringDecoder: Decoder<string> = string().where((s) => s.length > 0, "Expected a non-empty string");
+export const anyDecoder: Decoder<unknown> = anyJson();
 
 export const windowRelativeDirectionDecoder: Decoder<Glue42Web.Windows.RelativeDirection> = oneOf<"top" | "left" | "right" | "bottom">(
     constant("top"),
@@ -70,12 +71,17 @@ export const windowLayoutComponentDecoder: Decoder<Glue42Web.Layouts.WindowCompo
     })
 });
 
-export const libDomainDecoder: Decoder<LibDomains> = oneOf<"windows" | "appManager" | "layouts" | "workspaces" | "intents">(
+export const libDomainDecoder: Decoder<LibDomains> = oneOf<"system" | "windows" | "appManager" | "layouts" | "workspaces" | "intents">(
+    constant("system"),
     constant("windows"),
     constant("appManager"),
     constant("layouts"),
     constant("workspaces"),
     constant("intents")
+);
+
+export const systemOperationTypesDecoder: Decoder<SystemOperationTypes> = oneOf<"getEnvironment">(
+    constant("getEnvironment")
 );
 
 export const windowLayoutItemDecoder: Decoder<Glue42Workspaces.WindowLayoutItem> = object({
@@ -275,6 +281,7 @@ export const platformConfigDecoder: Decoder<Glue42WebPlatform.Config> = object({
     gateway: optional(gatewayConfigDecoder),
     glue: optional(glueConfigDecoder),
     workspaces: optional(workspacesConfigDecoder),
+    environment: optional(anyJson()),
     glueFactory: optional(anyJson().andThen((result) => functionCheck(result, "glueFactory")))
 });
 

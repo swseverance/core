@@ -13,10 +13,12 @@ import { WorkspacesController } from "../libs/workspaces/controller";
 import { IntentsController } from "../libs/intents/controller";
 import { ChannelsController } from "../libs/channels/controller";
 import { Glue42WebPlatform } from "../../platform";
+import { SystemController } from "./system";
 
 export class PlatformController {
 
     private readonly controllers: { [key in LibDomains]: LibController } = {
+        system: this.systemController,
         windows: this.windowsController,
         appManager: this.applicationsController,
         layouts: this.layoutsController,
@@ -26,6 +28,7 @@ export class PlatformController {
     }
 
     constructor(
+        private readonly systemController: SystemController,
         private readonly glueController: GlueController,
         private readonly windowsController: WindowsController,
         private readonly applicationsController: ApplicationsController,

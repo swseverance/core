@@ -246,6 +246,7 @@ export namespace Glue42WebPlatform {
         gateway?: Gateway.Config;
         glue?: Glue42Web.Config;
         workspaces?: Workspaces.Config;
+        environment?: any;
         glueFactory?: (config?: Glue42Web.Config) => Promise<Glue42Web.API>;
     }
 

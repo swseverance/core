@@ -28,7 +28,8 @@ export const defaultPlatformConfig: InternalPlatformConfig = {
             level: "info"
         }
     },
-    glue: {}
+    glue: {},
+    environment: {}
 };
 
 export const defaultTargetString = "*";

@@ -14,6 +14,7 @@ import { WorkspacesController } from "../libs/workspaces/controller";
 import { IntentsController } from "../libs/intents/controller";
 import { ChannelsController } from "../libs/channels/controller";
 import { FramesController } from "../libs/workspaces/frames";
+import { SystemController } from "../controllers/system";
 
 export class IoC {
     private _gatewayInstance!: Gateway;
@@ -30,6 +31,7 @@ export class IoC {
     private _sessionController!: SessionStorageController;
     private _stateChecker!: StateController;
     private _framesController!: FramesController;
+    private _systemController!: SystemController;
     private _idbStore!: IdbStore;
 
     constructor(private readonly config?: Glue42WebPlatform.Config) { }
@@ -53,6 +55,7 @@ export class IoC {
     public get controller(): PlatformController {
         if (!this._mainController) {
             this._mainController = new PlatformController(
+                this.systemController,
                 this.glueController,
                 this.windowsController,
                 this.applicationsController,
@@ -74,6 +77,14 @@ export class IoC {
         }
 
         return this._glueController;
+    }
+
+    public get systemController(): SystemController {
+        if (!this._systemController) {
+            this._systemController = new SystemController();
+        }
+
+        return this._systemController;
     }
 
     public get sessionController(): SessionStorageController {
