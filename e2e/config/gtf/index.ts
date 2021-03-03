@@ -46,6 +46,13 @@ const startGtf = async () => {
             logging: {
                 level: "error"
             }
+        },
+        environment: {
+            test: 42,
+            testObj: {
+                test: 42
+            },
+            testArr: [42]
         }
     };
 
