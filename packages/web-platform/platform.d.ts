@@ -158,6 +158,7 @@ export namespace Glue42WebPlatform {
 
         export interface Config {
             local?: Array<Glue42Web.AppManager.Definition | FDC3Definition>;
+            remote?: RemoteStore;
         }
     }
 

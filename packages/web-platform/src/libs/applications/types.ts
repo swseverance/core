@@ -1,5 +1,6 @@
 import { Glue42Web } from "@glue42/web";
 import { Glue42WebPlatform } from "../../../platform";
+import { InternalApplicationsConfig } from "../../common/types";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type AppManagerOperationTypes = "appHello" | "applicationStart" | "instanceStop" |
@@ -68,4 +69,16 @@ export interface AppsImportOperation {
 
 export interface AppsExportOperation {
     definitions: Glue42Web.AppManager.Definition[];
+}
+
+export interface AppDirSetup {
+    config: InternalApplicationsConfig;
+    onAdded: (data: BaseApplicationData) => void;
+    onChanged: (data: BaseApplicationData) => void;
+    onRemoved: (data: BaseApplicationData) => void;
+}
+
+export interface AppDirProcessingConfig {
+    type: "remote" | "inmemory";
+    mode: "merge" | "replace";
 }

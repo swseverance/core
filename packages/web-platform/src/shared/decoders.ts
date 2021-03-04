@@ -228,7 +228,8 @@ export const allApplicationDefinitionsDecoder: Decoder<Glue42Web.AppManager.Defi
 export const appsCollectionDecoder: Decoder<Array<Glue42Web.AppManager.Definition | Glue42WebPlatform.Applications.FDC3Definition>> = array(allApplicationDefinitionsDecoder);
 
 export const applicationsConfigDecoder: Decoder<Glue42WebPlatform.Applications.Config> = object({
-    local: optional(array(allApplicationDefinitionsDecoder))
+    local: optional(array(allApplicationDefinitionsDecoder)),
+    remote: optional(remoteStoreDecoder)
 });
 
 export const layoutsConfigDecoder: Decoder<Glue42WebPlatform.Layouts.Config> = object({

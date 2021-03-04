@@ -15,6 +15,7 @@ export interface InternalWindowsConfig {
 
 export interface InternalApplicationsConfig {
     local: Array<Glue42Web.AppManager.Definition | Glue42WebPlatform.Applications.FDC3Definition>;
+    remote?: Glue42WebPlatform.RemoteStore;
 }
 
 export interface InternalLayoutsConfig {

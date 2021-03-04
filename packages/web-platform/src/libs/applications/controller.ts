@@ -2,14 +2,13 @@
 import { Glue42Web } from "@glue42/web";
 import { Glue42Core } from "@glue42/core";
 import { generate } from "shortid";
-import { Glue42WebPlatform } from "../../../platform";
-import { ApplicationStartConfig, BridgeOperation, InternalApplicationsConfig, InternalPlatformConfig, LibController, SessionWindowData } from "../../common/types";
+import { ApplicationStartConfig, BridgeOperation, InternalPlatformConfig, LibController, SessionWindowData } from "../../common/types";
 import { GlueController } from "../../controllers/glue";
 import { SessionStorageController } from "../../controllers/session";
 import { StateController } from "../../controllers/state";
 import { IoC } from "../../shared/ioc";
 import { PromiseWrap } from "../../shared/promisePlus";
-import { getRelativeBounds, objEqual } from "../../shared/utils";
+import { getRelativeBounds } from "../../shared/utils";
 import { appHelloDecoder, appHelloSuccessDecoder, applicationStartConfigDecoder, appManagerOperationTypesDecoder, appRemoveConfigDecoder, appsExportOperationDecoder, appsImportOperationDecoder, basicInstanceDataDecoder, instanceDataDecoder } from "./decoders";
 import { AppsImportOperation, AppHello, AppHelloSuccess, ApplicationData, AppManagerOperationTypes, BaseApplicationData, BasicInstanceData, InstanceData, InstanceLock, InstanceProcessInfo, AppsExportOperation, AppRemoveConfig } from "./types";
 import logger from "../../shared/logger";
@@ -17,11 +16,11 @@ import { workspaceWindowDataDecoder } from "../workspaces/decoders";
 import { simpleWindowDecoder } from "../windows/decoders";
 import { WorkspaceWindowData } from "../workspaces/types";
 import { SimpleWindowCommand, WindowTitleConfig } from "../windows/types";
+import { AppDirectory } from "./appStore/directory";
 
 export class ApplicationsController implements LibController {
     private applicationStartTimeoutMs = 15000;
     private started = false;
-    private config!: InternalApplicationsConfig;
     private defaultBounds!: Glue42Web.Windows.Bounds;
 
     private locks: { [key: string]: InstanceLock } = {};
@@ -42,6 +41,7 @@ export class ApplicationsController implements LibController {
         private readonly glueController: GlueController,
         private readonly sessionStorage: SessionStorageController,
         private readonly stateController: StateController,
+        private readonly appDirectory: AppDirectory,
         private readonly ioc: IoC
     ) { }
 
@@ -50,27 +50,21 @@ export class ApplicationsController implements LibController {
     }
 
     public async start(config: InternalPlatformConfig): Promise<void> {
-        this.config = config.applications;
         this.defaultBounds = config.windows.defaultWindowOpenBounds;
 
         this.logger?.trace("initializing applications");
 
-        await this.setupApps(this.config);
+        this.appDirectory.start({
+            config: config.applications,
+            onAdded: (data: BaseApplicationData) => this.emitStreamData("applicationAdded", data),
+            onChanged: (data: BaseApplicationData) => this.emitStreamData("applicationChanged", data),
+            onRemoved: (data: BaseApplicationData) => this.emitStreamData("applicationRemoved", data),
+        });
 
         this.started = true;
         this.stateController.onWindowDisappeared(this.processInstanceClosed.bind(this));
 
         this.logger?.trace("initialization is completed");
-    }
-
-    public async setupApps(config: InternalApplicationsConfig): Promise<void> {
-        if (config.local && config.local.length) {
-            const parsedDefinitions: BaseApplicationData[] = config.local.map((def) => this.parseDefinition(def));
-
-            const currentApps: BaseApplicationData[] = this.sessionStorage.getAllApps();
-
-            this.mergeImport(currentApps, parsedDefinitions);
-        }
     }
 
     public async handleControl(args: any): Promise<void> {
@@ -135,7 +129,7 @@ export class ApplicationsController implements LibController {
 
         this.logger?.trace(`[${commandId}] handling application start command for application: ${config.name}`);
 
-        const appDefinition = this.sessionStorage.getAllApps().find((app) => app.name === config.name);
+        const appDefinition = this.appDirectory.getAll().find((app) => app.name === config.name);
 
         if (!appDefinition) {
             throw new Error(`Cannot start an instance of application: ${config.name}, because it is not found.`);
@@ -233,7 +227,7 @@ export class ApplicationsController implements LibController {
 
         const allInstances = this.sessionStorage.getAllInstancesData();
 
-        const allAppsFull = this.sessionStorage.getAllApps().map<ApplicationData>((app) => {
+        const allAppsFull = this.appDirectory.getAll().map<ApplicationData>((app) => {
 
             const appInstances = allInstances.filter((inst) => inst.applicationName === app.name);
 
@@ -304,26 +298,16 @@ export class ApplicationsController implements LibController {
     public async handleImport(config: AppsImportOperation, commandId: string): Promise<void> {
         this.logger?.trace(`[${commandId}] handling import command`);
 
-        const parsedDefinitions: BaseApplicationData[] = config.definitions.map((def) => this.parseDefinition(def));
+        this.appDirectory.processAppDefinitions(config.definitions, { type: "inmemory", mode: config.mode });
 
-        const currentApps: BaseApplicationData[] = this.sessionStorage.getAllApps();
-
-        if (config.mode === "replace") {
-            this.replaceImport(currentApps, parsedDefinitions);
-            this.logger?.trace(`[${commandId}] replace import command completed`);
-            return;
-        }
-
-        this.mergeImport(currentApps, parsedDefinitions);
-        this.logger?.trace(`[${commandId}] merge import command completed`);
-
+        this.logger?.trace(`[${commandId}] import command completed`);
         return;
     }
 
     public async handleRemove(config: AppRemoveConfig, commandId: string): Promise<void> {
         this.logger?.trace(`[${commandId}] handling remove command for ${config.name}`);
 
-        const removed = this.sessionStorage.removeApp(config.name);
+        const removed = this.appDirectory.removeInMemory(config.name);
 
         if (removed) {
             this.logger?.trace(`definition ${removed.name} removed successfully`);
@@ -333,71 +317,20 @@ export class ApplicationsController implements LibController {
 
     public async handleExport(_: any, commandId: string): Promise<AppsExportOperation> {
         this.logger?.trace(`[${commandId}] handling export command`);
-        const all = this.sessionStorage.getAllApps();
 
-        const reversed = all.map((def) => this.reverseParseDefinition(def));
+        const definitions = this.appDirectory.exportInMemory();
 
-        return { definitions: reversed };
+        this.logger?.trace(`[${commandId}] export command successful`);
+
+        return { definitions };
     }
 
     public async handleClear(_: any, commandId: string): Promise<void> {
         this.logger?.trace(`[${commandId}] handling clear command`);
 
-        const allDefinitions = this.sessionStorage.getAllApps();
+        this.appDirectory.processAppDefinitions([], {type: "inmemory", mode: "replace"});
 
-        this.sessionStorage.overwriteApps([]);
-
-        allDefinitions.forEach((definition) => this.emitStreamData("applicationRemoved", definition));
-    }
-
-    public mergeImport(currentApps: BaseApplicationData[], parsedDefinitions: BaseApplicationData[]): void {
-        for (const definition of parsedDefinitions) {
-            const defCurrentIdx = currentApps.findIndex((app) => app.name === definition.name);
-
-            if (defCurrentIdx > -1 && !objEqual(definition, currentApps[defCurrentIdx])) {
-                this.logger?.trace(`change detected at definition ${definition.name}`);
-                this.emitStreamData("applicationChanged", definition);
-
-                currentApps[defCurrentIdx] = definition;
-
-                continue;
-            }
-
-            if (defCurrentIdx < 0) {
-                this.logger?.trace(`new definition: ${definition.name} detected, adding and announcing`);
-                this.emitStreamData("applicationAdded", definition);
-                currentApps.push(definition);
-            }
-        }
-
-        this.sessionStorage.overwriteApps(currentApps);
-    }
-
-    public replaceImport(currentApps: BaseApplicationData[], parsedDefinitions: BaseApplicationData[]): void {
-        for (const definition of parsedDefinitions) {
-            const defCurrentIdx = currentApps.findIndex((app) => app.name === definition.name);
-
-            if (defCurrentIdx < 0) {
-                this.logger?.trace(`new definition: ${definition.name} detected, adding and announcing`);
-                this.emitStreamData("applicationAdded", definition);
-                continue;
-            }
-
-            if (!objEqual(definition, currentApps[defCurrentIdx])) {
-                this.logger?.trace(`change detected at definition ${definition.name}`);
-                this.emitStreamData("applicationChanged", definition);
-            }
-
-            currentApps.splice(defCurrentIdx, 1);
-        }
-
-        // everything that is left in the old snap here, means it is removed in the latest one
-        currentApps.forEach((app) => {
-            this.logger?.trace(`definition ${app.name} missing, removing and announcing`);
-            this.emitStreamData("applicationRemoved", app);
-        });
-
-        this.sessionStorage.overwriteApps(parsedDefinitions);
+        this.logger?.trace(`[${commandId}] all in-memory apps are cleared`);
     }
 
     private setLock(id: string): void {
@@ -423,7 +356,7 @@ export class ApplicationsController implements LibController {
             throw new Error(`Cannot register application with config: ${JSON.stringify(data)}, because no app name was found`);
         }
 
-        if (!this.sessionStorage.getAllApps().some((app) => app.name === data.appName)) {
+        if (!this.appDirectory.getAll().some((app) => app.name === data.appName)) {
             throw new Error(`Cannot register application with config: ${JSON.stringify(data)}, because no app with this name name was found`);
         }
 
@@ -463,69 +396,6 @@ export class ApplicationsController implements LibController {
     private emitStreamData(operation: "applicationAdded" | "applicationRemoved" | "applicationChanged" | "instanceStarted" | "instanceStopped", data: any): void {
         this.logger?.trace(`sending notification of event: ${operation} with data: ${JSON.stringify(data)}`);
         this.glueController.pushSystemMessage("appManager", operation, data);
-    }
-
-    private reverseParseDefinition(definition: BaseApplicationData): Glue42Web.AppManager.Definition {
-
-        const definitionDetails = definition.userProperties.details;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { details, ...removedDetails } = definition.userProperties;
-
-        return {
-            name: definition.name,
-            type: (definition as any).type || "window",
-            title: definition.title,
-            version: definition.version,
-            icon: (definition as any).icon,
-            caption: (definition as any).caption,
-            details: definitionDetails,
-            customProperties: removedDetails
-        };
-    }
-
-    private parseDefinition(definition: Glue42Web.AppManager.Definition | Glue42WebPlatform.Applications.FDC3Definition): BaseApplicationData {
-
-        const glue42CoreAppProps = ["name", "title", "version", "customProperties", "icon", "caption", "type"];
-
-        const userProperties = Object.fromEntries(Object.entries(definition).filter(([key]) => !glue42CoreAppProps.includes(key)));
-
-        let createOptions: Glue42Web.AppManager.DefinitionDetails = { url: "" };
-
-        if ((definition as any).manifest) {
-            // this is fdc3
-            const parsedManifest = JSON.parse((definition as Glue42WebPlatform.Applications.FDC3Definition).manifest);
-
-            const url = parsedManifest.details?.url || parsedManifest.url;
-
-            if (!url || typeof url !== "string") {
-                throw new Error(`The FDC3 definition: ${definition.name} is not valid, because there is not url defined in the manifest`);
-            }
-
-            createOptions.url = url;
-        } else {
-            // this is GD
-            createOptions = (definition as Glue42Web.AppManager.Definition).details;
-        }
-
-        const baseDefinition = {
-            createOptions,
-            type: (definition as any).type || "window",
-            name: definition.name,
-            title: definition.title,
-            version: definition.version,
-            icon: (definition as any).icon,
-            caption: (definition as any).caption,
-            userProperties: {
-                ...userProperties,
-                ...(definition as any).customProperties
-            }
-        };
-
-        if (!baseDefinition.userProperties.details) {
-            baseDefinition.userProperties.details = createOptions;
-        }
-
-        return baseDefinition;
     }
 
     private async getStartingBounds(appDefOptions: Glue42Web.AppManager.DefinitionDetails, openOptions: ApplicationStartConfig, commandId: string): Promise<Glue42Web.Windows.Bounds> {

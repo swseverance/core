@@ -15,6 +15,7 @@ export class SessionStorageController {
     private readonly workspaceFramesNamespace = "g42_core_workspace_frames";
     private readonly layoutNamespace = "g42_core_layouts";
     private readonly appDefsNamespace = "g42_core_app_definitions";
+    private readonly appDefsInmemoryNamespace = "g42_core_app_definitions_inmemory";
 
     constructor() {
         this.sessionStorage = window.sessionStorage;
@@ -27,7 +28,8 @@ export class SessionStorageController {
             this.workspaceWindowsNamespace,
             this.workspaceFramesNamespace,
             this.layoutNamespace,
-            this.appDefsNamespace
+            this.appDefsNamespace,
+            this.appDefsInmemoryNamespace
         ].forEach((namespace) => {
             const data = this.sessionStorage.getItem(namespace);
 
@@ -41,23 +43,29 @@ export class SessionStorageController {
         return logger.get("session.storage");
     }
 
-    public getAllApps(): BaseApplicationData[] {
-        const appsString = JSON.parse(this.sessionStorage.getItem(this.appDefsNamespace) as string);
+    public getAllApps(type: "remote" | "inmemory"): BaseApplicationData[] {
+        const namespace = type === "remote" ? this.appDefsNamespace : this.appDefsInmemoryNamespace;
+
+        const appsString = JSON.parse(this.sessionStorage.getItem(namespace) as string);
 
         return appsString;
     }
 
-    public overwriteApps(apps: BaseApplicationData[]): void {
-        this.sessionStorage.setItem(this.appDefsNamespace, JSON.stringify(apps));
+    public overwriteApps(apps: BaseApplicationData[], type: "remote" | "inmemory"): void {
+        const namespace = type === "remote" ? this.appDefsNamespace : this.appDefsInmemoryNamespace;
+
+        this.sessionStorage.setItem(namespace, JSON.stringify(apps));
     }
 
-    public removeApp(name: string): BaseApplicationData | undefined {
-        const all = this.getAllApps();
+    public removeApp(name: string, type: "remote" | "inmemory"): BaseApplicationData | undefined {
+        const namespace = type === "remote" ? this.appDefsNamespace : this.appDefsInmemoryNamespace;
+
+        const all = this.getAllApps(type);
 
         const app = all.find((app) => app.name === name);
 
         if (app) {
-            this.sessionStorage.setItem(this.appDefsNamespace, JSON.stringify(all.filter((a) => a.name !== name)));
+            this.sessionStorage.setItem(namespace, JSON.stringify(all.filter((a) => a.name !== name)));
         }
 
         return app;

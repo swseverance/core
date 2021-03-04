@@ -3,13 +3,13 @@ import { Glue42Core } from "@glue42/core";
 import { Glue42Web } from "@glue42/web";
 import { ApplicationStartConfig, BridgeOperation, LibController } from "../../common/types";
 import { GlueController } from "../../controllers/glue";
-import { SessionStorageController } from "../../controllers/session";
 import { IoC } from "../../shared/ioc";
 import { PromisePlus } from "../../shared/promisePlus";
 import { intentsOperationTypesDecoder, wrappedIntentsDecoder, wrappedIntentFilterDecoder, intentRequestDecoder, intentResultDecoder } from "./decoders";
 import { IntentsOperationTypes, AppDefinitionWithIntents, IntentInfo, IntentStore, WrappedIntentFilter, WrappedIntents } from "./types";
 import logger from "../../shared/logger";
 import { GlueWebIntentsPrefix } from "../../common/constants";
+import { AppDirectory } from "../applications/appStore/directory";
 
 export class IntentsController implements LibController {
     private operations: { [key in IntentsOperationTypes]: BridgeOperation } = {
@@ -21,7 +21,7 @@ export class IntentsController implements LibController {
 
     constructor(
         private readonly glueController: GlueController,
-        private readonly sessionStorage: SessionStorageController,
+        private readonly appDirectory: AppDirectory,
         private readonly ioc: IoC
     ) { }
 
@@ -169,7 +169,7 @@ export class IntentsController implements LibController {
             2. Running instances (application can register dynamic intents by calling `addIntentListener()` that aren't predefined inside of their application definitions)
             It also populates intent handlers (actual entities that can handle the intent).
         */
-        const apps: AppDefinitionWithIntents[] = this.sessionStorage.getAllApps().map((app) => {
+        const apps: AppDefinitionWithIntents[] = this.appDirectory.getAll().map((app) => {
             return {
                 name: app.name,
                 title: app.title || "",
