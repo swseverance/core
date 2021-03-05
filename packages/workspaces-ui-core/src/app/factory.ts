@@ -41,7 +41,6 @@ export class ApplicationFactory {
             return;
         }
 
-        console.log("in start for",component);
         const startPromise = this.startCore(component, workspace);
 
         this.idToWindowPromise[idAsString(component.config.id)] = startPromise;
@@ -58,18 +57,12 @@ export class ApplicationFactory {
 
     public getLoadingStrategy(systemSettings: WorkspacesSystemConfig, contentConfig: GoldenLayout.Config, restoreConfig?: RestoreWorkspaceConfig) {
         if (restoreConfig?.loadingStrategy) {
-            console.log("restore", contentConfig);
-
             return restoreConfig.loadingStrategy;
         } else if ((contentConfig.workspacesOptions as any)?.loadingStrategy) {
-            console.log("correct", contentConfig);
             return (contentConfig.workspacesOptions as any).loadingStrategy;
         } else if (systemSettings.loadingStrategy) {
-            console.log("system", contentConfig);
             return systemSettings.loadingStrategy.defaultStrategy;
         }
-
-        console.log("all", systemSettings, contentConfig, restoreConfig);
     }
 
     public async startLazy(workspaceId: string) {
@@ -79,7 +72,6 @@ export class ApplicationFactory {
         }
         const allComponentsInWorkspace = workspace.layout.root.getItemsByType("component");
         const result = this.getComponentsByVisibility(allComponentsInWorkspace.map((c) => c as GoldenLayout.Component));
-            console.log("starting", result.visibleComponents);
         return Promise.all(result.visibleComponents.map((c) => this.start(c, workspaceId)));
     }
 

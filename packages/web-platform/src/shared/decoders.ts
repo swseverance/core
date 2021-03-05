@@ -264,9 +264,20 @@ export const hibernationConfigDecoder: Decoder<Glue42WebPlatform.Workspaces.Hibe
     idleWorkspaces: optional(idleWorkspacesDecoder)
 });
 
+export const loadingConfigDecoder: Decoder<Glue42WebPlatform.Workspaces.LoadingConfig> = object({
+    delayed: optional(object({
+        batch: optional(number()),
+        initialOffsetInterval: optional(number()),
+        interval: optional(number())
+    })),
+    defaultStrategy: optional(oneOf(constant("direct"), constant("delayed"), constant("lazy"))),
+    showDelayedIndicator: optional(boolean())
+})
+
 export const workspacesConfigDecoder: Decoder<Glue42WebPlatform.Workspaces.Config> = object({
     src: nonEmptyStringDecoder,
-    hibernation: optional(hibernationConfigDecoder)
+    hibernation: optional(hibernationConfigDecoder),
+    loadingStrategy: optional(loadingConfigDecoder)
 });
 
 export const windowsConfigDecoder: Decoder<Glue42WebPlatform.Windows.Config> = object({

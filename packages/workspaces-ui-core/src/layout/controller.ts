@@ -703,7 +703,7 @@ export class LayoutController {
 
             this.refreshTabSizeClass(tab);
 
-            if (this._showLoadingIndicator && tab?.contentItem.type === "component" && this._stateResolver.isWindowLoaded(tab.contentItem.config.id)) {
+            if (this._showLoadingIndicator && tab?.contentItem.type === "component" && !this._stateResolver.isWindowLoaded(tab.contentItem.config.id)) {
                 const hibernationIcon = document.createElement("div");
                 hibernationIcon.classList.add("lm_saveButton", "lm_hibernationIcon");
                 tab.element[0].prepend(hibernationIcon);

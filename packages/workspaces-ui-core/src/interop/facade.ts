@@ -196,6 +196,7 @@ export class GlueFacade {
 
         } catch (error) {
             errorCallback(error.message);
+            console.warn(error);
         }
     };
 
@@ -358,7 +359,6 @@ export class GlueFacade {
             operationArguments.config = {};
         }
         operationArguments.config.context = operationArguments.config.context || operationArguments.context;
-        console.log("Received", operationArguments);
         const config = this._converter.convertToRendererConfig(operationArguments);
 
         const workspaceId = await manager.createWorkspace(config as GoldenLayout.Config);

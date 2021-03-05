@@ -194,10 +194,10 @@ export class LayoutsManager {
             return undefined;
         }
         const workspaceConfig = this.resolver.getWorkspaceConfig(workspace.id);
-
         if ((workspaceConfig.workspacesOptions as any).layoutName) {
-            (delete workspaceConfig.workspacesOptions as any).layoutName;
+            delete (workspaceConfig.workspacesOptions as any).layoutName;
         }
+
         this.removeWorkspaceIds(workspaceConfig);
         await this.applyWindowLayoutState(workspaceConfig);
 

@@ -501,7 +501,6 @@ export class WorkspacesManager {
         const workspacesSystemSettings = await systemSettings.getSettings(this._glue);
         const config = await this._layoutsManager.getInitialConfig();
 
-        console.log(`the initial config is `, config);
         this.subscribeForPopups();
         this.subscribeForLayout();
 
@@ -510,7 +509,6 @@ export class WorkspacesManager {
         await Promise.all(config.workspaceConfigs.map(c => {
             return this._glue.contexts.set(getWorkspaceContextName(c.id), c.config?.workspacesOptions?.context || {});
         }));
-
         await this._controller.init({
             frameId: this._frameId,
             workspaceLayout: config.workspaceLayout,
@@ -520,7 +518,6 @@ export class WorkspacesManager {
 
         Promise.all(store.workspaceIds.map((wid) => {
             const loadingStrategy = this._applicationFactory.getLoadingStrategy(workspacesSystemSettings, config.workspaceConfigs[0].config);
-            console.log("SELECTED ", loadingStrategy, " FOR WORKSPACE ", wid);
             return this.handleWindows(wid, loadingStrategy);
         }));
 

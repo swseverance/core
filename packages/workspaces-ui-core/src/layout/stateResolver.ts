@@ -55,7 +55,6 @@ export class LayoutStateResolver {
 
         this.transformComponentsToWindowSummary(glConfig);
         this.transformParentsToContainerSummary(glConfig);
-
         return glConfig;
     }
 

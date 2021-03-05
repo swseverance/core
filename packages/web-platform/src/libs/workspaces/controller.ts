@@ -15,6 +15,8 @@ import { StateController } from "../../controllers/state";
 import { WorkspaceHibernationWatcher } from "./hibernationWatcher";
 import callbackRegistry from "callback-registry";
 import { workspacesConfigDecoder } from "../../shared/decoders";
+import deepMerge from "deepmerge";
+import { defaultHibernationConfig, defaultLoadingConfig } from "./defaultConfig";
 
 export class WorkspacesController implements LibController {
     private started = false;
@@ -70,7 +72,7 @@ export class WorkspacesController implements LibController {
             return;
         }
 
-        this.settings = config.workspaces;
+        this.settings = this.applyDefaults(config.workspaces);
 
         this.hibernationWatcher.start(this.settings.hibernation, this);
 
@@ -599,5 +601,19 @@ export class WorkspacesController implements LibController {
 
     private handleWorkspaceEventCore(data: WorkspaceEventPayload) {
         this.registry.execute(data.type, data);
+    }
+
+    private applyDefaults(config: Glue42WebPlatform.Workspaces.Config): Glue42WebPlatform.Workspaces.Config {
+        const providedHibernationConfig = config?.hibernation || {};
+        const providedLoadingConfig = config?.loadingStrategy || {};
+
+        const hibernationConfig = deepMerge<Glue42WebPlatform.Workspaces.HibernationConfig>(defaultHibernationConfig, providedHibernationConfig as Glue42WebPlatform.Workspaces.HibernationConfig);
+        const loadingConfig = deepMerge<Glue42WebPlatform.Workspaces.LoadingConfig>(defaultLoadingConfig, providedLoadingConfig as Glue42WebPlatform.Workspaces.LoadingConfig);
+
+        return {
+            ...config,
+            loadingStrategy: loadingConfig,
+            hibernation: hibernationConfig
+        }
     }
 }

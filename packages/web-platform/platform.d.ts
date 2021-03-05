@@ -241,17 +241,17 @@ export namespace Glue42WebPlatform {
              * Default restore strategy when opening Workspaces.
              */
             defaultStrategy?: "direct" | "delayed" | "lazy";
-            delayed: {
+            delayed?: {
                 /**
-                 * Valid only in `delayed` mode. Initial period after which to start loading applications in batches.
+                 * Valid only in `delayed` mode. Initial period after which to start loading applications in batches. Defaults to 1000.
                  */
                 initialOffsetInterval?: number;
                 /**
-                 * Valid only in `delayed` mode. Interval in minutes at which to load the application batches.
+                 * Valid only in `delayed` mode. Interval in minutes at which to load the application batches. Defaults to 5000.
                  */
                 interval?: number;
                 /**
-                 * Valid only in `delayed` mode. Number of applications in a batch to be loaded at each interval.
+                 * Valid only in `delayed` mode. Number of applications in a batch to be loaded at each interval. Defaults to 1.
                  */
                 batch?: number;
             }
