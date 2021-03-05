@@ -128,19 +128,21 @@ export class ConfigConverter {
             return resultWindow;
         }
         const configAsAny = config as any;
-        return {
+        const containerResult =  {
             id: idAsString(config.id),
             type: config.type === "stack" ? "group" : config.type,
             children: this.flat(config.content.map((c) => this.convertToApiConfigCore(c))),
             config: {
-                positionIndex: configAsAny.workspacesConfig.positionIndex,
-                frameId: configAsAny.workspacesConfig.frameId,
-                workspaceId: configAsAny.workspacesConfig.workspaceId,
+                positionIndex: configAsAny.workspacesConfig?.positionIndex,
+                frameId: configAsAny.workspacesConfig?.frameId,
+                workspaceId: configAsAny.workspacesConfig?.workspaceId,
                 activeTabIndex: configAsAny.activeItemIndex,
                 width: configAsAny.width,
                 height: configAsAny.height
             }
         };
+
+        return containerResult;
     }
 
     private flat = <T>(arr: T[]) => arr.reduce((acc, i) => [...acc, ...(Array.isArray(i) ? i : [i])], []);

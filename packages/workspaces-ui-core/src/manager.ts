@@ -143,8 +143,12 @@ export class WorkspacesManager {
             savedConfig.workspacesOptions = savedConfig.workspacesOptions || {};
 
             (savedConfig.workspacesOptions as WorkspaceOptionsWithLayoutName).layoutName = savedConfigWithData.layoutData.name;
+        }
+
+        if (savedConfig && options) {
             (savedConfig.workspacesOptions as any).loadingStrategy = options.loadingStrategy;
         }
+
 
         if (savedConfig && options?.noTabHeader !== undefined) {
             savedConfig.workspacesOptions = savedConfig.workspacesOptions || {};
@@ -594,33 +598,6 @@ export class WorkspacesManager {
     }
 
     private subscribeForLayout() {
-        this._controller.emitter.onContentComponentCreated(async (component, workspaceId) => {
-            const loadStrategy = component.config?.componentState?.loadingStrategy;
-
-            // if (loadStrategy === "lazy") {
-            //     // subscribe for generic selection changed
-            //     let unsub = this.subscribeForComponentSelectedAndVisible(
-            //         idAsString(component.config.id),
-            //         workspaceId,
-            //         async (componentId, workspaceId) => {
-            //             if (this.stateResolver.isWindowSelected(componentId) &&
-            //                 this.stateResolver.isWorkspaceSelected(workspaceId)) {
-            //                 unsub();
-            //                 await this._applicationFactory.start(component, workspaceId);
-            //             }
-            //         });
-            // } else if (loadStrategy === "delayed") {
-            //     // subscribe for generic selection changed
-            //     // enqueue in delayed executor and unsub
-            // } else {
-            //     await this._applicationFactory.start(component, workspaceId);
-            // }
-
-            // if (loadStrategy) {
-            //     delete component.config.componentState.loadingStrategy;
-            // }
-        });
-
         this._controller.emitter.onContentItemResized((target, id) => {
             this._frameController.moveFrame(id, getElementBounds(target));
         });

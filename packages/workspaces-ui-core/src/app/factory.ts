@@ -60,8 +60,8 @@ export class ApplicationFactory {
             return restoreConfig.loadingStrategy;
         } else if ((contentConfig.workspacesOptions as any)?.loadingStrategy) {
             return (contentConfig.workspacesOptions as any).loadingStrategy;
-        } else if (systemSettings.loadingStrategy) {
-            return systemSettings.loadingStrategy.defaultStrategy;
+        } else if (systemSettings?.loadingStrategy) {
+            return systemSettings?.loadingStrategy?.defaultStrategy;
         }
     }
 

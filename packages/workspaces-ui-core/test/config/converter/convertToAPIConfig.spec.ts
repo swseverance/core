@@ -52,7 +52,14 @@ describe("convertToAPIConfig() Should", () => {
             const expectedResult: object = {
                 children: [],
                 type,
-                config: {},
+                config: {
+                    activeTabIndex: undefined,
+                    frameId: undefined,
+                    height: undefined,
+                    workspaceId: undefined,
+                    width: undefined,
+                    positionIndex: undefined
+                },
                 id: undefined
             };
 
@@ -94,7 +101,14 @@ describe("convertToAPIConfig() Should", () => {
                         mockAppConfig
                     ],
                 type,
-                config: {},
+                config: {
+                    activeTabIndex: undefined,
+                    frameId: undefined,
+                    height: undefined,
+                    workspaceId: undefined,
+                    width: undefined,
+                    positionIndex: undefined
+                },
                 id: undefined
             };
 
@@ -179,25 +193,53 @@ describe("convertToAPIConfig() Should", () => {
                     [
                         {
                             type: type === "row" ? "column" : "row",
-                            config: {},
+                            config: {
+                                activeTabIndex: undefined,
+                                frameId: undefined,
+                                height: undefined,
+                                workspaceId: undefined,
+                                width: undefined,
+                                positionIndex: undefined
+                            },
                             id: undefined,
                             children: []
                         },
                         {
                             type: type === "row" ? "column" : "row",
-                            config: {},
+                            config: {
+                                activeTabIndex: undefined,
+                                frameId: undefined,
+                                height: undefined,
+                                workspaceId: undefined,
+                                width: undefined,
+                                positionIndex: undefined
+                            },
                             id: undefined,
                             children: []
                         },
                         {
                             type: type === "row" ? "column" : "row",
-                            config: {},
+                            config: {
+                                activeTabIndex: undefined,
+                                frameId: undefined,
+                                height: undefined,
+                                workspaceId: undefined,
+                                width: undefined,
+                                positionIndex: undefined
+                            },
                             id: undefined,
                             children: []
                         }
                     ],
                 type,
-                config: {},
+                config: {
+                    activeTabIndex: undefined,
+                    frameId: undefined,
+                    height: undefined,
+                    workspaceId: undefined,
+                    width: undefined,
+                    positionIndex: undefined
+                },
                 id: undefined
             };
 
@@ -257,25 +299,53 @@ describe("convertToAPIConfig() Should", () => {
                     [
                         {
                             type: "group",
-                            config: {},
+                            config: {
+                                activeTabIndex: undefined,
+                                frameId: undefined,
+                                height: undefined,
+                                workspaceId: undefined,
+                                width: undefined,
+                                positionIndex: undefined
+                            },
                             id: undefined,
                             children: []
                         },
                         {
                             type: "group",
-                            config: {},
+                            config: {
+                                activeTabIndex: undefined,
+                                frameId: undefined,
+                                height: undefined,
+                                workspaceId: undefined,
+                                width: undefined,
+                                positionIndex: undefined
+                            },
                             id: undefined,
                             children: []
                         },
                         {
                             type: "group",
-                            config: {},
+                            config: {
+                                activeTabIndex: undefined,
+                                frameId: undefined,
+                                height: undefined,
+                                workspaceId: undefined,
+                                width: undefined,
+                                positionIndex: undefined
+                            },
                             id: undefined,
                             children: []
                         }
                     ],
                 type,
-                config: {},
+                config: {
+                    activeTabIndex: undefined,
+                    frameId: undefined,
+                    height: undefined,
+                    workspaceId: undefined,
+                    width: undefined,
+                    positionIndex: undefined
+                },
                 id: undefined
             };
 
@@ -314,7 +384,14 @@ describe("convertToAPIConfig() Should", () => {
         const expectedResult: GroupItem = {
             children: [],
             type: "group",
-            config: {},
+            config: {
+                activeTabIndex: undefined,
+                frameId: undefined,
+                height: undefined,
+                workspaceId: undefined,
+                width: undefined,
+                positionIndex: undefined
+            },
             id: undefined
         };
 
@@ -346,7 +423,14 @@ describe("convertToAPIConfig() Should", () => {
                 mockAppConfig,
             ],
             type: "group",
-            config: {},
+            config: {
+                activeTabIndex: undefined,
+                frameId: undefined,
+                height: undefined,
+                workspaceId: undefined,
+                width: undefined,
+                positionIndex: undefined
+            },
             id: undefined
         };
 
@@ -402,7 +486,14 @@ describe("convertToAPIConfig() Should", () => {
             children: [{
                 children: [],
                 type: "row",
-                config: {},
+                config: {
+                    activeTabIndex: undefined,
+                    frameId: undefined,
+                    height: undefined,
+                    workspaceId: undefined,
+                    width: undefined,
+                    positionIndex: undefined
+                },
                 id: undefined
             }],
             id: undefined,
@@ -450,7 +541,14 @@ describe("convertToAPIConfig() Should", () => {
             children: [{
                 children: [],
                 type: "column",
-                config: {},
+                config: {
+                    activeTabIndex: undefined,
+                    frameId: undefined,
+                    height: undefined,
+                    workspaceId: undefined,
+                    width: undefined,
+                    positionIndex: undefined
+                },
                 id: undefined,
             }],
             id: undefined,
@@ -499,7 +597,14 @@ describe("convertToAPIConfig() Should", () => {
                 children: [],
                 type: "group",
                 id: undefined,
-                config: {},
+                config: {
+                    activeTabIndex: undefined,
+                    frameId: undefined,
+                    height: undefined,
+                    workspaceId: undefined,
+                    width: undefined,
+                    positionIndex: undefined
+                },
             }],
             id: undefined,
             config: {},
@@ -538,16 +643,37 @@ describe("convertToAPIConfig() Should", () => {
             children: [{
                 type: "row",
                 id: undefined,
-                config: {},
+                config: {
+                    activeTabIndex: undefined,
+                    frameId: undefined,
+                    height: undefined,
+                    workspaceId: undefined,
+                    width: undefined,
+                    positionIndex: undefined
+                },
                 children: [
                     {
                         type: "column",
                         id: undefined,
-                        config: {},
+                        config: {
+                            activeTabIndex: undefined,
+                            frameId: undefined,
+                            height: undefined,
+                            workspaceId: undefined,
+                            width: undefined,
+                            positionIndex: undefined
+                        },
                         children: [{
                             type: "group",
                             id: undefined,
-                            config: {},
+                            config: {
+                                activeTabIndex: undefined,
+                                frameId: undefined,
+                                height: undefined,
+                                workspaceId: undefined,
+                                width: undefined,
+                                positionIndex: undefined
+                            },
                             children: [
                                 mockAppConfig
                             ]
@@ -556,15 +682,36 @@ describe("convertToAPIConfig() Should", () => {
                     {
                         type: "column",
                         id: undefined,
-                        config: {},
+                        config: {
+                            activeTabIndex: undefined,
+                            frameId: undefined,
+                            height: undefined,
+                            workspaceId: undefined,
+                            width: undefined,
+                            positionIndex: undefined
+                        },
                         children: [{
                             type: "row",
                             id: undefined,
-                            config: {},
+                            config: {
+                                activeTabIndex: undefined,
+                                frameId: undefined,
+                                height: undefined,
+                                workspaceId: undefined,
+                                width: undefined,
+                                positionIndex: undefined
+                            },
                             children: [{
                                 type: "group",
                                 id: undefined,
-                                config: {},
+                                config: {
+                                    activeTabIndex: undefined,
+                                    frameId: undefined,
+                                    height: undefined,
+                                    workspaceId: undefined,
+                                    width: undefined,
+                                    positionIndex: undefined
+                                },
                                 children: [
                                     mockAppConfig
                                 ]
