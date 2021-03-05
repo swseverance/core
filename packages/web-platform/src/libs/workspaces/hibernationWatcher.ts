@@ -19,8 +19,9 @@ export class WorkspaceHibernationWatcher {
     private maximumAmountCheckInProgress = false;
 
     public start(
-        settings: Glue42WebPlatform.Workspaces.HibernationConfig | undefined,
-        workspacesController: WorkspacesController): void {
+        workspacesController: WorkspacesController,
+        settings?: Glue42WebPlatform.Workspaces.HibernationConfig,
+    ): void {
         this.workspacesController = workspacesController;
         this.settings = settings;
         try {
@@ -133,14 +134,13 @@ export class WorkspaceHibernationWatcher {
         const snapshotsPromises = result.summaries.map(s => this.workspacesController.getWorkspaceSnapshot({ itemId: s.id }, commandId));
         const snapshots = await Promise.all(snapshotsPromises);
 
-        const eligibleForHibernation = await snapshots.reduce(async (acc, s) => {
-            const result = await acc;
-            if (!await this.isWorkspaceHibernated(s.config) && !await this.isWorkspaceEmpty(s)) {
+        const eligibleForHibernation = snapshots.reduce((acc, s) => {
+            const result = acc;
+            if (!this.isWorkspaceHibernated(s.config) && !this.isWorkspaceEmpty(s)) {
                 result.push(s);
             }
-
             return result;
-        }, Promise.resolve([] as WorkspaceSnapshotResult[]));
+        }, [] as WorkspaceSnapshotResult[]);
 
         if (eligibleForHibernation.length <= threshold) {
             return;
@@ -159,7 +159,7 @@ export class WorkspaceHibernationWatcher {
     private async tryHibernateWorkspace(workspaceId: string): Promise<void> {
         const snapshot = await this.workspacesController.getWorkspaceSnapshot({ itemId: workspaceId }, generate());
 
-        if (!await this.canBeHibernated(snapshot)) {
+        if (!this.canBeHibernated(snapshot)) {
             return;
         }
 
@@ -173,49 +173,24 @@ export class WorkspaceHibernationWatcher {
         }
     }
 
-    private async canBeHibernated(snapshot: WorkspaceSnapshotResult) {
-        const isWorkspaceHibernated = await this.isWorkspaceHibernated(snapshot.config);
-        const isWorkspaceSelected = await this.isWorkspaceSelected(snapshot.config);
-        const isWorkspaceEmpty = await this.isWorkspaceEmpty(snapshot);
+    private canBeHibernated(snapshot: WorkspaceSnapshotResult) {
+        const isWorkspaceHibernated = this.isWorkspaceHibernated(snapshot.config);
+        const isWorkspaceSelected = this.isWorkspaceSelected(snapshot.config);
+        const isWorkspaceEmpty = this.isWorkspaceEmpty(snapshot);
 
         return !isWorkspaceHibernated && !isWorkspaceSelected && !isWorkspaceEmpty;
     }
 
-    private async isWorkspaceHibernated(workspaceId: string | WorkspaceConfigResult) {
-        let config: WorkspaceConfigResult;
-
-        if (typeof workspaceId === "string") {
-            const snapshot = await this.workspacesController.getWorkspaceSnapshot({ itemId: workspaceId }, generate());
-            config = snapshot.config;
-        } else {
-            config = workspaceId;
-        }
-
-        return config.isHibernated;
+    private isWorkspaceHibernated(workspaceSnapshot: WorkspaceConfigResult) {
+        return workspaceSnapshot.isHibernated;
     }
 
-    private async isWorkspaceSelected(workspaceId: string | WorkspaceConfigResult) {
-        let config: WorkspaceConfigResult;
-
-        if (typeof workspaceId === "string") {
-            const snapshot = await this.workspacesController.getWorkspaceSnapshot({ itemId: workspaceId }, generate());
-            config = snapshot.config;
-        } else {
-            config = workspaceId;
-        }
-        return config.isSelected;
+    private isWorkspaceSelected(workspaceSnapshot: WorkspaceConfigResult) {
+        return workspaceSnapshot.isSelected;
     }
 
-    private async isWorkspaceEmpty(workspaceId: string | WorkspaceSnapshotResult) {
-        let snapshot: WorkspaceSnapshotResult;
-
-        if (typeof workspaceId === "string") {
-            snapshot = await this.workspacesController.getWorkspaceSnapshot({ itemId: workspaceId }, generate());
-        } else {
-            snapshot = workspaceId;
-        }
-
-        return !snapshot.children.length;
+    private isWorkspaceEmpty(workspaceSnapshot: WorkspaceSnapshotResult) {
+        return !workspaceSnapshot.children.length;
     }
 
     private async getWorkspacesInFrame(frameId: string) {
@@ -239,8 +214,8 @@ export class WorkspaceHibernationWatcher {
 
         const workspacesInFrame = await this.getWorkspacesInFrame(frameId);
 
-        await Promise.all(workspacesInFrame.map(async (w) => {
-            if (!await this.canBeHibernated(w) || this.workspaceIdToTimer[w.id]) {
+        workspacesInFrame.map((w) => {
+            if (!this.canBeHibernated(w) || this.workspaceIdToTimer[w.id]) {
                 return;
             }
             const timeout = setTimeout(() => {
@@ -252,6 +227,6 @@ export class WorkspaceHibernationWatcher {
             this.workspaceIdToTimer[w.id] = timeout;
 
             this.logger?.trace(`Starting workspace idle timer ( ${this.settings?.idleWorkspaces?.idleMSThreshold}ms ) for workspace ${w.id}`);
-        }));
+        });
     }
 }

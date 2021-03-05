@@ -70,7 +70,7 @@ export class WorkspacesController implements LibController {
 
         this.settings = config.workspaces;
 
-        this.hibernationWatcher.start(this.settings.hibernation, this);
+        this.hibernationWatcher.start(this, this.settings.hibernation);
 
         await Promise.all([
             this.glueController.createWorkspacesStream(),
@@ -139,7 +139,7 @@ export class WorkspacesController implements LibController {
         this.glueController.pushWorkspacesMessage(data);
         this.handleWorkspaceEventCore(data);
     }
-   
+
     public subscribeForFrameEvent(callback: (data: WorkspaceEventPayload) => void) {
         return this.registry.add("frame", callback);
     }
