@@ -20,6 +20,18 @@ function Stocks() {
     return (
         <div className="container-fluid">
             <div className="row">
+                {/* <div className="col-md-2">
+                    {!glue && (
+                        <span id="glueSpan" className="badge badge-warning">
+                            Glue42 is unavailable
+                        </span>
+                    )}
+                    {glue && (
+                        <span id="glueSpan" className="badge badge-success">
+                            Glue42 is available
+                        </span>
+                    )}
+                </div> */}
                 <div className="col-md-8">
                     <h1 id="title" className="text-center">
                         Stocks
@@ -27,7 +39,7 @@ function Stocks() {
                 </div>
             </div>
             <div className="row">
-                <div className="col-md-12">
+                <div className="col">
                     <table id="portfolioTable" className="table table-hover">
                         <thead>
                             <tr>

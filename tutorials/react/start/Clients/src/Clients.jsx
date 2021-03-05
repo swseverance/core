@@ -19,31 +19,48 @@ function Clients() {
     return (
         <div className="container-fluid">
             <div className="row">
-                <div className="col-md-10">
+                {/* <div className="col-md-2">
+                    {!glue && (
+                        <span id="glueSpan" className="badge badge-warning">
+                            Glue42 is unavailable
+                        </span>
+                    )}
+                    {glue && (
+                        <span id="glueSpan" className="badge badge-success">
+                            Glue42 is available
+                        </span>
+                    )}
+                </div> */}
+                <div className="col-md-8">
                     <h1 className="text-center">Clients</h1>
+                </div>
+                <div className="col-md-2 py-2">
+                    <button className="btn btn-primary">Stocks</button>
                 </div>
             </div>
             <div className="row">
-                <table id="clientsTable" className="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Full Name</th>
-                            <th>PID</th>
-                            <th>GID</th>
-                            <th>Account Manager</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {clients.map(({ name, pId, gId, accountManager }) => (
-                            <tr key={pId}>
-                                <td>{name}</td>
-                                <td>{pId}</td>
-                                <td>{gId}</td>
-                                <td>{accountManager}</td>
+                <div className="col">
+                    <table id="clientsTable" className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Full Name</th>
+                                <th>PID</th>
+                                <th>GID</th>
+                                <th>Account Manager</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {clients.map(({ name, pId, gId, accountManager }) => (
+                                <tr key={pId}>
+                                    <td>{name}</td>
+                                    <td>{pId}</td>
+                                    <td>{gId}</td>
+                                    <td>{accountManager}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

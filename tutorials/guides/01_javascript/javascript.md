@@ -645,11 +645,11 @@ Now when the **Clients** and the **Stocks** apps are on the same Channel, the **
 
 ## 7. Application Management
 
-Up until now the **Stocks** app had to use the Window Management API to open the **Stock Details** application when the user clicks on a stock. This works fine for small projects, but does not scale well for larger ones, because this way each app has to know all details (URL, start position, initial context, etc.) about every application it needs to start. In this chapter you will replace the Window Management API with the [Application Management API](../../reference/core/latest/appmanager/index.html) which will allow you to predefine all available applications when initializing the [Main Application](../../developers/core-concepts/web-platform/overview/index.html). The **Stocks** app will be decoupled from **Stock Details** - it will need only the name of the **Stock Details** app to be able to start it.
+Up until now you had to use the Window Management API to open new windows when the user clicks on the "Stocks" button in the **Clients** app or on a stock in the **Stocks** app. This works fine for small projects, but does not scale well for larger ones, because this way each app has to know all details (URL, start position, initial context, etc.) about every application it needs to start. In this chapter you will replace the Window Management API with the [Application Management API](../../reference/core/latest/appmanager/index.html) which will allow you to predefine all available applications when initializing the [Main Application](../../developers/core-concepts/web-platform/overview/index.html). The **Clients** app will be decoupled from the **Stocks** app and the **Stocks** app will be decoupled from **Stock Details** - you will need only the names of the apps to be able to start them.
 
 ### 7.1. Application Configuration
 
-To take advantage of the [Application Management API](../../reference/core/latest/appmanager/index.html), you need to define configurations for your applications. Go to the **Clients** app and, similarly to Channels, define an `applications` property in the configuration object passed to `GlueWebPlatform()` containing all required definitions:
+To take advantage of the [Application Management API](../../reference/core/latest/appmanager/index.html), define configurations for your applications. Go to the **Clients** app and, similarly to Channels, define an `applications` property in the configuration object passed to `GlueWebPlatform()` containing all required definitions:
 
 ```javascript
 // In `start()`.
@@ -659,12 +659,14 @@ const applications = {
     local: [
         {
             name: "Clients",
+            type: "window",
             details: {
                 url: "http://localhost:9000/"
             }
         },
         {
             name: "Stocks",
+            type: "window",
             details: {
                 url: "http://localhost:9100/",
                 left: 0,
@@ -675,6 +677,7 @@ const applications = {
         },
         {
             name: "Stock Details",
+            type: "window",
             details: {
                 url: "http://localhost:9100/details",
                 left: 100,
@@ -685,6 +688,7 @@ const applications = {
         },
         {
             name: "Client Details",
+            type: "window",
             details: {
                 url: "http://localhost:9200/"
             }
