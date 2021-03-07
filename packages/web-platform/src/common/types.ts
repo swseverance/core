@@ -47,7 +47,7 @@ export interface CoreClientData {
 
 export interface LibController {
     start(config: InternalPlatformConfig): Promise<void>;
-    handleControl(args: any): Promise<void>;
+    handleControl(args: any): Promise<any>;
     handleClientUnloaded?(windowId: string, win: Window): void;
 }
 

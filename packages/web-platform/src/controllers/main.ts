@@ -63,6 +63,7 @@ export class PlatformController {
 
         await this.glueController.initClientGlue(config?.glue, config?.glueFactory, config?.workspaces?.isFrame);
 
+        // all plugins are fire and forget
         config.plugins?.definitions.forEach(this.startPlugin.bind(this));
     }
 
@@ -70,9 +71,10 @@ export class PlatformController {
         return this.glueController.clientGlue;
     }
 
-    private startPlugin(definition: Glue42WebPlatform.Plugins.PluginDefinition): void {
+    private async startPlugin(definition: Glue42WebPlatform.Plugins.PluginDefinition): Promise<void> {
         try {
-            definition.start(this.glueController.clientGlue, definition.config);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await definition.start(this.glueController.clientGlue, definition.config, (args: any) => this.handlePluginMessage(args, definition.name));
         } catch (error) {
             this.logger?.warn(`Plugin: ${definition.name} threw while initiating: ${JSON.stringify(error.message)}`);
         }
@@ -107,6 +109,31 @@ export class PlatformController {
                 this.logger?.trace(`[${args.commandId}] this command's execution was rejected, reason: ${stringError}`);
                 error(`The platform rejected operation ${args.operation} for domain: ${domain} with reason: ${stringError}`);
             });
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private async handlePluginMessage(args: any, pluginName: string): Promise<any> {
+        const decodeResult = libDomainDecoder.run(args.domain);
+
+        if (!decodeResult.ok) {
+            const errString = JSON.stringify(decodeResult.error);
+
+            this.logger?.trace(`rejecting execution of a command issued by plugin: ${pluginName}, because of a domain validation error: ${errString}`);
+
+            throw new Error(`Cannot execute this platform control, because of domain validation error: ${errString}`);
+        }
+
+        const domain = decodeResult.result;
+
+        args.commandId = generate();
+
+        this.logger?.trace(`[${args.commandId}] received a command issued by plugin: ${pluginName} for a valid domain: ${domain}, forwarding to the appropriate controller`);
+
+        const result = await this.controllers[domain].handleControl(args);
+
+        this.logger?.trace(`[${args.commandId}] this command was executed successfully, sending the result to the caller.`);
+
+        return result;
     }
 
     private handleClientUnloaded(client: CoreClientData): void {

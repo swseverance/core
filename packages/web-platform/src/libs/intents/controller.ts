@@ -33,7 +33,7 @@ export class IntentsController implements LibController {
         this.started = true;
     }
 
-    public async handleControl(args: any): Promise<void> {
+    public async handleControl(args: any): Promise<any> {
         if (!this.started) {
             new Error("Cannot handle this intents control message, because the controller has not been started");
         }

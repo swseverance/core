@@ -19,11 +19,13 @@ export class AppDirectory {
     ) { }
 
     public async start(setup: AppDirSetup): Promise<void> {
+        this.logger?.trace("Starting the application directory");
         this.onAdded = setup.onAdded;
         this.onChanged = setup.onChanged;
         this.onRemoved = setup.onRemoved;
 
         if (setup.config.local && setup.config.local.length) {
+            this.logger?.trace("Detected local applications, parsing...");
             const parsedDefinitions: BaseApplicationData[] = setup.config.local.map((def) => this.parseDefinition(def));
 
             const currentApps: BaseApplicationData[] = this.sessionStorage.getAllApps("inmemory");
@@ -34,6 +36,7 @@ export class AppDirectory {
         }
 
         if (setup.config.remote) {
+            this.logger?.trace("Detected remote app store configuration, starting the watcher...");
             this.remoteWatcher.start(setup.config.remote, (apps) => this.processAppDefinitions(apps, {type: "remote", mode: "replace"}));
         }
     }

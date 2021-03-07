@@ -20,6 +20,8 @@ export class RemoteWatcher {
         this.pollingInterval = config.pollingInterval;
 
         this.setRequest(config.customHeaders);
+        
+        this.logger?.trace(`Remote watcher configured with timeout: ${this.requestTimeout} and interval: ${this.pollingInterval}`);
 
         this.poll();
     }
@@ -31,11 +33,10 @@ export class RemoteWatcher {
 
             const responseJson: { applications: Array<Glue42Web.AppManager.Definition | Glue42WebPlatform.Applications.FDC3Definition> } = await response.json();
 
-
             if (!responseJson || !Array.isArray(responseJson.applications)) {
                 throw new Error("The remote response was either empty or did not contain an applications collection");
             }
-
+            this.logger?.trace("There is a valid response from the app store, processing definitions...");
             const validatedApps = responseJson.applications.reduce<Array<Glue42Web.AppManager.Definition | Glue42WebPlatform.Applications.FDC3Definition>>((soFar, app) => {
 
                 const result = allApplicationDefinitionsDecoder.run(app);
@@ -55,7 +56,7 @@ export class RemoteWatcher {
 
             const stringError = typeof error === "string" ? error : JSON.stringify(error.message);
             this.logger?.warn(stringError);
-            
+
         } finally {
             if (this.pollingInterval) {
 
@@ -74,6 +75,7 @@ export class RemoteWatcher {
         }
 
         for (const key in customHeaders) {
+            this.logger?.trace("Custom headers detected and set");
             requestHeaders.append(key, customHeaders[key]);
         }
 

@@ -81,7 +81,7 @@ export class WorkspacesController implements LibController {
         return logger.get("workspaces.controller");
     }
 
-    public async handleControl(args: any): Promise<void> {
+    public async handleControl(args: any): Promise<any> {
         if (!this.started) {
             throw new Error("Cannot handle this workspaces control message, because the controller has not been started");
         }

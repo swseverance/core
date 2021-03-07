@@ -22,7 +22,7 @@ export class SystemController implements LibController {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public async handleControl(args: any): Promise<void> {
+    public async handleControl(args: any): Promise<any> {
         if (!this.started) {
             new Error("Cannot handle this system control message, because the controller has not been started");
         }

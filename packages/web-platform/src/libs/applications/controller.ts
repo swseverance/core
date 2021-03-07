@@ -9,8 +9,8 @@ import { StateController } from "../../controllers/state";
 import { IoC } from "../../shared/ioc";
 import { PromiseWrap } from "../../shared/promisePlus";
 import { getRelativeBounds } from "../../shared/utils";
-import { appHelloDecoder, appHelloSuccessDecoder, applicationStartConfigDecoder, appManagerOperationTypesDecoder, appRemoveConfigDecoder, appsExportOperationDecoder, appsImportOperationDecoder, basicInstanceDataDecoder, instanceDataDecoder } from "./decoders";
-import { AppsImportOperation, AppHello, AppHelloSuccess, ApplicationData, AppManagerOperationTypes, BaseApplicationData, BasicInstanceData, InstanceData, InstanceLock, InstanceProcessInfo, AppsExportOperation, AppRemoveConfig } from "./types";
+import { appHelloDecoder, appHelloSuccessDecoder, applicationStartConfigDecoder, appManagerOperationTypesDecoder, appRemoveConfigDecoder, appsExportOperationDecoder, appsImportOperationDecoder, appsRemoteBypass, basicInstanceDataDecoder, instanceDataDecoder } from "./decoders";
+import { AppsImportOperation, AppHello, AppHelloSuccess, ApplicationData, AppManagerOperationTypes, BaseApplicationData, BasicInstanceData, InstanceData, InstanceLock, InstanceProcessInfo, AppsExportOperation, AppRemoveConfig, AppsRemoteBypass } from "./types";
 import logger from "../../shared/logger";
 import { workspaceWindowDataDecoder } from "../workspaces/decoders";
 import { simpleWindowDecoder } from "../windows/decoders";
@@ -34,7 +34,8 @@ export class ApplicationsController implements LibController {
         import: { name: "import", dataDecoder: appsImportOperationDecoder, execute: this.handleImport.bind(this) },
         remove: { name: "remove", dataDecoder: appRemoveConfigDecoder, execute: this.handleRemove.bind(this) },
         export: { name: "export", resultDecoder: appsExportOperationDecoder, execute: this.handleExport.bind(this) },
-        clear: { name: "clear", execute: this.handleClear.bind(this) }
+        clear: { name: "clear", execute: this.handleClear.bind(this) },
+        remoteBypass: { name: "remoteBypass", dataDecoder: appsRemoteBypass, execute: this.handleRemoteBypass.bind(this) },
     }
 
     constructor(
@@ -67,7 +68,7 @@ export class ApplicationsController implements LibController {
         this.logger?.trace("initialization is completed");
     }
 
-    public async handleControl(args: any): Promise<void> {
+    public async handleControl(args: any): Promise<any> {
         if (!this.started) {
             new Error("Cannot handle this windows control message, because the controller has not been started");
         }
@@ -295,6 +296,15 @@ export class ApplicationsController implements LibController {
         this.logger?.trace(`[${commandId}] instance ${inst.id} has been closed, removed from store, announced stopped and notified windows, responding to caller`);
     }
 
+    public async handleRemoteBypass(config: AppsRemoteBypass, commandId: string): Promise<void> {
+        this.logger?.trace(`[${commandId}] handling remote bypass command`);
+
+        this.appDirectory.processAppDefinitions(config.definitions, { mode: "replace", type: "remote" });
+
+        this.logger?.trace(`[${commandId}] remote bypass command completed`);
+        return;
+    }
+
     public async handleImport(config: AppsImportOperation, commandId: string): Promise<void> {
         this.logger?.trace(`[${commandId}] handling import command`);
 
@@ -328,7 +338,7 @@ export class ApplicationsController implements LibController {
     public async handleClear(_: any, commandId: string): Promise<void> {
         this.logger?.trace(`[${commandId}] handling clear command`);
 
-        this.appDirectory.processAppDefinitions([], {type: "inmemory", mode: "replace"});
+        this.appDirectory.processAppDefinitions([], { type: "inmemory", mode: "replace" });
 
         this.logger?.trace(`[${commandId}] all in-memory apps are cleared`);
     }

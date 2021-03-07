@@ -62,7 +62,7 @@ export class WindowsController implements LibController {
         this.stateController.onWindowDisappeared(this.cleanUpWindow.bind(this));
     }
 
-    public async handleControl(args: any): Promise<void> {
+    public async handleControl(args: any): Promise<any> {
         if (!this.started) {
             new Error("Cannot handle this windows control message, because the controller has not been started");
         }

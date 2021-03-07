@@ -15,7 +15,6 @@ import { IntentsController } from "../intents/controller";
 import { ChannelsController } from "../channels/controller";
 import { SystemController } from "../system/controller";
 
-
 export class IoC {
     private _windowsControllerInstance!: WindowsController;
     private _appManagerControllerInstance!: AppManagerController;

@@ -4,7 +4,7 @@ import { InternalApplicationsConfig } from "../../common/types";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type AppManagerOperationTypes = "appHello" | "applicationStart" | "instanceStop" |
-    "registerWorkspaceApp" | "unregisterWorkspaceApp" | "export" | "import" | "remove" | "clear";
+    "registerWorkspaceApp" | "unregisterWorkspaceApp" | "export" | "import" | "remove" | "clear" | "remoteBypass";
 
 export interface BaseApplicationData {
     name: string;
@@ -81,4 +81,8 @@ export interface AppDirSetup {
 export interface AppDirProcessingConfig {
     type: "remote" | "inmemory";
     mode: "merge" | "replace";
+}
+
+export interface AppsRemoteBypass {
+    definitions: Array<Glue42Web.AppManager.Definition | Glue42WebPlatform.Applications.FDC3Definition>;
 }
