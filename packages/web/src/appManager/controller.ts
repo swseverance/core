@@ -119,7 +119,7 @@ export class AppManagerController implements LibController {
             onInstanceStopped: this.onInstanceStopped.bind(this)
         };
 
-        return Object.freeze(api);
+        return api;
     }
 
     private addOperationsExecutors(): void {
