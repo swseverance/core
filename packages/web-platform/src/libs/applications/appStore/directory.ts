@@ -34,7 +34,7 @@ export class AppDirectory {
         }
 
         if (setup.config.remote) {
-            // start the remote if any
+            this.remoteWatcher.start(setup.config.remote, (apps) => this.processAppDefinitions(apps, {type: "remote", mode: "replace"}));
         }
     }
 
@@ -180,6 +180,6 @@ export class AppDirectory {
     }
 
     private get logger(): Glue42Core.Logger.API | undefined {
-        return logger.get("applications.controller");
+        return logger.get("applications.remote.directory");
     }
 }

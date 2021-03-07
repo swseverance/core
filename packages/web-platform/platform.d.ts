@@ -20,6 +20,10 @@ export namespace Glue42WebPlatform {
         * @default 3000
          */
         requestTimeout?: number;
+
+        customHeaders?: {
+            [key: string]: string;
+        };
     }
 
     export interface Supplier<T> {

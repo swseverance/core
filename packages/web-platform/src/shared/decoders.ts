@@ -197,7 +197,8 @@ export const fdc3AppDefinitionDecoder: Decoder<Glue42WebPlatform.Applications.FD
 export const remoteStoreDecoder: Decoder<Glue42WebPlatform.RemoteStore> = object({
     url: nonEmptyStringDecoder,
     pollingInterval: optional(nonNegativeNumberDecoder),
-    requestTimeout: optional(nonNegativeNumberDecoder)
+    requestTimeout: optional(nonNegativeNumberDecoder),
+    customHeaders: optional(anyJson())
 });
 
 export const supplierDecoder: Decoder<Glue42WebPlatform.Supplier<any>> = object({
