@@ -15,6 +15,12 @@ if (typeof window !== "undefined") {
     delete windowAny.GlueCore;
 }
 
+if (!window.glue42gd && !(window as any).glue42core) {
+
+    (window as any).glue42core = { webStarted: false };
+
+}
+
 (glueWebFactory as any).version = version;
 
 export default glueWebFactory;
