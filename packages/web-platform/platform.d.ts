@@ -21,6 +21,9 @@ export namespace Glue42WebPlatform {
          */
         requestTimeout?: number;
 
+        /**
+        * Name-value pairs of headers, which will be appended to every request to the provided url.
+        */
         customHeaders?: {
             [key: string]: string;
         };

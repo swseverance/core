@@ -83,6 +83,6 @@ export interface AppDirProcessingConfig {
     mode: "merge" | "replace";
 }
 
-export interface AppsRemoteBypass {
+export interface AppsRemoteRegistration {
     definitions: Array<Glue42Web.AppManager.Definition | Glue42WebPlatform.Applications.FDC3Definition>;
 }

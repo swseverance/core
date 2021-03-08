@@ -9,8 +9,8 @@ import { StateController } from "../../controllers/state";
 import { IoC } from "../../shared/ioc";
 import { PromiseWrap } from "../../shared/promisePlus";
 import { getRelativeBounds } from "../../shared/utils";
-import { appHelloDecoder, appHelloSuccessDecoder, applicationStartConfigDecoder, appManagerOperationTypesDecoder, appRemoveConfigDecoder, appsExportOperationDecoder, appsImportOperationDecoder, appsRemoteBypass, basicInstanceDataDecoder, instanceDataDecoder } from "./decoders";
-import { AppsImportOperation, AppHello, AppHelloSuccess, ApplicationData, AppManagerOperationTypes, BaseApplicationData, BasicInstanceData, InstanceData, InstanceLock, InstanceProcessInfo, AppsExportOperation, AppRemoveConfig, AppsRemoteBypass } from "./types";
+import { appHelloDecoder, appHelloSuccessDecoder, applicationStartConfigDecoder, appManagerOperationTypesDecoder, appRemoveConfigDecoder, appsExportOperationDecoder, appsImportOperationDecoder, appsRemoteRegistrationDecoder, basicInstanceDataDecoder, instanceDataDecoder } from "./decoders";
+import { AppsImportOperation, AppHello, AppHelloSuccess, ApplicationData, AppManagerOperationTypes, BaseApplicationData, BasicInstanceData, InstanceData, InstanceLock, InstanceProcessInfo, AppsExportOperation, AppRemoveConfig, AppsRemoteRegistration } from "./types";
 import logger from "../../shared/logger";
 import { workspaceWindowDataDecoder } from "../workspaces/decoders";
 import { simpleWindowDecoder } from "../windows/decoders";
@@ -36,7 +36,7 @@ export class ApplicationsController implements LibController {
         remove: { name: "remove", dataDecoder: appRemoveConfigDecoder, execute: this.handleRemove.bind(this) },
         export: { name: "export", resultDecoder: appsExportOperationDecoder, execute: this.handleExport.bind(this) },
         clear: { name: "clear", execute: this.handleClear.bind(this) },
-        registerRemoteApps: { name: "registerRemoteApps", dataDecoder: appsRemoteBypass, execute: this.handleRegisterRemoteApps.bind(this) },
+        registerRemoteApps: { name: "registerRemoteApps", dataDecoder: appsRemoteRegistrationDecoder, execute: this.handleRegisterRemoteApps.bind(this) },
     }
 
     constructor(
@@ -299,7 +299,7 @@ export class ApplicationsController implements LibController {
         this.logger?.trace(`[${commandId}] instance ${inst.id} has been closed, removed from store, announced stopped and notified windows, responding to caller`);
     }
 
-    public async handleRegisterRemoteApps(config: AppsRemoteBypass, commandId: string): Promise<void> {
+    public async handleRegisterRemoteApps(config: AppsRemoteRegistration, commandId: string): Promise<void> {
         this.logger?.trace(`[${commandId}] handling remote bypass command`);
 
         if (this.config.remote) {

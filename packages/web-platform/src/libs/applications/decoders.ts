@@ -1,6 +1,6 @@
 import { Decoder, object, array, optional, anyJson, number, oneOf, constant, boolean } from "decoder-validate";
 import { allApplicationDefinitionsDecoder, applicationDetailsDecoder, glueCoreAppDefinitionDecoder, nonEmptyStringDecoder, nonNegativeNumberDecoder } from "../../shared/decoders";
-import { ApplicationData, BaseApplicationData, AppHelloSuccess, InstanceData, AppHello, BasicInstanceData, AppManagerOperationTypes, AppsImportOperation as AppsImportOperation, AppRemoveConfig, AppsExportOperation, AppsRemoteBypass } from "./types";
+import { ApplicationData, BaseApplicationData, AppHelloSuccess, InstanceData, AppHello, BasicInstanceData, AppManagerOperationTypes, AppsImportOperation as AppsImportOperation, AppRemoveConfig, AppsExportOperation, AppsRemoteRegistration } from "./types";
 import { ApplicationStartConfig } from "../../common/types";
 
 export const appManagerOperationTypesDecoder: Decoder<AppManagerOperationTypes> = oneOf<"appHello" | "applicationStart" | "instanceStop" | "registerWorkspaceApp" | "unregisterWorkspaceApp" | "export" | "import" | "remove" | "clear" | "registerRemoteApps">(
@@ -90,6 +90,6 @@ export const appsExportOperationDecoder: Decoder<AppsExportOperation> = object({
     definitions: array(glueCoreAppDefinitionDecoder)
 });
 
-export const appsRemoteBypass: Decoder<AppsRemoteBypass> = object({
+export const appsRemoteRegistrationDecoder: Decoder<AppsRemoteRegistration> = object({
     definitions: array(allApplicationDefinitionsDecoder)
 });
