@@ -2,7 +2,7 @@
 import { Glue42Web } from "@glue42/web";
 import { Glue42Core } from "@glue42/core";
 import { generate } from "shortid";
-import { ApplicationStartConfig, BridgeOperation, InternalPlatformConfig, LibController, SessionWindowData } from "../../common/types";
+import { ApplicationStartConfig, BridgeOperation, InternalApplicationsConfig, InternalPlatformConfig, LibController, SessionWindowData } from "../../common/types";
 import { GlueController } from "../../controllers/glue";
 import { SessionStorageController } from "../../controllers/session";
 import { StateController } from "../../controllers/state";
@@ -19,6 +19,7 @@ import { SimpleWindowCommand, WindowTitleConfig } from "../windows/types";
 import { AppDirectory } from "./appStore/directory";
 
 export class ApplicationsController implements LibController {
+    private config!: InternalApplicationsConfig;
     private applicationStartTimeoutMs = 15000;
     private started = false;
     private defaultBounds!: Glue42Web.Windows.Bounds;
@@ -35,7 +36,7 @@ export class ApplicationsController implements LibController {
         remove: { name: "remove", dataDecoder: appRemoveConfigDecoder, execute: this.handleRemove.bind(this) },
         export: { name: "export", resultDecoder: appsExportOperationDecoder, execute: this.handleExport.bind(this) },
         clear: { name: "clear", execute: this.handleClear.bind(this) },
-        remoteBypass: { name: "remoteBypass", dataDecoder: appsRemoteBypass, execute: this.handleRemoteBypass.bind(this) },
+        registerRemoteApps: { name: "registerRemoteApps", dataDecoder: appsRemoteBypass, execute: this.handleRegisterRemoteApps.bind(this) },
     }
 
     constructor(
@@ -54,6 +55,8 @@ export class ApplicationsController implements LibController {
         this.defaultBounds = config.windows.defaultWindowOpenBounds;
 
         this.logger?.trace("initializing applications");
+
+        this.config = config.applications;
 
         this.appDirectory.start({
             config: config.applications,
@@ -296,8 +299,12 @@ export class ApplicationsController implements LibController {
         this.logger?.trace(`[${commandId}] instance ${inst.id} has been closed, removed from store, announced stopped and notified windows, responding to caller`);
     }
 
-    public async handleRemoteBypass(config: AppsRemoteBypass, commandId: string): Promise<void> {
+    public async handleRegisterRemoteApps(config: AppsRemoteBypass, commandId: string): Promise<void> {
         this.logger?.trace(`[${commandId}] handling remote bypass command`);
+
+        if (this.config.remote) {
+            throw new Error(`[${commandId}] cannot accept remote apps from the protocol, because there is an active remote configuration.`);
+        }
 
         this.appDirectory.processAppDefinitions(config.definitions, { mode: "replace", type: "remote" });
 

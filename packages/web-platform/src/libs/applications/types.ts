@@ -4,7 +4,7 @@ import { InternalApplicationsConfig } from "../../common/types";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type AppManagerOperationTypes = "appHello" | "applicationStart" | "instanceStop" |
-    "registerWorkspaceApp" | "unregisterWorkspaceApp" | "export" | "import" | "remove" | "clear" | "remoteBypass";
+    "registerWorkspaceApp" | "unregisterWorkspaceApp" | "export" | "import" | "remove" | "clear" | "registerRemoteApps";
 
 export interface BaseApplicationData {
     name: string;
