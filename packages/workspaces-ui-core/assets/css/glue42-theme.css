@@ -166,6 +166,12 @@
 .lm_header .lm_tab .lm_saveButton:hover::before {
   background-color: var(--t42-content-color);
 }
+.lm_header .lm_tab .lm_hibernationIcon:hover {
+  background-color: transparent;
+}
+.lm_header .lm_tab .lm_hibernationIcon:hover::before {
+  background-color: auto;
+}
 .lm_header .lm_tab .lm_close_tab::before {
   background-color: var(--t42-content-color);
 }
