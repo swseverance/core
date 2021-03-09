@@ -2,7 +2,7 @@
 import GlueCore, { Glue42Core } from "@glue42/core";
 import GlueWeb, { Glue42Web, Glue42WebFactoryFunction } from "@glue42/web";
 import { GlueClientControlName, GlueWebPlatformControlName, GlueWebPlatformStreamName, GlueWebPlatformWorkspacesStreamName, GlueWorkspaceFrameClientControlName } from "../common/constants";
-import { BridgeOperation, InternalPlatformConfig, LibDomains } from "../common/types";
+import { BridgeOperation, ControlMessage, InternalPlatformConfig, LibDomains } from "../common/types";
 import { PortsBridge } from "../connection/portsBridge";
 import { generate } from "shortid";
 import { SessionStorageController } from "./session";
@@ -54,7 +54,7 @@ export class GlueController {
         return this._clientGlue;
     }
 
-    public async createPlatformSystemMethod(handler: (args: unknown, caller: Glue42Web.Interop.Instance, success: (args?: unknown) => void, error: (error?: string | object) => void) => void): Promise<void> {
+    public async createPlatformSystemMethod(handler: (args: ControlMessage, caller: Glue42Web.Interop.Instance, success: (args?: ControlMessage) => void, error: (error?: string | object) => void) => void): Promise<void> {
         await this.createMethodAsync(GlueWebPlatformControlName, handler);
     }
 
@@ -222,7 +222,7 @@ export class GlueController {
         }
     }
 
-    private async createMethodAsync(name: string, handler: (args: unknown, caller: Glue42Web.Interop.Instance, success: (args?: unknown) => void, error: (error?: string | object) => void) => void): Promise<void> {
+    private async createMethodAsync(name: string, handler: (args: any, caller: Glue42Web.Interop.Instance, success: (args?: any) => void, error: (error?: string | object) => void) => void): Promise<void> {
         await this._systemGlue.interop.registerAsync(name, handler);
     }
 

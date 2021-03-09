@@ -195,10 +195,22 @@ export namespace Glue42WebPlatform {
 
     export namespace Plugins {
 
+        export interface ControlMessage {
+            domain: "system" | "windows" | "appManager" | "layouts" | "workspaces" | "intents" | "channels";
+            operation: string;
+            data: any;
+            commandId?: string;
+        }
+        
+        export interface PlatformControls {
+            control: (args: ControlMessage) => Promise<any>;
+            logger?: Glue42Web.Logger.API;
+        }
+
         export interface PluginDefinition {
             name: string;
             config?: unknown;
-            start: (glue: Glue42Web.API, config: unknown, control: (args: any) => void) => void;
+            start: (glue: Glue42Web.API, config: unknown, platform: PlatformControls) => void;
         }
 
         export interface Config {

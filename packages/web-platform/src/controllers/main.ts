@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Glue42Web } from "@glue42/web";
-import { CoreClientData, InternalPlatformConfig, LibController, LibDomains } from "../common/types";
+import { ControlMessage, CoreClientData, InternalPlatformConfig, LibController, LibDomains } from "../common/types";
 import { libDomainDecoder } from "../shared/decoders";
 import { GlueController } from "./glue";
 import { WindowsController } from "../libs/windows/controller";
@@ -73,15 +74,18 @@ export class PlatformController {
 
     private async startPlugin(definition: Glue42WebPlatform.Plugins.PluginDefinition): Promise<void> {
         try {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await definition.start(this.glueController.clientGlue, definition.config, (args: any) => this.handlePluginMessage(args, definition.name));
+            const platformControls: Glue42WebPlatform.Plugins.PlatformControls = {
+                control: (args: Glue42WebPlatform.Plugins.ControlMessage): Promise<any> => this.handlePluginMessage(args, definition.name),
+                logger: logger.get(definition.name)
+            };
+
+            await definition.start(this.glueController.clientGlue, definition.config, platformControls);
         } catch (error) {
             this.logger?.warn(`Plugin: ${definition.name} threw while initiating: ${JSON.stringify(error.message)}`);
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private handleControlMessage(args: any, caller: Glue42Web.Interop.Instance, success: (args?: unknown) => void, error: (error?: string | object) => void): void {
+    private handleControlMessage(args: ControlMessage, caller: Glue42Web.Interop.Instance, success: (args?: ControlMessage) => void, error: (error?: string | object) => void): void {
         const decodeResult = libDomainDecoder.run(args.domain);
 
         if (!decodeResult.ok) {
@@ -111,8 +115,7 @@ export class PlatformController {
             });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private async handlePluginMessage(args: any, pluginName: string): Promise<any> {
+    private async handlePluginMessage(args: ControlMessage, pluginName: string): Promise<any> {
         const decodeResult = libDomainDecoder.run(args.domain);
 
         if (!decodeResult.ok) {

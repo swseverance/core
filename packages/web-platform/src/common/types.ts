@@ -91,3 +91,7 @@ export interface ApplicationStartConfig {
 }
 
 export type SystemOperationTypes = "getEnvironment";
+
+export interface ControlMessage extends Glue42WebPlatform.Plugins.ControlMessage {
+    commandId?: string;
+}
