@@ -6,7 +6,7 @@
 ## Install
 
 ```bash
-npm install --save @glue42/workspaces-ui-react
+npm install --save @glue42/workspaces-ui-react @glue42/react-hooks
 ```
 
 ## Usage

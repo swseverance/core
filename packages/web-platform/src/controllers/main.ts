@@ -64,8 +64,11 @@ export class PlatformController {
 
         await this.glueController.initClientGlue(config?.glue, config?.glueFactory, config?.workspaces?.isFrame);
 
-        // all plugins are fire and forget
-        config.plugins?.definitions.forEach(this.startPlugin.bind(this));
+        if (Array.isArray(config.plugins)) {
+            await Promise.all(config.plugins.definitions.filter((def) => def.critical).map(this.startPlugin.bind(this)));
+
+            config.plugins.definitions.filter((def) => !def.critical).map(this.startPlugin.bind(this));
+        }
     }
 
     public getClientGlue(): Glue42Web.API {
@@ -80,8 +83,15 @@ export class PlatformController {
             };
 
             await definition.start(this.glueController.clientGlue, definition.config, platformControls);
+
         } catch (error) {
-            this.logger?.warn(`Plugin: ${definition.name} threw while initiating: ${JSON.stringify(error.message)}`);
+            const message = `Plugin: ${definition.name} threw while initiating: ${JSON.stringify(error.message)}`;
+
+            if (definition.critical) {
+                throw new Error(message);
+            } else {
+                this.logger?.warn(message);
+            }
         }
     }
 

@@ -218,7 +218,8 @@ export const channelDefinitionDecoder: Decoder<Glue42WebPlatform.Channels.Channe
 export const pluginDefinitionDecoder: Decoder<Glue42WebPlatform.Plugins.PluginDefinition> = object({
     name: nonEmptyStringDecoder,
     start: anyJson(),
-    config: optional(anyJson())
+    config: optional(anyJson()),
+    critical: optional(boolean())
 });
 
 export const allApplicationDefinitionsDecoder: Decoder<Glue42Web.AppManager.Definition | Glue42WebPlatform.Applications.FDC3Definition> = oneOf<Glue42Web.AppManager.Definition | Glue42WebPlatform.Applications.FDC3Definition>(

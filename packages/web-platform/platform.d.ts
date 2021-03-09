@@ -209,8 +209,9 @@ export namespace Glue42WebPlatform {
 
         export interface PluginDefinition {
             name: string;
-            config?: unknown;
             start: (glue: Glue42Web.API, config: unknown, platform: PlatformControls) => void;
+            config?: unknown;
+            critical?: boolean;
         }
 
         export interface Config {
