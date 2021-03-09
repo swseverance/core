@@ -95,6 +95,11 @@ class WorkspacesManager {
     }
 
     public subscribeForWindowClicked = (cb: () => void) => {
+        if (!this._frameController) {
+             // tslint:disable-next-line: no-console
+            console.warn("Your subscription to window clicked wasn't successful, because the Workspaces library isn't initialized yet");
+            return () => { };
+        }
         return this._frameController.onFrameContentClicked(cb);
     }
 
