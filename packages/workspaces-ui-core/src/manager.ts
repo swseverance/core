@@ -96,7 +96,7 @@ class WorkspacesManager {
 
     public subscribeForWindowClicked = (cb: () => void) => {
         if (!this._frameController) {
-             // tslint:disable-next-line: no-console
+            // tslint:disable-next-line: no-console
             console.warn("Your subscription to window clicked wasn't successful, because the Workspaces library isn't initialized yet");
             return () => { };
         }
@@ -132,9 +132,7 @@ class WorkspacesManager {
             savedConfig.workspacesOptions.context = options?.context;
         }
 
-        if (options?.title) {
-            (savedConfig.workspacesOptions as WorkspaceOptionsWithTitle).title = options?.title;
-        }
+        (savedConfig.workspacesOptions as WorkspaceOptionsWithTitle).title = options?.title || name;
 
         if (savedConfig && savedConfig.workspacesOptions && !savedConfig.workspacesOptions.name) {
             savedConfig.workspacesOptions.name = name;
