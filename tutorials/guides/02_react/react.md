@@ -1025,7 +1025,7 @@ The `<GlueProvider />` component will initialize internally the [Glue42 Web](../
 
 ### 6.2. Channel Selector Widget
 
-The users have to be able to navigate through the Channels for which they will need some sort of user interface. You can create your own channel selector widget by using the Channels API, but for the purpose of the tutorial there is a `<ChannelSelectorWidget />` component provided. To add it to the **Stocks** and **Clients** apps, follow these steps:
+The users have to be able to navigate through the Channels for which they will need some sort of user interface. You can create your own Channel Selector widget by using the Channels API, but for the purpose of the tutorial there is a `<ChannelSelectorWidget />` component provided. To add it to the **Stocks** and **Clients** apps, follow these steps:
 
 1. Import the Channel Selector widget in the `<Clients />` and `<Stocks />` components:
 
@@ -1120,9 +1120,10 @@ return (
 );
 ```
 
-4. Go to the **Stocks** app to set up the Channels functionalities. Create a `setDefaultClient()` callback for handling the default state where no client has been selected:
+4. Go to the **Stocks** app to set up the Channels functionalities. Import the `NO_CHANNEL_VALUE` constant that will be used for leaving the current Channel. Define a `setDefaultClient()` callback for handling the default state where no client has been selected and a `channelWidgetState` variable that will be used to trigger state change in the `<ChannelWidgetSelector />` component:
 
 ```javascript
+import { NO_CHANNEL_VALUE } from "./constants";
 import {
     getChannelNamesAndColors,
     joinChannel
@@ -1133,11 +1134,12 @@ function Stocks() {
     const channelNamesAndColors = useGlue(getChannelNamesAndColors);
     const onChannelSelected = useGlue(joinChannel);
     const setDefaultClient = () => setClient({ clientId: "", clientName: "" });
+    const [channelWidgetState, setChannelWidgetState] = useState(false);
     ...
 };
 ```
 
-Create the `<ChannelWidgetSelector />` component in the `return` statement. Pass the `channelNamesAndColors` and `onChannelSelected` as props to it: 
+Create the `<ChannelWidgetSelector />` component in the `return` statement. Pass `channelNamesAndColors` and `onChannelSelected` as props to it. Use the `onDefaultChannelSelected` property to clear the selected client and leave the current Channel when the user selects "No channel": 
 
 ```javascript
 return (
@@ -1152,7 +1154,10 @@ return (
                 <ChannelSelectorWidget
                     channelNamesAndColors={channelNamesAndColors}
                     onChannelSelected={onChannelSelected}
-                    onDefaultChannelSelected={setDefaultClient}
+                    onDefaultChannelSelected={() => {
+                        setDefaultClient();
+                        joinChannel(glue)({value: NO_CHANNEL_VALUE});
+                    }}
                 />
             </div>
         </div>
@@ -1161,14 +1166,21 @@ return (
 );
 ```
 
-Pass a `channelWidgetState` state variable to the `key` property of the `ChannelSelectorWidget` component to trigger state change when the user clicks the "Show All" button to clear the currently selected client. Update the code of the `onClick` handler in the button:
+To leave the current Channel, re-render the Channel Selector and clear the selected client when the user clicks the "Show All" button, modify its `onClick` handler: 
+
+```javascript
+ onClick={() => {
+    setChannelWidgetState(!channelWidgetState);
+    setDefaultClient();
+    joinChannel(glue)({value: NO_CHANNEL_VALUE});
+}}
+```
+
+Pass the `channelWidgetState` state variable to the `key` property of the `ChannelSelectorWidget` component to trigger state change:
 
 ```javascript
 function Stocks() {
     ...
-    const [channelWidgetState, setChannelWidgetState] = useState(false);
-    ...
-
     return (
         <div className="container-fluid">
             <div className="row">
@@ -1179,6 +1191,7 @@ function Stocks() {
                     onClick={() => {
                         setChannelWidgetState(!channelWidgetState);
                         setDefaultClient();
+                        joinChannel(glue)({value: NO_CHANNEL_VALUE});
                     }}
                 >
                     Show All
@@ -1189,7 +1202,10 @@ function Stocks() {
                         key={channelWidgetState}
                         channelNamesAndColors={channelNamesAndColors}
                         onChannelSelected={onChannelSelected}
-                        onDefaultChannelSelected={setDefaultClient}
+                        onDefaultChannelSelected={() => {
+                            setDefaultClient();
+                            joinChannel(glue)({value: NO_CHANNEL_VALUE});
+                        }}
                     />
                 </div>
             </div>
@@ -1366,7 +1382,7 @@ export const startApp = glue => async () => {
 };
 ```
 
-*Note that the `ChannelSelectorWidget` wraps a React `Select` component and to use it as a controlled component (when you want to make the **Stocks** app automatically select a channel on startup), you must create a proper channel definition object using the values of the `name` and `meta.color` properties and pass it to the **Stocks** application.*
+*Note that the `ChannelSelectorWidget` wraps a React `<Select />` component and to use it as a controlled component (when you want to make the **Stocks** app automatically select a Channel on startup), you must create a proper Channel definition object using the values of the `name` and `meta.color` properties and pass it to the **Stocks** application.*
 
 Import the `startApp()` function in the `<Clients />` component, create a `startStocksApp()` callback and pass it to the `onClick` handler of the "Stocks" button:
 
@@ -1388,15 +1404,27 @@ function Clients() {
 };
 ```
 
-Go to the **Stocks** app and use the `getWindowContext()` function from the `glue.js` file to get the channel passed as window context by the **Clients** application. Import the `NO_CHANNEL_VALUE` constant from `constants.js` to handle the case when no channel is available in the window context:
+Go to the `glue.js` file of the **Stocks** app and define a function that will get the Channel passed as window context by the **Clients** application:
+
+```javascript
+export const getMyWindowContext = (setWindowContext) => async (glue) => {
+    const myWindow = glue.appManager.myInstance;
+    const context = await myWindow.getContext();
+
+    setWindowContext({ channel: context.channel });
+};
+```
+
+Go to the `<Stocks />` component, import the function and use it to set the window context. Import also the `NO_CHANNEL_VALUE` constant from the `constants.js` file to handle the case when no Channel is available in the window context:
 
 ```javascript
 import { getMyWindowContext } from "./glue";
-import { NO_CHANNEL_VALUE } from "./constants";
 
 function Stocks() {
     ...
     const [currentChannel, setCurrentChannel] = useState({ value: NO_CHANNEL_VALUE, label: NO_CHANNEL_VALUE });
+    const [windowContext, setWindowContext] = useState({});
+
     useGlue(getMyWindowContext(setWindowContext));
 
     useEffect(() => {
@@ -1410,7 +1438,7 @@ function Stocks() {
         }
     }, [windowContext.channel, onChannelSelected]);
     ...
-}
+};
 ```
 
 Add a `value` property to the `<ChannelSelectorWidget />` that will hold the `currentChannel` value. Add the `setCurentChannel()` function to the `onChannelSelected` property:
@@ -1441,33 +1469,33 @@ function Stocks() {
 }
 ```
 
-The `onChannelSelected()` function manages the channel selection and the `setCurrentChannel()` function visualizes the current channel in the component.
+The `onChannelSelected()` function manages the Channel selection and the `setCurrentChannel()` function visualizes the current Channel in the component.
 
 ### 7.3. Application Instances
 
-Go to the `glue.js` file of the **Stock** app and edit the `openStockDetails()` function. Use the [`application()`](../../reference/core/latest/appmanager/index.html#!API-application) method to get the **Stock Details** app and call the [`start()`](../../reference/core/latest/appmanager/index.html#!Application-start) method on the application object to start it. The `start()` method also accepts a context object as a first parameter that will be passed as context to the started application instance:
+Go to the `glue.js` file of the **Stock** app and edit the `openStockDetails()` function. Use the [`application()`](../../reference/core/latest/appmanager/index.html#!API-application) method to get the **Stock Details** app. Check whether an instance with the selected stock has already been started by iterating over the contexts of the existing **Stock Details** instances. If there is no instance with the selected stock, call the `start()` method on the application object and pass the selected stock as a context:
 
 ```javascript
-export const openStockDetails = glue => symbol => {
-    glue.appManager.application("Stock Details").start({ symbol });
-};
-```
+export const openStockDetails = (glue) => (symbol) => {
+    const detailsApplication = glue.appManager.application("Stock Details");
 
-Go to the `glue.js` files of the **Stocks** and the **Stock Details** apps and edit the `getMyWindowContext()` function to get the window context using the Application Management API:
-
-```javascript
-// Stocks
-export const getMyWindowContext = setWindowContext => glue => {
-    const myWindow = glue.appManager.myInstance;
-    const context = await myWindow.getContext();
+    // Check whether an instance with the selected stock is already running.
+    const contexts = await Promise.all(
+        // Use the `instances` property to get all running application instances.
+        detailsApplication.instances.map(instance => instance.getContext())
+    );
+    const isRunning = contexts.find(context => context.symbol.RIC === symbol.RIC);
     
-    setWindowContext({ channel: context.channel });
+    if (!isRunning) {
+        detailsApplication.start({ symbol }).catch(console.error);
+    };
 };
 ```
 
+Go to the `glue.js` file of the **Stock Details** app and edit the `getMyWindowContext()` function to get the window context using the Application Management API:
+
 ```javascript
-// Stock Details
-export const getMyWindowContext = setWindowContext => glue => {
+export const getMyWindowContext = (setWindowContext) => async (glue) => {
     const myWindow = glue.appManager.myInstance;
     const context = await myWindow.getContext();
     
@@ -1475,7 +1503,7 @@ export const getMyWindowContext = setWindowContext => glue => {
 };
 ```
 
-Everything should work as before, the difference being that now the apps are using the Application Management API instead of the Window Management API.
+Everything will work as before, the difference being that now the apps are using the Application Management API instead of the Window Management API.
 
 ## 8. Workspaces
 
