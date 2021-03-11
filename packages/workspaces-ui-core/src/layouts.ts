@@ -115,7 +115,7 @@ export class LayoutsManager {
     }
 
     public async save(options: SaveWorkspaceConfig): Promise<WorkspaceLayout> {
-        const { workspace, title, name, saveContext } = options;
+        const { workspace, name, saveContext } = options;
         if (!workspace.layout) {
             throw new Error("An empty layout cannot be saved");
         }
@@ -123,9 +123,11 @@ export class LayoutsManager {
 
         const workspaceConfig = await this.saveWorkspaceCore(workspace);
 
-        if (title) {
-            workspaceConfig.config.title = title;
+        // Its superfluous to add the title to the layout since its never used
+        if (workspaceConfig.config.title) {
+            delete workspaceConfig.config.title;
         }
+
         let workspaceContext = undefined;
 
         if (saveContext) {
@@ -161,6 +163,11 @@ export class LayoutsManager {
         }
         workspace.layout.config.workspacesOptions.name = name;
         const workspaceConfig = await this.saveWorkspaceCore(workspace);
+
+        // Its superfluous to add the title to the layout since its never used
+        if (workspaceConfig.config.title) {
+            delete workspaceConfig.config.title;
+        }
 
         return {
             name,
