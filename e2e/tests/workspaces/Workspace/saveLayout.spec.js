@@ -102,19 +102,6 @@ describe('saveLayout() Should ', function () {
         expect(layoutUnderTest.components[0].state.context).to.not.exist;
     });
 
-    it("save the layout with title which matches the one before the operation", async () => {
-        const title = "myNewTitle";
-        const layoutName = gtf.getWindowName("layout.integration");
-
-        await workspace.setTitle(title);
-        await workspace.saveLayout(layoutName);
-
-        const layouts = await glue.workspaces.layouts.export();
-        const layoutUnderTest = layouts.find(l => l.name === layoutName);
-
-        expect(layoutUnderTest.components[0].state.config.title).to.eql(title);
-    });
-
     it("not update the title after the save", async () => {
         const title = "myNewTitle";
         const layoutName = gtf.getWindowName("layout.integration");
@@ -124,19 +111,6 @@ describe('saveLayout() Should ', function () {
         await workspace.refreshReference();
 
         expect(workspace.title).to.eql(title);
-    });
-
-    it("the layout with the correct window title when the window title has been set", async () => {
-        const title = "myNewWIndowTitle";
-        const windows = workspace.getAllWindows();
-        const layoutName = gtf.getWindowName("layout.integration");
-
-        await windows[0].setTitle(title);
-
-        const layout = await glue.workspaces.layouts.save({ name: layoutName, workspaceId: workspace.id });
-        console.log(layout);
-
-        expect(layout.components[0].state.children[0].children[0].config.title).to.eql(title);
     });
 
     Array.from([[], {}, 42, undefined, null]).forEach((input) => {

@@ -175,20 +175,6 @@ describe("properties: ", () => {
             return glue.workspaces.layouts.delete(layoutName);
         });
 
-        it("be the same as the one in the layout", async () => {
-            await glue.workspaces.layouts.import([configWithTitle]);
-            const newWorkspace = await glue.workspaces.restoreWorkspace(layoutName, {});
-
-            expect(newWorkspace.title).to.eql(workspaceTitle);
-        });
-
-        it("be the same as the name in the config of the layout when a title is not passed", async () => {
-            await glue.workspaces.layouts.import([configWithoutTitle]);
-            const newWorkspace = await glue.workspaces.restoreWorkspace(layoutName, {});
-
-            expect(newWorkspace.title).to.eql(configWithoutTitle.components[0].state.config.name);
-        });
-
         it("be the same as the name of the layout when a title is not passed and the config object is empty", async () => {
             await glue.workspaces.layouts.import([configWithoutTitleAndName]);
             const newWorkspace = await glue.workspaces.restoreWorkspace(layoutName, {});
