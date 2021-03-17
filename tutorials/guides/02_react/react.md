@@ -74,7 +74,7 @@ The three apps of your **Glue42 Core** project contain the following resources:
 - `.env` - environment variables for CRA;
 - `config-overrides.js` - defines additional WebPack configuration to resolve `react` and `react-dom` modules from within the `node_modules` in the current directory;
 
-Go to the directories of the three apps, open a command prompt and run:
+Go to the directories of all apps, open a command prompt and run:
 
 ```cmd
 npm install
@@ -82,7 +82,7 @@ npm install
 npm start
 ```
 
-This will install all necessary dependencies and will run the **Clients** app on port 3000, the **Stocks** app on port 3001 and the **Stock Details** app on port 3002. The pages will reload whenever you make edits.
+This will install all necessary dependencies and will run the **Clients** app on port 3000, the **Stocks** app on port 3001, the **Stock Details** app on port 3002 and the Workspaces App on port 9300. The pages will reload whenever you make edits.
 
 ### 1.2. Solution Files
 
@@ -90,7 +90,7 @@ Before you continue, take a look at the solution files. You are free to use the 
 
 Go to the `/rest-server` directory and start the REST Server (as described in the [REST Server](#initial_setup-rest_server) chapter). 
 
-Install all dependencies in `/react/solution/Clients`, `/react/solution/ClientDetails`, `/react/solution/Stocks`, `/react/solution/StockDetails` and start both apps by running the following commands: 
+Install all dependencies in `/react/solution/Clients`, `/react/solution/ClientDetails`, `/react/solution/Stocks`, `/react/solution/StockDetails` and start all apps by running the following commands: 
 
 ```cmd
 npm install
@@ -133,7 +133,7 @@ npx create-react-app my-app
 2. Install the following dependencies in the root directory of your app:
 
 ```cmd
-npm install --save @glue42/react-hooks@1.0.7 react-select@3.1.0 bootstrap@4.4.1 react-app-rewired@2.1.5 chroma-js@2.1.0
+npm install --save @glue42/react-hooks@2.0.12 react-select@3.1.0 bootstrap@4.4.1 react-app-rewired@2.1.5 chroma-js@2.1.0
 ```
 
 3. Edit the `package.json` file of your app:
@@ -156,7 +156,7 @@ npm install --save @glue42/react-hooks@1.0.7 react-select@3.1.0 bootstrap@4.4.1 
 
 ```cmd
 SKIP_PREFLIGHT_CHECK=true
-PORT=3002
+PORT=3003
 ```
 
 *Note that the `PORT` value must be different for each app in the project.*
@@ -270,7 +270,7 @@ import GlueWeb from "@glue42/web";
 import { GlueProvider } from "@glue42/react-hooks";
 
 const settings = {
-    webPlatform: {
+    web: {
         factory: GlueWeb
     }
 };
@@ -1511,25 +1511,26 @@ The latest feedback from the users is that their desktops very quickly become cl
 
 The new requirement is that when a user clicks on a client in the Clients application, a new Workspace should open displaying detailed information about the selected client in one app and his stocks portfolio in another. When the user clicks on a stock, a third application should appear in the same Workspace displaying more details about the selected stock. You will create a **Client Details** application for displaying information about the selected client.
 
-Go to the `.jsx` files of the **Clients** and **Stocks** apps and comment out all logic and imports related to Channels, introduced in a previous chapter. Instead, you will use Workspaces to allow the users to work with multiple clients at once and organize their desktop at the same time. Channels and Workspaces can, of course, be used together to provide extremely enhanced user experience, but in order to focus entirely on working with Workspaces, the Channels functionality will be ignored.
+Go to the **Clients** and **Stocks** apps and comment out all logic and imports related to Channels, introduced in a previous chapter. Instead, you will use Workspaces to allow the users to work with multiple clients at once and organize their desktop at the same time. Channels and Workspaces can, of course, be used together to provide extremely enhanced user experience, but in order to focus entirely on working with Workspaces, the Channels functionality will be ignored.
 
 Use the [Workspaces API](../../reference/core/latest/workspaces/index.html) documentation as a reference when working on this chapter.
 
 ### 8.1. Setup
 
-All workspaces are contained in a specialized, standalone web application called "Workspaces Frame". It is outside the scope of this tutorial to cover building and customizing this applications, so you have a ready-to-go application located at /workspace. This application is already being hosted by the npm start script at `http://localhost:9300/`, so there is nothing you need to do.
+All Workspaces are contained in a specialized, standalone web application called [Workspaces App](../../capabilities/windows/workspaces/index.html#workspaces_concepts-frame). It is outside the scope of this tutorial to cover building and customizing this applications, so you have a ready-to-go application located at `/workspace`. The Workspaces App is already being hosted at `http://localhost:9300/`.
 
 #### Create the Client Details App
 
-- Create a new React app named `ClientDetails` in the root directory of your **Glue42 Core** project following the instructions in [Chapter 1.5.](#1_setup-15_react_project_setup).
+- Create a new React app named `client-details` in the root directory of your **Glue42 Core** project following the instructions in [Chapter 1.5.](#1_setup-15_react_project_setup).
 
-- Create a `ClientDetails.jsx` file in `/ClientDetails/src` and paste the following code:
+- Create a `ClientDetails.jsx` file in `/client-details/src` and paste the following code:
 
 ```javascript
 import React, { useState } from "react";
 
 function ClientDetails() {
     const [client, setClient] = useState({});
+
     return (
         <div className="container-fluid">
             <div className="row">
@@ -1573,7 +1574,7 @@ function ClientDetails() {
             </div>
         </div>
     );
-}
+};
 
 export default ClientDetails;
 ```
@@ -1587,16 +1588,16 @@ import "bootstrap/dist/css/bootstrap.css";
 import ClientDetails from "./ClientDetails";
 
 const settings  = {
-  webPlatform: {
-      factory: GlueWeb
-  }
-}
+    web: {
+        factory: GlueWeb
+    }
+};
 
 ReactDOM.render(
-  <GlueProvider settings={settings}>
-    <ClientDetails />
-  </GlueProvider>,
-  document.getElementById('root')
+    <GlueProvider settings={settings}>
+        <ClientDetails />
+    </GlueProvider>,
+    document.getElementById("root")
 );
 ```
 
@@ -1604,29 +1605,28 @@ ReactDOM.render(
 
 Next, you need to build a Workspace layout which will be the blueprint of the Workspace that the **Clients** app will restore when the user clicks on a client. This layout should contain the **Client Details** and **Stocks** apps.
 
-@orkspace layout can be restored by name using the [Workspaces API](../../reference/core/latest/workspaces/index.html).
+The Workspace layout can be restored by name using the [Workspaces API](../../reference/core/latest/workspaces/index.html).
 
 ### 8.3. Initializing Workspaces
 
 To be able to use Workspaces functionalities, you need to initialize the [Workspaces API](../../reference/core/latest/workspaces/index.html) in the **Clients**, **Client Details** and **Stocks** apps. The **Stock Details** app will participate in the Workspace, but will not need to use any Workspaces functionality. Go to the root directories of the **Clients**, **Stocks** and **Client Details** apps and run the following command to install the Workspaces API:
 
 ```cmd
-npm i --save @glue42/workspaces-api
+npm install --save @glue42/workspaces-api
 ```
 
-Go to the `index.js` files of the **Clients**, **Client Details** and **Stocks** apps, import the `GlueWorkspaces` library and add `GlueWorkspaces` to the `libraries` array of the configuration object when initializing the Glue42 Web library.
-
-In the `index.js` file of the **Clients** application add  the layouts initialization code:
+Go to the `index.js` file of the **Clients** application, define the Workspace layout and add the necessary configuration for initializing the Workspaces API:
 
 ```javascript
 // Initializing the Workspaces API in the Clients app.
 import GlueWorkspaces from "@glue42/workspaces-api";
 
+// Defining Workspace layouts.
 const layouts = {
     mode: "idb",
     local: [
         {
-            name: "example",
+            name: "Client Space",
             type: "Workspace",
             metadata: {},
             components: [
@@ -1682,7 +1682,7 @@ const layouts = {
                             }
                         ],
                         config: {
-                            name: "example",
+                            name: "Client Space",
                             title: "Untitled 1"
                         },
                         context: {}
@@ -1691,14 +1691,17 @@ const layouts = {
             ]
         }
     ]
-}
+};
 
 const config = {
+    // Pass the `GlueWorkspaces` factory function.
     glue: { libraries: [GlueWorkspaces] },
+    // Specify the location of the Workspaces App.
     workspaces: { src: "http://localhost:9300/" },
+    // Pass predefined Workspace layouts.
+    layouts,
     channels,
-    applications,
-    layouts
+    applications
 };
 
 const settings  = {
@@ -1706,88 +1709,42 @@ const settings  = {
         factory: GlueWebPlatform,
         config
     }
-}
+};
 
 ReactDOM.render(
     <GlueProvider settings={settings}>
         <Clients />
     </GlueProvider>,
-    document.getElementById('root')
+    document.getElementById("root")
 );
 ```
 
-```javascript
-// Stocks.jsx
-import GlueWorkspaces from '@glue42/workspaces-api';
-
-const settings  = {
-    webPlatform: {
-        factory: GlueWeb,
-        config: {
-          libraries: [GlueWorkspaces]
-        }
-    }
-  }
-
-ReactDOM.render(
-    <GlueProvider settings={settings}>
-        <Stocks />
-    </GlueProvider>,
-    document.getElementById('root')
-);
-```
+Next, go to the `index.js` files of the **Client Details** and **Stocks** apps, import the `GlueWorkspaces` library and add `GlueWorkspaces` to the `libraries` array of the configuration object when initializing the Glue42 Web library:
 
 ```javascript
-// ClientDetails.jsx
+import GlueWorkspaces from "@glue42/workspaces-api";
 
-import GlueWorkspaces from '@glue42/workspaces-api';
-
-const settings  = {
-  webPlatform: {
-      factory: GlueWeb,
-      config: {
-        libraries: [GlueWorkspaces]
-      }
-  }
-}
-
-ReactDOM.render(
-  <GlueProvider settings={settings}>
-    <ClientDetails />
-  </GlueProvider>,
-  document.getElementById('root')
-);
-```
-
-```javascript
-// StockDetails.jsx
-import GlueWeb from "@glue42/web";
+const config = { libraries: [GlueWorkspaces] };
 
 const settings = {
-    webPlatform: {
-        factory: GlueWeb
+    web: {
+        factory: GlueWeb,
+        config
     }
-}
-
-ReactDOM.render(
-    <GlueProvider settings={settings}>
-        <StockDetails />
-    </GlueProvider>,
-    document.getElementById('root')
-);
+};
 ```
 
 ### 8.4. Opening Workspaces
 
-Next, you have to implement opening a new Workspace when the user clicks on a client in the **Clients** app. Go to the `clientClickedHandler` function in the **Clients** app, restore by name the Workspace layout you created earlier and pass the selected client as a starting context. The specified context will be attached as a window context to all windows participating in the Workspace. Go to the `index.js` file of the **Clients** app and add the following:
+Next, you have to implement opening a new Workspace when the user clicks on a client in the **Clients** app. Go to the `index.js` file of the **Clients** app, define a function that will restore by name the Workspace layout you created earlier and pass the selected client as a starting context. The specified context will be attached as window context to all windows participating in the Workspace:
 
 ```javascript
 export const startAppWithWorkspace = glue => client => {
-    glue.workspaces.restoreWorkspace("client-space", { context: client });
-}
+    glue.workspaces.restoreWorkspace("Client Space", { context: client });
+};
 ```
 
-Import the function in `Clients.jsx` and create a `openWorkspace()` callback to be passed to the `onClick` handler of the client row:
+Import the function in the `<Clients />` components and create a `openWorkspace()` callback to be passed to the `onClick` handler of the client row:
 
 ```javascript
 import { startAppWithWorkspace } from "./glue";
@@ -1808,54 +1765,49 @@ Delete the existing code in the `onClick` handler of the client row element and 
             <tr
                 key={pId}
                 onClick={() => {
-                        openWorkspace({ clientId: gId, clientName: name, accountManager, portfolio, ...rest });
-                    }
-                }
+                    openWorkspace({ clientId: gId, clientName: name, accountManager, portfolio });
+                }}
             >
-                <td>{name}</td>
-                <td>{pId}</td>
-                <td>{gId}</td>
-                <td>{accountManager}</td>
+            ...
             </tr>
         ...
     );
 ...
 ```
 
-If everything is correct, a new Workspace should now open every time you click a client.
+If everything is correct, a new Workspace will now open every time you click a client.
 
 ### 8.5. Starting Context
 
 The windows of the **Client Details** and **Stocks** apps participating in the new Workspace will have a starting context attached to them. You have to handle this starting context in order to display the relevant client data when the user selects a client from the **Clients** app.
 
-To get the starting window context, you have to subscribe for updates to the context of the current window using the [Window Management API](../../reference/core/latest/windows/index.html). When the window context has been updated, you have to handle the client data in the respective application and also set the Workspace title to the name of the selected client.
+To get the starting window context, subscribe for updates to the context of the current window using the [Window Management API](../../reference/core/latest/windows/index.html). When the window context has been updated, handle the client data in the respective application and also set the Workspace title to the name of the selected client.
 
-Create a `glue.js` in `/ClientDetails/src` and insert the following:
+Create a `glue.js` file in `/client-details/src` and insert the following:
 
 ```javascript
-export const setClientFromWorkspace = setClient => glue =>
-    glue.workspaces.getMyWorkspace()
-        .then(myWorkspace => {
-            myWorkspace
-                .onContextUpdated(context => {
-                    if (context) {
-                        setClient(context);
-                        myWorkspace.setTitle(context.clientName);
-                    }
-                })
-        });
+export const setClientFromWorkspace = (setClient) => async (glue) => {
+    const myWorkspace = await glue.workspaces.getMyWorkspace();
+    myWorkspace.onContextUpdated((context) => {
+        if (context) {
+            setClient(context);
+            myWorkspace.setTitle(context.clientName);
+        };
+    });
+};
 ```
 
-Import the `setClientFromWorkspace()` function in `ClientDetails.jsx` and set it up using the `useGlue()` hook:
+Import the `setClientFromWorkspace()` function in the `<Clients />` component and set it up using the `useGlue()` hook:
 
 ```javascript
 import { setClientFromWorkspace } from "./glue";
+import { useGlue } from "@glue42/react-hooks";
 
 function ClientDetails() {
     ...
     useGlue(setClientFromWorkspace(setClient));
     ...
-}
+};
 ```
 
 Next, update the **Stocks** application to show the stocks of the currently selected client. Go to the `glue.js` file of the **Stocks** app and add the following:
