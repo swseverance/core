@@ -50,7 +50,7 @@ function Clients() {
                             </tr>
                         </thead>
                         <tbody>
-                            {clients.map(({ name, pId, gId, accountManager }) => (
+                            {clients.map(({ name, pId, gId, accountManager, portfolio, ...rest }) => (
                                 <tr key={pId}>
                                     <td>{name}</td>
                                     <td>{pId}</td>

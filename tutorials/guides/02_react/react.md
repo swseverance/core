@@ -133,7 +133,7 @@ npx create-react-app my-app
 2. Install the following dependencies in the root directory of your app:
 
 ```cmd
-npm install --save @glue42/react-hooks@2.0.12 react-select@3.1.0 bootstrap@4.4.1 react-app-rewired@2.1.5 chroma-js@2.1.0
+npm install --save @glue42/react-hooks bootstrap@4.4.1 react-app-rewired@2.1.5
 ```
 
 3. Edit the `package.json` file of your app:
@@ -600,7 +600,7 @@ In the `return` statement, attach the `onClick` handler to each client row:
 return (
     ...    
         <tbody>
-            {clients.map(({ name, pId, gId, accountManager, portfolio }) => (
+            {clients.map(({ name, pId, gId, accountManager, portfolio, ...rest }) => (
                 <tr
                     key={pId}
                     onClick={() => {
@@ -820,7 +820,7 @@ function Clients() {
 
     return (
         ...
-            {clients.map(({ name, pId, gId, accountManager, portfolio }) => (
+            {clients.map(({ name, pId, gId, accountManager, portfolio, ...rest }) => (
                 <tr
                     key={pId}
                     onClick={() => {
@@ -1169,7 +1169,7 @@ return (
 To leave the current Channel, re-render the Channel Selector and clear the selected client when the user clicks the "Show All" button, modify its `onClick` handler: 
 
 ```javascript
- onClick={() => {
+onClick={() => {
     setChannelWidgetState(!channelWidgetState);
     setDefaultClient();
     joinChannel(glue)({value: NO_CHANNEL_VALUE});
@@ -1466,7 +1466,7 @@ function Stocks() {
         </div>
         ...
     )
-}
+};
 ```
 
 The `onChannelSelected()` function manages the Channel selection and the `setCurrentChannel()` function visualizes the current Channel in the component.
@@ -1739,7 +1739,7 @@ const settings = {
 Next, you have to implement opening a new Workspace when the user clicks on a client in the **Clients** app. Go to the `index.js` file of the **Clients** app, define a function that will restore by name the Workspace layout you created earlier and pass the selected client as a starting context. The specified context will be attached as window context to all windows participating in the Workspace:
 
 ```javascript
-export const startAppWithWorkspace = glue => client => {
+export const startAppWithWorkspace = (glue) => (client) => {
     glue.workspaces.restoreWorkspace("Client Space", { context: client });
 };
 ```
@@ -1753,7 +1753,7 @@ function Clients() {
     ...
     const openWorkspace = useGlue(startAppWithWorkspace);
     ...
-}
+};
 ```
 
 Delete the existing code in the `onClick` handler of the client row element and replace it with a call to `openWorkspace()`:
@@ -1765,7 +1765,7 @@ Delete the existing code in the `onClick` handler of the client row element and 
             <tr
                 key={pId}
                 onClick={() => {
-                    openWorkspace({ clientId: gId, clientName: name, accountManager, portfolio });
+                    openWorkspace({ clientId: gId, clientName: name, accountManager, portfolio, ...rest });
                 }}
             >
             ...
@@ -1797,7 +1797,7 @@ export const setClientFromWorkspace = (setClient) => async (glue) => {
 };
 ```
 
-Import the `setClientFromWorkspace()` function in the `<Clients />` component and set it up using the `useGlue()` hook:
+Import the `setClientFromWorkspace()` function in the `<ClientDetails />` component and set it up using the `useGlue()` hook:
 
 ```javascript
 import { setClientFromWorkspace } from "./glue";
@@ -1813,21 +1813,17 @@ function ClientDetails() {
 Next, update the **Stocks** application to show the stocks of the currently selected client. Go to the `glue.js` file of the **Stocks** app and add the following:
 
 ```javascript
-export const setClientFromWorkspace = setClient => glue => {
-    glue.workspaces.getMyWorkspace()
-        .then(myWorkspace => {
-            myWorkspace
-                .onContextUpdated(context => {
-                    if (context) {
-                        setClient(context);
-                        myWorkspace.setTitle(context.clientName);
-                    }
-                })
-        });
-}
+export const setClientFromWorkspace = (setClient) => async (glue) => {
+    const myWorkspace = await glue.workspaces.getMyWorkspace();
+    myWorkspace.onContextUpdated((context) => {
+        if (context) {
+            setClient(context);
+        };
+    });
+};
 ```
 
-Import the `setClientFromWorkspace()` function in `ClientDetails.jsx` and set it up using the `useGlue()` hook:
+Import the `setClientFromWorkspace()` function in the `<Stocks />` component and set it up using the `useGlue()` hook:
 
 ```javascript
 import { setClientFromWorkspace } from "./glue";
@@ -1836,10 +1832,10 @@ function Stocks() {
     ...
     useGlue(setClientFromWorkspace(setClient));
     ...
-}
+};
 ```
 
-Now when you select a client in the **Clients** app, a new Workspace should open with the **Client Details** and **Stocks** apps showing the relevant client information.
+Now when you select a client in the **Clients** app, a new Workspace will open with the **Client Details** and **Stocks** apps showing the relevant client information.
 
 ### 8.6. Modifying Workspaces
 
@@ -1847,14 +1843,14 @@ Next, you have to make the **Stock Details** app appear in the same Workspace as
 
 *To achieve this functionality, you will have to manipulate a Workspace and its elements. It is recommended that you familiarize yourself with the Workspaces terminology to fully understand the concepts and steps below. You can use the available documentation about [Workspaces Concepts](../../capabilities/windows/workspaces/index.html#workspaces_concepts), [Workspace Box Elements](https://docs.glue42.com/glue42-concepts/windows/workspaces/javascript/index.html#box_elements) and the [Workspaces API](../../reference/core/latest/workspaces/index.html).*
 
-The **Stocks** app is a [`WorkspaceWindow`](../../reference/core/latest/workspaces/index.html#!WorkspaceWindow) that is the only child of a [`Group`](../../reference/core/latest/workspaces/index.html#!Group) element. If you add the **Stock Details** app as a child to that `Group`, it will be added as a second tab window and the user will have to manually switch between both apps. The **Stock Details** has to be a sibling of the **Stocks** app, but both apps have to be visible within the same parent element. That is why, you have to add a new `Group` element as a sibling of the existing `Group` that contains the **Stocks** app, and then load the **Stock Details** app in it.
+The **Stocks** app is a [`WorkspaceWindow`](../../reference/core/latest/workspaces/index.html#!WorkspaceWindow) that is the only child of a [`Group`](../../reference/core/latest/workspaces/index.html#!Group) element. If you add the **Stock Details** app as a child to that `Group`, it will be added as a second tab window and the user will have to manually switch between both apps. The **Stock Details** has to be a sibling of the **Stocks** app, but both apps have to be visible within the same parent element. That's why, you have to add a new `Group` element as a sibling of the existing `Group` that contains the **Stocks** app, and then load the **Stock Details** app in it.
 
 After the **Stocks Details** app has been opened in the Workspace as a [`WorkspaceWindow`](../../reference/core/latest/workspaces/index.html#!WorkspaceWindow), you have to pass the selected stock as its context. To do that, get a reference to the underlying [Glue42 Window](../../reference/core/latest/windows/index.html#!WebWindow) object of the **Stock Details** window using the [`getGdWindow()`](../../reference/core/latest/workspaces/index.html#!WorkspaceWindow-getGdWindow) method of the [`WorkspaceWindow`](../../reference/core/latest/workspaces/index.html#!WorkspaceWindow) instance and update its context with the [`updateContext()`](../../reference/core/latest/windows/index.html#!WebWindow-updateContext) method.
 
 Go to the `glue.js` file of the **Stocks** app and create the following function:
 
 ```javascript
-export const openStockDetailsInWorkspace = glue => async stock => {
+export const openStockDetailsInWorkspace = (glue) => async (symbol) => {
     // Reference to the Glue42 Window object of the Stock Details instance.
     let detailsGlue42Window;
 
@@ -1878,56 +1874,46 @@ export const openStockDetailsInWorkspace = glue => async stock => {
         detailsWorkspaceWindow = await group.addWindow({ appName: "Stock Details" });
         await detailsWorkspaceWindow.forceLoad();
         detailsGlue42Window = detailsWorkspaceWindow.getGdWindow();
-    }
+    };
 
     // Update the window context with the selected stock.
-    detailsGlue42Window.updateContext({ stock });
-}
+    detailsGlue42Window.updateContext({ symbol });
+};
 ```
 
-*Note that [`forceLoad()`](../../reference/core/latest/workspaces/index.html#!WorkspaceWindow-forceLoad) is used to make sure that the **Stock Details** app is loaded and a [Glue42 Window](../../reference/core/latest/windows/index.html#!WebWindow) instance is available. This is necessary, because [`addWindow()`](../../reference/core/latest/workspaces/index.html#!Group-addWindow) adds a new window to the [`Group`](../../reference/core/latest/workspaces/index.html#!Group) (meaning that it exists as an element in the Workspace), but it does not guarantee that the content has loaded.*
+*Note that [`forceLoad()`](../../reference/core/latest/workspaces/index.html#!WorkspaceWindow-forceLoad) is used to make sure that the **Stock Details** app is loaded and a [Glue42 Window](../../reference/core/latest/windows/index.html#!WebWindow) instance is available. This is necessary, because [`addWindow()`](../../reference/core/latest/workspaces/index.html#!Group-addWindow) adds a new window to the [`Group`](../../reference/core/latest/workspaces/index.html#!Group) (meaning that it exists as an element in the Workspace), but it doesn't guarantee that the content has loaded.*
 
-Import the function in `Stocks.jsx`, comment out or delete the existing `onClick()` callback and replace it with the newly created `openStockDetailsInWorkspace()` function:
+Import the function in the `<Stocks />` component and edit the existing `showStockDetails()` callback:
 
 ```javascript
 import { openStockDetailsInWorkspace } from "./glue";
 
 function Stocks() {
     ...
-    const onClick = useGlue(openStockDetailsInWorkspace);
+    const showStockDetails = useGlue(openStockDetailsInWorkspace);
     ...
-}
+};
 ```
 
 Go to the `glue.js` file of the **Stock Details** app and change the `getMyWindowContext()` function to the following:
 
 ```javascript
-export const getMyWindowContext = setWindowContext => glue => {
+export const getMyWindowContext = (setWindowContext) => async (glue) => {
     const myWindow = glue.windows.my();
-    myWindow.getContext()
-        .then(context => {
-            setWindowContext({ symbol: context.stock });
-        })
-    myWindow.onContextUpdated(context => {
-        if (context.stock) {
-            setWindowContext({ symbol: context.stock });
-        }
-    })
-}
+    const context = await myWindow.getContext();
+    
+    setWindowContext({ symbol: context.symbol });
+
+    myWindow.onContextUpdated((context) => {
+        if (context) {
+            setWindowContext({ symbol: context.symbol });
+        };
+    });
+};
 ```
 
-Go to `StockDetails.jsx`, change the `windowContext` variable to a React hook state variable and set up `getMyWindowContext()` using the `useGlue()` hook:
+Now when you click on a stock in the **Stocks** app, the **Stock Details** app will open below it in the Workspace, showing information about the selected stocks.
 
-```javascript
-function StockDetails() {
-    ...
-    const [windowContext, setWindowContext] = useState({});
-    ...
-    useGlue(getMyWindowContext(setWindowContext));
-    ...
-}
-```
-
-## Congratulations
+## Congratulations!
 
 You have successfully completed the **Glue42 Core** React tutorial! See also the [JavaScript](../javascript/index.html) and [Angular](../angular/index.html) tutorials for **Glue42 Core**.
