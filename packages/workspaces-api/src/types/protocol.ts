@@ -25,6 +25,12 @@ export interface WorkspaceConfigResult {
     positionIndex: number;
     layoutName: string | undefined;
     isHibernated: boolean;
+    lockSplitters: boolean;
+    allowDrop: boolean;
+    allowExtract: boolean;
+    showCloseButton: boolean;
+    showWindowAddButtons: boolean;
+    showSaveButton: boolean;
 }
 
 export interface BaseChildSnapshotConfig {
@@ -187,7 +193,7 @@ export interface BundleConfig {
     workspaceId: string;
 }
 
-export interface WorkspaceSeletor {
+export interface WorkspaceSelector {
     workspaceId: string;
 }
 

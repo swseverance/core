@@ -301,6 +301,10 @@ export class MainController implements WorkspacesController {
         return this.base.resumeWorkspace(workspaceId);
     }
 
+    public lockWorkspace(workspaceId: string, config?: Glue42Workspaces.WorkspaceLockConfig): Promise<void> {
+        return this.base.lockWorkspace(workspaceId, config);
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private async handleCoreLocalSubscription(config: SubscriptionConfig, levelId: string): Promise<Glue42Workspaces.Unsubscribe> {
         await this.bridge.createCoreEventSubscription();

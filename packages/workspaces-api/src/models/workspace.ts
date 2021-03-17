@@ -64,6 +64,30 @@ export class Workspace implements Glue42Workspaces.Workspace {
         return getData(this).frame;
     }
 
+    public get lockSplitters(): boolean {
+        return getData(this).config.lockSplitters;
+    }
+
+    public get allowDrop(): boolean {
+        return getData(this).config.allowDrop;
+    }
+
+    public get allowExtract(): boolean {
+        return getData(this).config.allowExtract;
+    }
+
+    public get showCloseButton(): boolean {
+        return getData(this).config.showCloseButton;
+    }
+
+    public get showWindowAddButton(): boolean {
+        return getData(this).config.showWindowAddButtons;
+    }
+
+    public get showSaveButton(): boolean {
+        return getData(this).config.showSaveButton;
+    }
+
     public async removeChild(predicate: (child: Glue42Workspaces.WorkspaceElement) => boolean): Promise<void> {
         checkThrowCallback(predicate);
         const child = this.children.find(predicate);
@@ -305,6 +329,12 @@ export class Workspace implements Glue42Workspaces.Workspace {
         await getData(this).controller.resumeWorkspace(this.id);
         await this.refreshReference();
     }
+
+    public async lock(config?: Glue42Workspaces.WorkspaceLockConfig): Promise<void> {
+        await getData(this).controller.lockWorkspace(this.id, config);
+        await this.refreshReference();
+    }
+
 
     public async onClosed(callback: () => void): Promise<Glue42Workspaces.Unsubscribe> {
         checkThrowCallback(callback);

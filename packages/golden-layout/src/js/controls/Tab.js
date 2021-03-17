@@ -143,6 +143,10 @@ lm.utils.copy(lm.controls.Tab.prototype, {
 			return;
 		}
 
+		if (this._layoutManager.config && this._layoutManager.config.workspacesOption.allowExtract === false) {
+			return;
+		}
+
 		const newProxy = new lm.controls.DragProxy(
 			x,
 			y,

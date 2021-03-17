@@ -53,4 +53,5 @@ export interface WorkspacesController {
     iterateFilterChildren(children: Child[], predicate: (child: Child) => boolean): Child[];
     hibernateWorkspace(workspaceId: string): Promise<void>;
     resumeWorkspace(workspaceId: string): Promise<void>;
+    lockWorkspace(workspaceId: string, config?: Glue42Workspaces.WorkspaceLockConfig): Promise<void>;
 }

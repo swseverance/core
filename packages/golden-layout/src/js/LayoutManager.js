@@ -674,6 +674,10 @@ lm.utils.copy(lm.LayoutManager.prototype, {
 		if (this.config.settings.mode === "workspace") {
 			this._itemAreas = [this._itemAreas[this._itemAreas.length - 1]];
 		}
+
+		if (this.config.workspacesOptions.allowDrop === false) {
+			this._itemAreas = [];
+		}
 	},
 
 	/**

@@ -1,7 +1,46 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { Decoder, object, boolean, string, optional, array, oneOf, constant, lazy, number, anyJson, intersection } from "decoder-validate";
-import { IsWindowInSwimlaneResult, WorkspaceSnapshotResult, ChildSnapshotResult, WorkspaceConfigResult, FrameSummaryResult, WorkspaceCreateConfigProtocol, GetFrameSummaryConfig, WorkspaceSummaryResult, LayoutSummariesResult, LayoutSummary, OpenWorkspaceConfig, FrameSummariesResult, WorkspaceSummariesResult, ExportedLayoutsResult, DeleteLayoutConfig, SimpleItemConfig, ResizeItemConfig, MoveFrameConfig, FrameSnapshotResult, BaseChildSnapshotConfig, ParentSnapshotConfig, SwimlaneWindowSnapshotConfig, SimpleWindowOperationSuccessResult, SetItemTitleConfig, MoveWindowConfig, AddWindowConfig, AddContainerConfig, AddItemResult, BundleConfig, WorkspaceStreamData, FrameStreamData, ContainerStreamData, ContainerSummaryResult, WindowStreamData, PingResult, FrameStateConfig, FrameStateResult, WorkspaceSeletor } from "../types/protocol";
+import {
+    IsWindowInSwimlaneResult,
+    WorkspaceSnapshotResult,
+    ChildSnapshotResult,
+    WorkspaceConfigResult,
+    FrameSummaryResult,
+    WorkspaceCreateConfigProtocol,
+    GetFrameSummaryConfig,
+    WorkspaceSummaryResult,
+    LayoutSummariesResult,
+    LayoutSummary,
+    OpenWorkspaceConfig,
+    FrameSummariesResult,
+    WorkspaceSummariesResult,
+    ExportedLayoutsResult,
+    DeleteLayoutConfig,
+    SimpleItemConfig,
+    ResizeItemConfig,
+    MoveFrameConfig,
+    FrameSnapshotResult,
+    BaseChildSnapshotConfig,
+    ParentSnapshotConfig,
+    SwimlaneWindowSnapshotConfig,
+    SimpleWindowOperationSuccessResult,
+    SetItemTitleConfig,
+    MoveWindowConfig,
+    AddWindowConfig,
+    AddContainerConfig,
+    AddItemResult,
+    BundleConfig,
+    WorkspaceStreamData,
+    FrameStreamData,
+    ContainerStreamData,
+    ContainerSummaryResult,
+    WindowStreamData,
+    PingResult,
+    FrameStateConfig,
+    FrameStateResult,
+    WorkspaceSelector
+} from "../types/protocol";
 import { WorkspaceEventType, WorkspaceEventAction } from "../types/subscription";
 import { Glue42Workspaces } from "../../workspaces";
 
@@ -233,6 +272,12 @@ export const workspaceConfigResultDecoder: Decoder<WorkspaceConfigResult> = obje
     layoutName: optional(nonEmptyStringDecoder),
     isHibernated: boolean(),
     isSelected: boolean(),
+    allowDrop: boolean(),
+    allowExtract: boolean(),
+    lockSplitters: boolean(),
+    showCloseButton: boolean(),
+    showSaveButton: boolean(),
+    showWindowAddButtons: boolean()
 });
 
 // todo: remove number positionIndex when fixed
@@ -511,6 +556,16 @@ export const workspaceLayoutSaveConfigDecoder: Decoder<Glue42Workspaces.Workspac
     saveContext: optional(boolean())
 });
 
-export const workspaceSelectorDecoder: Decoder<WorkspaceSeletor> = object({
+export const workspaceSelectorDecoder: Decoder<WorkspaceSelector> = object({
     workspaceId: nonEmptyStringDecoder,
+});
+
+export const lockWorkspaceDecoder: Decoder<(Glue42Workspaces.WorkspaceLockConfig & WorkspaceSelector)> = object({
+    workspaceId: nonEmptyStringDecoder,
+    allowDrop: optional(boolean()),
+    allowExtract: optional(boolean()),
+    lockSplitters: optional(boolean()),
+    showCloseButton: optional(boolean()),
+    showSaveButton: optional(boolean()),
+    showWindowAddButtons: optional(boolean()),
 });

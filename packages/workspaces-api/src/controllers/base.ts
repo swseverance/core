@@ -380,6 +380,9 @@ export class BaseController {
 
     public async resumeWorkspace(workspaceId: string): Promise<void> {
         await this.bridge.send<void>(OPERATIONS.resumeWorkspace.name, { workspaceId });
+    }
 
+    public async lockWorkspace(workspaceId: string, config?: Glue42Workspaces.WorkspaceLockConfig): Promise<void> {
+        await this.bridge.send<void>(OPERATIONS.lockWorkspace.name, { workspaceId, config });
     }
 }

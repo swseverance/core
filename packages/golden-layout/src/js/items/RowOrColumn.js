@@ -499,6 +499,9 @@ lm.utils.copy( lm.items.RowOrColumn.prototype, {
 	 * @returns {void}
 	 */
 	_onSplitterDrag: function( splitter, offsetX, offsetY ) {
+		if( this._layoutManager.config && this._layoutManager.config.workspacesOptions.lockSplitters ){
+			return;
+		}
 		var offset = this._isColumn ? offsetY : offsetX;
 
 		if( offset > this._splitterMinPosition && offset < this._splitterMaxPosition ) {
@@ -520,6 +523,10 @@ lm.utils.copy( lm.items.RowOrColumn.prototype, {
 	 */
 	_onSplitterDragStop: function( splitter ) {
 
+		if( this._layoutManager.config && this._layoutManager.config.workspacesOptions.lockSplitters ){
+			return;
+		}
+		
 		var items = this._getItemsForSplitter( splitter ),
 			sizeBefore = items.before.element[ this._dimension ](),
 			sizeAfter = items.after.element[ this._dimension ](),

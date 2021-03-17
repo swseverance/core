@@ -32,7 +32,8 @@ type OperationsTypes = "isWindowInWorkspace" |
     "changeFrameState" |
     "getFrameState" |
     "hibernateWorkspace" |
-    "resumeWorkspace";
+    "resumeWorkspace" |
+    "lockWorkspace";
 type MethodsTypes = "control" | "frameStream" | "workspaceStream" | "containerStream" | "windowStream";
 
 export const webPlatformMethodName = "T42.Web.Platform.Control";
@@ -85,4 +86,5 @@ export const OPERATIONS: { [key in OperationsTypes]: ControlOperation } = {
     bundleWorkspace: { name: "bundleWorkspace", argsDecoder: bundleConfigDecoder, resultDecoder: voidResultDecoder },
     hibernateWorkspace: { name: "hibernateWorkspace", argsDecoder: workspaceSelectorDecoder, resultDecoder: voidResultDecoder },
     resumeWorkspace: { name: "resumeWorkspace", argsDecoder: workspaceSelectorDecoder, resultDecoder: voidResultDecoder },
+    lockWorkspace: { name: "lockWorkspace", argsDecoder: lockWorkspaceDecoder, resultDecoder: voidResultDecoder }
 };
