@@ -25,7 +25,7 @@ const WorkspaceContents: React.FC<WorkspaceContentsProps> = ({ workspaceId, cont
     }, [workspaceId]);
 
     return (
-        <div {...props} style={{ flexGrow: 1, width: "100%", height: "100%" }} ref={containerRef}>
+        <div style={{ width: "100%", height: "100%" }}  {...props} ref={containerRef}>
         </div >
     );
 };
