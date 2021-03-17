@@ -96,7 +96,7 @@ class WorkspacesManager {
 
     public subscribeForWindowClicked = (cb: () => void) => {
         if (!this._frameController) {
-             // tslint:disable-next-line: no-console
+            // tslint:disable-next-line: no-console
             console.warn("Your subscription to window clicked wasn't successful, because the Workspaces library isn't initialized yet");
             return () => { };
         }
@@ -430,8 +430,6 @@ class WorkspacesManager {
             const windowTitle = this.vaidateTitle(title) || this.vaidateTitle(applicationTitle) || this.vaidateTitle(appName) || "Glue";
             const windowContext = component?.config.componentState?.context;
             let url = this.getUrlByAppName(componentState.appName) || componentState.url;
-            console.log("WINDow title", windowTitle);
-            console.log("componentState", component.config);
 
             const isNewWindow = !store.getWindow(componentId);
 
@@ -750,14 +748,22 @@ class WorkspacesManager {
             return this.eject(item);
         });
 
+        // debouncing because there is potential for 1ms spam
+        let shownTimeout: NodeJS.Timeout = undefined;
         componentStateMonitor.onWorkspaceContentsShown((workspaceId: string) => {
             const workspace = store.getActiveWorkspace();
             if (!workspace?.layout || workspaceId !== workspace.id) {
                 return;
             }
-            const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
-            const bounds = getElementBounds(workspaceContentItem.element);
-            workspace.layout.updateSize(bounds.width, bounds.height);
+            if (shownTimeout) {
+                clearTimeout(resizedTimeout);
+            }
+
+            shownTimeout = setTimeout(() => {
+                const containerElement = $(`#nestHere${workspace.id}`);
+                const bounds = getElementBounds(containerElement[0]);
+                workspace.layout.updateSize(bounds.width, bounds.height);
+            }, 50);
             const stacks = workspace.layout.root.getItemsByFilter((e) => e.type === "stack");
 
             this._frameController.selectionChangedDeep(stacks.map(s => idAsString(s.getActiveContentItem().config.id)), []);
@@ -770,6 +776,26 @@ class WorkspacesManager {
             }
 
             this._frameController.selectionChangedDeep([], workspace.windows.map(w => w.id));
+        });
+
+        // debouncing because there is potential for 1ms spam
+        let resizedTimeout: NodeJS.Timeout = undefined;
+        componentStateMonitor.onWorkspaceContentsResized((workspaceId: string) => {
+            const workspace = store.getActiveWorkspace();
+            if (!workspace.layout || workspaceId !== workspace.id) {
+                return;
+            }
+
+            if (resizedTimeout) {
+                clearTimeout(resizedTimeout);
+            }
+
+            resizedTimeout = setTimeout(() => {
+                const containerElement = $(`#nestHere${workspace.id}`);
+                const bounds = getElementBounds(containerElement[0]);
+                workspace.layout.updateSize(bounds.width, bounds.height);
+            }, 50);
+
         });
     }
 
