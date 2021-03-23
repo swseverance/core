@@ -60,6 +60,14 @@ export class Window implements Glue42Workspaces.WorkspaceWindow {
         return getData(this).config.title;
     }
 
+    public get allowExtract(): boolean {
+        return getData(this).config.allowExtract;
+    }
+
+    public get showCloseButton(): boolean {
+        return getData(this).config.showCloseButton;
+    }
+
     public get workspace(): Glue42Workspaces.Workspace {
         return getData(this).workspace;
     }
@@ -96,7 +104,6 @@ export class Window implements Glue42Workspaces.WorkspaceWindow {
     }
 
     public async close(): Promise<void> {
-
         const id = getData(this).id;
         const controller = getData(this).controller;
 
@@ -144,7 +151,6 @@ export class Window implements Glue42Workspaces.WorkspaceWindow {
     }
 
     public getGdWindow(): GDWindow {
-
         if (!this.isLoaded) {
             throw new Error("Cannot fetch this GD window, because the window is not yet loaded");
         }
@@ -170,6 +176,11 @@ export class Window implements Glue42Workspaces.WorkspaceWindow {
         }
 
         return controller.moveWindowTo(myId, parent.id);
+    }
+
+    public async lock(config: Glue42Workspaces.WorkspaceWindowLockConfig): Promise<void> {
+        const windowPlacementId = getData(this).id;
+        await getData(this).controller.lockWindow(windowPlacementId, config);
     }
 
     public async onRemoved(callback: () => void): Promise<Glue42Workspaces.Unsubscribe> {

@@ -49,6 +49,9 @@ export class Row implements Glue42Workspaces.Row {
     public get workspace(): Glue42Workspaces.Workspace {
         return getBase(this).getMyWorkspace(this);
     }
+    public get allowDrop(): boolean {
+        return getBase(this).getAllowDrop(this);
+    }
 
     public addWindow(definition: Glue42Workspaces.WorkspaceWindowDefinition): Promise<Glue42Workspaces.WorkspaceWindow> {
         return getBase(this).addWindow(this, definition, "row");
@@ -86,6 +89,10 @@ export class Row implements Glue42Workspaces.Row {
 
     public close(): Promise<void> {
         return getBase(this).close(this);
+    }
+
+    public lock(config?: Glue42Workspaces.RowLockConfig): Promise<void> {
+        return getBase(this).lockContainer(this, config);
     }
 
 }

@@ -614,6 +614,17 @@ lm.utils.copy(lm.LayoutManager.prototype, {
 	},
 
 	_$createRootItemAreas: function () {
+		const { allowDrop, allowDropLeft, allowDropTop, allowDropRight, allowDropBottom } = this.config.workspacesOptions;
+
+		console.log("AREAS", this.config.workspacesOptions);
+		if (allowDrop === false &&
+			allowDropLeft !== true &&
+			allowDropTop !== true &&
+			allowDropRight !== true &&
+			allowDropBottom !== true) {
+			return;
+		}
+
 		var areaSize = 50;
 		var sides = { y2: 0, x2: 0, y1: 'y2', x1: 'x2' };
 		for (var side in sides) {
@@ -630,6 +641,30 @@ lm.utils.copy(lm.LayoutManager.prototype, {
 
 			this._itemAreas.push(area);
 		}
+
+		if (allowDropLeft === false ||
+			allowDrop === false && allowDropLeft !== true) {
+			this._itemAreas[1]=undefined;
+		}
+
+		if (allowDropTop === false ||
+			allowDrop === false && allowDropTop !== true) {
+			this._itemAreas[0] =undefined;
+		}
+
+		if (allowDropRight === false ||
+			allowDrop === false && allowDropRight !== true) {
+			this._itemAreas[3]=undefined;
+		}
+
+		if (allowDropBottom === false ||
+			allowDrop === false && allowDropBottom !== true) {
+			this._itemAreas[2]=undefined;
+		}
+
+		this._itemAreas = this._itemAreas.filter((ia) => typeof ia !== "undefined");
+
+		console.log(this._itemAreas);
 	},
 
 	_$calculateItemAreas: function () {
@@ -655,6 +690,18 @@ lm.utils.copy(lm.LayoutManager.prototype, {
 				continue;
 			}
 
+			console.log("Testing", allContentItems[i], allContentItems[i].config.workspacesConfig);
+			const isAllowDropExplicitlyTrue = allContentItems[i].config.workspacesConfig && allContentItems[i].config.workspacesConfig.allowDrop === true;
+
+			if (this.config.workspacesOptions.allowDrop === false && !isAllowDropExplicitlyTrue) {
+				return;
+			}
+
+			if (allContentItems[i].config.workspacesConfig && allContentItems[i].config.workspacesConfig.allowDrop === false) {
+				console.log("returning");
+				continue;
+			}
+
 			area = allContentItems[i]._$getArea();
 
 			if (area === null) {
@@ -673,10 +720,6 @@ lm.utils.copy(lm.LayoutManager.prototype, {
 
 		if (this.config.settings.mode === "workspace") {
 			this._itemAreas = [this._itemAreas[this._itemAreas.length - 1]];
-		}
-
-		if (this.config.workspacesOptions.allowDrop === false) {
-			this._itemAreas = [];
 		}
 	},
 

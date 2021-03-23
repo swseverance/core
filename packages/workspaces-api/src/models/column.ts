@@ -49,6 +49,9 @@ export class Column implements Glue42Workspaces.Column {
     public get workspace(): Glue42Workspaces.Workspace {
         return getBase(this).getMyWorkspace(this);
     }
+    public get allowDrop(): boolean {
+        return getBase(this).getAllowDrop(this);
+    }
 
     public addWindow(definition: Glue42Workspaces.WorkspaceWindowDefinition): Promise<Glue42Workspaces.WorkspaceWindow> {
         return getBase(this).addWindow(this, definition, "column");
@@ -89,4 +92,7 @@ export class Column implements Glue42Workspaces.Column {
         return getBase(this).close(this);
     }
 
+    public lock(config?: Glue42Workspaces.ColumnLockConfig): Promise<void> {
+        return getBase(this).lockContainer(this, config);
+    }
 }

@@ -12,3 +12,4 @@ export type AllParent = "row" | "column" | "group" | "workspace";
 export type Child = Window | Row | Column | Group;
 export type AllParentTypes = Row | Column | Group | Workspace;
 export type SubParentTypes = Row | Column | Group;
+export type ContainerLockConfig = Glue42Workspaces.ColumnLockConfig | Glue42Workspaces.RowLockConfig | Glue42Workspaces.GroupLockConfig;

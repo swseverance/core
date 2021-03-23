@@ -49,6 +49,25 @@ export class Group implements Glue42Workspaces.Group {
     public get workspace(): Glue42Workspaces.Workspace {
         return getBase(this).getMyWorkspace(this);
     }
+    public get allowExtract(): boolean {
+        return getBase(this).getAllowExtract(this);
+    }
+
+    public get allowDrop(): boolean {
+        return getBase(this).getAllowDrop(this);
+    }
+
+    public get showMaximizeButton(): boolean {
+        return getBase(this).getShowMaximizeButton(this);
+    }
+
+    public get showEjectButton(): boolean {
+        return getBase(this).getShowEjectButton(this);
+    }
+
+    public get showAddWindowButton(): boolean {
+        return getBase(this).getShowAddWindowButton(this);
+    }
 
     public addWindow(definition: Glue42Workspaces.WorkspaceWindowDefinition): Promise<Glue42Workspaces.WorkspaceWindow> {
         return getBase(this).addWindow(this, definition, "group");
@@ -80,6 +99,10 @@ export class Group implements Glue42Workspaces.Group {
 
     public close(): Promise<void> {
         return getBase(this).close(this);
+    }
+
+    public lock(config?: Glue42Workspaces.GroupLockConfig): Promise<void> {
+        return getBase(this).lockContainer(this, config);
     }
 
 }

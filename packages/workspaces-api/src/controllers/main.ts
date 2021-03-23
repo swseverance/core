@@ -5,7 +5,7 @@ import { OPERATIONS } from "../communication/constants";
 import { SubscriptionConfig, WorkspaceEventType, WorkspaceEventAction } from "../types/subscription";
 import { Workspace } from "../models/workspace";
 import { Frame } from "../models/frame";
-import { Child } from "../types/builders";
+import { Child, ContainerLockConfig, SubParentTypes } from "../types/builders";
 import { RefreshChildrenConfig } from "../types/privateData";
 import { Glue42Workspaces } from "../../workspaces";
 import { WorkspacesController } from "../types/controller";
@@ -303,6 +303,14 @@ export class MainController implements WorkspacesController {
 
     public lockWorkspace(workspaceId: string, config?: Glue42Workspaces.WorkspaceLockConfig): Promise<void> {
         return this.base.lockWorkspace(workspaceId, config);
+    }
+
+    public lockWindow(windowPlacementId: string, config?: Glue42Workspaces.WorkspaceWindowLockConfig): Promise<void> {
+        return this.base.lockWindow(windowPlacementId, config);
+    }
+
+    public lockContainer(itemId: string, type: SubParentTypes["type"], config?: ContainerLockConfig): Promise<void> {
+        return this.base.lockContainer(itemId, type, config);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

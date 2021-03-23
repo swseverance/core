@@ -9,7 +9,7 @@ import { GDWindow, WindowsAPI, ContextsAPI, LayoutsAPI } from "../types/glue";
 import { Glue42Workspaces } from "../../workspaces";
 import { Frame } from "../models/frame";
 import { RefreshChildrenConfig } from "../types/privateData";
-import { Child } from "../types/builders";
+import { Child, ContainerLockConfig, SubParentTypes } from "../types/builders";
 import { PrivateDataManager } from "../shared/privateDataManager";
 import { Window } from "../models/window";
 import { UnsubscribeFunction } from "callback-registry";
@@ -384,5 +384,13 @@ export class BaseController {
 
     public async lockWorkspace(workspaceId: string, config?: Glue42Workspaces.WorkspaceLockConfig): Promise<void> {
         await this.bridge.send<void>(OPERATIONS.lockWorkspace.name, { workspaceId, config });
+    }
+
+    public async lockWindow(windowPlacementId: string, config?: Glue42Workspaces.WorkspaceWindowLockConfig): Promise<void> {
+        await this.bridge.send<void>(OPERATIONS.lockWindow.name, { windowPlacementId, config });
+    }
+
+    public async lockContainer(itemId: string, type: SubParentTypes["type"], config?: ContainerLockConfig): Promise<void> {
+        await this.bridge.send<void>(OPERATIONS.lockContainer.name, { itemId, type, config });
     }
 }

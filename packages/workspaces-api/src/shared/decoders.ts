@@ -39,7 +39,9 @@ import {
     PingResult,
     FrameStateConfig,
     FrameStateResult,
-    WorkspaceSelector
+    WorkspaceSelector,
+    WindowSelector,
+    ItemSelector
 } from "../types/protocol";
 import { WorkspaceEventType, WorkspaceEventAction } from "../types/subscription";
 import { Glue42Workspaces } from "../../workspaces";
@@ -560,12 +562,41 @@ export const workspaceSelectorDecoder: Decoder<WorkspaceSelector> = object({
     workspaceId: nonEmptyStringDecoder,
 });
 
+// TODO fix typings
 export const lockWorkspaceDecoder: Decoder<(Glue42Workspaces.WorkspaceLockConfig & WorkspaceSelector)> = object({
     workspaceId: nonEmptyStringDecoder,
-    allowDrop: optional(boolean()),
-    allowExtract: optional(boolean()),
-    lockSplitters: optional(boolean()),
-    showCloseButton: optional(boolean()),
-    showSaveButton: optional(boolean()),
-    showWindowAddButtons: optional(boolean()),
+    config: optional(object({
+        allowDrop: optional(boolean()),
+        allowDropLeft: optional(boolean()),
+        allowDropTop: optional(boolean()),
+        allowDropRight: optional(boolean()),
+        allowDropBottom: optional(boolean()),
+        allowExtract: optional(boolean()),
+        lockSplitters: optional(boolean()),
+        showCloseButton: optional(boolean()),
+        showSaveButton: optional(boolean()),
+        showWindowAddButtons: optional(boolean()),
+    }))
 });
+
+// TODO fix typings
+export const lockWindowDecoder: Decoder<Glue42Workspaces.WorkspaceWindowLockConfig & WindowSelector> = object({
+    windowPlacementId: nonEmptyStringDecoder,
+    config: optional(object({
+        allowExtract: optional(boolean()),
+        showCloseButton: optional(boolean())
+    }))
+
+});
+
+// TODO fix typings
+export const lockContainerDecoder: Decoder<Glue42Workspaces.GroupLockConfig & ItemSelector> = object({
+    itemId: nonEmptyStringDecoder,
+    config: optional(object({
+        allowExtract: optional(boolean()),
+        allowDrop: optional(boolean()),
+        showMaximizeButton: optional(boolean()),
+        showEjectButton: optional(boolean()),
+        showAddWindowButton: optional(boolean()),
+    }))
+})

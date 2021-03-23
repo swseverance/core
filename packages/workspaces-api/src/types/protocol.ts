@@ -39,8 +39,25 @@ export interface BaseChildSnapshotConfig {
     positionIndex: number;
 }
 
-export interface ParentSnapshotConfig extends BaseChildSnapshotConfig {
-    type?: "window" | "row" | "column" | "group"; // this just a place-holder until there are real parent-specific configs
+export type ParentSnapshotConfig = RowSnapshotConfig | ColumnSnapshotConfig | GroupSnapshotConfig;
+
+export interface RowSnapshotConfig extends BaseChildSnapshotConfig {
+    type?: "row";
+    allowDrop: boolean;
+}
+
+export interface ColumnSnapshotConfig extends BaseChildSnapshotConfig {
+    type?: "column";
+    allowDrop: boolean;
+}
+
+export interface GroupSnapshotConfig extends BaseChildSnapshotConfig {
+    type?: "group";
+    allowDrop: boolean;
+    allowExtract: boolean;
+    showMaximizeButton: boolean;
+    showEjectButton: boolean;
+    showAddWindowButton: boolean;
 }
 
 export interface SwimlaneWindowSnapshotConfig extends BaseChildSnapshotConfig {
@@ -49,6 +66,8 @@ export interface SwimlaneWindowSnapshotConfig extends BaseChildSnapshotConfig {
     isFocused: boolean;
     appName?: string;
     title?: string;
+    allowExtract: boolean;
+    showCloseButton: boolean;
 }
 
 export interface ChildSnapshotResult {
@@ -195,6 +214,14 @@ export interface BundleConfig {
 
 export interface WorkspaceSelector {
     workspaceId: string;
+}
+
+export interface WindowSelector {
+    windowPlacementId: string;
+}
+
+export interface ItemSelector {
+    itemId: string;
 }
 
 // #endregion
