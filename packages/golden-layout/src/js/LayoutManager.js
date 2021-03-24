@@ -616,7 +616,6 @@ lm.utils.copy(lm.LayoutManager.prototype, {
 	_$createRootItemAreas: function () {
 		const { allowDrop, allowDropLeft, allowDropTop, allowDropRight, allowDropBottom } = this.config.workspacesOptions;
 
-		console.log("AREAS", this.config.workspacesOptions);
 		if (allowDrop === false &&
 			allowDropLeft !== true &&
 			allowDropTop !== true &&
@@ -663,8 +662,6 @@ lm.utils.copy(lm.LayoutManager.prototype, {
 		}
 
 		this._itemAreas = this._itemAreas.filter((ia) => typeof ia !== "undefined");
-
-		console.log(this._itemAreas);
 	},
 
 	_$calculateItemAreas: function () {
@@ -690,7 +687,6 @@ lm.utils.copy(lm.LayoutManager.prototype, {
 				continue;
 			}
 
-			console.log("Testing", allContentItems[i], allContentItems[i].config.workspacesConfig);
 			const isAllowDropExplicitlyTrue = allContentItems[i].config.workspacesConfig && allContentItems[i].config.workspacesConfig.allowDrop === true;
 
 			if (this.config.workspacesOptions.allowDrop === false && !isAllowDropExplicitlyTrue) {
@@ -698,7 +694,6 @@ lm.utils.copy(lm.LayoutManager.prototype, {
 			}
 
 			if (allContentItems[i].config.workspacesConfig && allContentItems[i].config.workspacesConfig.allowDrop === false) {
-				console.log("returning");
 				continue;
 			}
 
