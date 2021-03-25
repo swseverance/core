@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { REQUEST_OPTIONS } from './constants';
+import React, { useEffect, useState } from "react";
+import { REQUEST_OPTIONS } from "./constants";
 
 function Stocks() {
     const [portfolio, setPortfolio] = useState([]);
     useEffect(() => {
         const fetchPortfolio = async () => {
             try {
-                const url = 'http://localhost:8080/api/portfolio';
+                const url = "http://localhost:8080/api/portfolio";
                 const response = await fetch(url, REQUEST_OPTIONS);
                 const portfolio = await response.json();
                 setPortfolio(portfolio);

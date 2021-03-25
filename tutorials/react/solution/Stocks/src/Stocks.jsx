@@ -1,19 +1,17 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useGlue, GlueContext } from '@glue42/react-hooks';
-import { REQUEST_OPTIONS } from './constants';
+import React, { useEffect, useState, useContext } from "react";
+import { REQUEST_OPTIONS } from "./constants";
+import { GlueContext, useGlue } from "@glue42/react-hooks";
 import {
     createInstrumentStream,
     subscribeForInstrumentStream,
     setClientFromWorkspace,
     openStockDetailsInWorkspace
-} from './glue';
+} from "./glue";
 
 function Stocks() {
     const [portfolio, setPortfolio] = useState([]);
-    const [prices, setPrices] = useState({});
     const [{ clientId, clientName }, setClient] = useState({});
-    const setDefaultClient = () => setClient({ clientId: "", clientName: "" });
-    useGlue(createInstrumentStream);
+    const [prices, setPrices] = useState({});
     const subscription = useGlue(
         (glue, portfolio) => {
             if (portfolio.length > 0) {
@@ -22,25 +20,31 @@ function Stocks() {
         },
         [portfolio]
     );
-    const onClick = useGlue(openStockDetailsInWorkspace);
     useEffect(() => {
         const fetchPortfolio = async () => {
             try {
-                subscription && typeof subscription.close === 'function' && subscription.close();
-                const url = 'http://localhost:8080' + (clientId ? `/api/portfolio/${clientId}` : '/api/portfolio');
+                // Close the existing subscription when a new client has been selected.
+                subscription &&
+                    typeof subscription.close === "function" &&
+                    subscription.close();
+
+                const url = `http://localhost:8080${clientId ? `/api/portfolio/${clientId}` : "/api/portfolio"}`;
                 const response = await fetch(url, REQUEST_OPTIONS);
                 const portfolio = await response.json();
                 setPortfolio(portfolio);
-            } catch (e) {
-                console.log(e);
-            }
+            } catch (error) {
+                console.error(error);
+            };
         };
         fetchPortfolio();
     }, [clientId]);
-
     const glue = useContext(GlueContext);
+    const showStockDetails = useGlue(openStockDetailsInWorkspace);
+    useGlue(createInstrumentStream);
+    const setDefaultClient = () => setClient({ clientId: "", clientName: "" });
     useGlue(setClientFromWorkspace(setClient));
-     return (
+
+    return (
         <div className="container-fluid">
             <div className="row">
                 <div className="col-md-2">
@@ -60,23 +64,25 @@ function Stocks() {
                         Stocks
                     </h1>
                 </div>
+                <div className="col-md-2 py-2">
+                    <button
+                        type="button"
+                        className="mb-3 btn btn-primary"
+                        onClick={() => {                     
+                            setDefaultClient();
+                        }}
+                    >
+                        Show All
+                    </button>
+                </div>
             </div>
-            <button
-                type="button"
-                className="mb-3 btn btn-primary"
-                onClick={() => {
-                    setDefaultClient();
-                }}
-            >
-                Show All
-            </button>
+            {clientId && (
+                <h2 className="p-3">
+                    Client {clientName} - {clientId}
+                </h2>
+            )}
             <div className="row">
-                {clientId && (
-                    <h2 className="p-3">
-                        Client {clientName} - {clientId}
-                    </h2>
-                )}
-                <div className="col-md-12">
+                <div className="col">
                     <table id="portfolioTable" className="table table-hover">
                         <thead>
                             <tr>
@@ -89,11 +95,11 @@ function Stocks() {
                         <tbody>
                             {portfolio.map(({ RIC, Description, Bid, Ask, ...rest }) => (
                                 <tr
-                                    onClick={() => onClick({ ...rest, RIC, Description })}
                                     key={RIC}
+                                    onClick={() => showStockDetails({ RIC, Description, Bid, Ask, ...rest })}
                                 >
                                     <td>{RIC}</td>
-                                    <td>{Description && Description.toUpperCase()}</td>
+                                    <td>{Description}</td>
                                     <td className="text-right">
                                         {prices[RIC] ? prices[RIC].Bid : Bid}
                                     </td>

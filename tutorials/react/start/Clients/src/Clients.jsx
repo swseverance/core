@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { REQUEST_OPTIONS } from './constants';
+import React, { useEffect, useState } from "react";
+import { REQUEST_OPTIONS } from "./constants";
 
 function Clients() {
     const [clients, setClients] = useState([]);
     useEffect(() => {
         const fetchClients = async () => {
             try {
-                const response = await fetch('http://localhost:8080/api/clients', REQUEST_OPTIONS);
+                const response = await fetch("http://localhost:8080/api/clients", REQUEST_OPTIONS);
                 const clients = await response.json();
                 setClients(clients);
             } catch (e) {
