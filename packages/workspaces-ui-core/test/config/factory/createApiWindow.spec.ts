@@ -11,10 +11,12 @@ describe("createApiWindow() Should", () => {
     const mockTitle = "mockTitle";
     const mockPositionIndex = 0;
     const mockWorkspaceId = "mockWorkspaceId";
+    const mockAllowExtract = true;
+    const mockShowCloseButton = true;
 
     let factory: WorkspacesConfigurationFactory;
 
-    before(()=>{
+    before(() => {
         const glueStub: any = {
             appManager: {
                 instances: () => []
@@ -38,7 +40,9 @@ describe("createApiWindow() Should", () => {
                 frameId: mockFrameId,
                 positionIndex: mockPositionIndex,
                 title: mockTitle,
-                workspaceId: mockWorkspaceId
+                workspaceId: mockWorkspaceId,
+                allowExtract: mockAllowExtract,
+                showCloseButton: mockShowCloseButton
             }
         };
 
@@ -52,7 +56,9 @@ describe("createApiWindow() Should", () => {
             frameId: mockFrameId,
             positionIndex: mockPositionIndex,
             title: mockTitle,
-            workspaceId: mockWorkspaceId
+            workspaceId: mockWorkspaceId,
+            allowExtract: mockAllowExtract,
+            showCloseButton: mockShowCloseButton
         });
 
         expect(result).to.eql(expectedResult);
@@ -72,7 +78,9 @@ describe("createApiWindow() Should", () => {
                 frameId: mockFrameId,
                 positionIndex: mockPositionIndex,
                 title: mockTitle,
-                workspaceId: mockWorkspaceId
+                workspaceId: mockWorkspaceId,
+                allowExtract: mockAllowExtract,
+                showCloseButton: mockShowCloseButton
             }
         };
 
@@ -86,7 +94,9 @@ describe("createApiWindow() Should", () => {
             frameId: mockFrameId,
             positionIndex: 0,
             title: mockTitle,
-            workspaceId: mockWorkspaceId
+            workspaceId: mockWorkspaceId,
+            allowExtract: mockAllowExtract,
+            showCloseButton: mockShowCloseButton
         });
 
         expect(result).to.eql(expectedResult);
@@ -106,7 +116,9 @@ describe("createApiWindow() Should", () => {
                 frameId: mockFrameId,
                 positionIndex: mockPositionIndex,
                 title: mockTitle,
-                workspaceId: mockWorkspaceId
+                workspaceId: mockWorkspaceId,
+                allowExtract: mockAllowExtract,
+                showCloseButton: mockShowCloseButton
             }
         };
 
@@ -120,7 +132,9 @@ describe("createApiWindow() Should", () => {
             frameId: mockFrameId,
             positionIndex: mockPositionIndex,
             title: mockTitle,
-            workspaceId: mockWorkspaceId
+            workspaceId: mockWorkspaceId,
+            allowExtract: mockAllowExtract,
+            showCloseButton: mockShowCloseButton
         });
 
         expect(result).to.eql(expectedResult);

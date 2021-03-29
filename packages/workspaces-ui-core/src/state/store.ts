@@ -1,6 +1,6 @@
-import { Workspace, Window } from "./types/internal";
+import { Workspace, Window } from "../types/internal";
 import GoldenLayout from "@glue42/golden-layout";
-import { idAsString } from "./utils";
+import { idAsString } from "../utils";
 
 class WorkspaceStore {
     private readonly _idToLayout: { [k: string]: Workspace } = {};
@@ -39,7 +39,8 @@ class WorkspaceStore {
         return this._idToLayout[id];
     }
 
-    public getByContainerId(id: string) {
+    public getByContainerId(id: string | string[]) {
+        id = idAsString(id);
         return this._idToLayout[id] || this.getByContainerIdCore(id);
     }
 
@@ -117,7 +118,8 @@ class WorkspaceStore {
         return windowIdResult;
     }
 
-    public getContainer(containerId: string) {
+    public getContainer(containerId: string | string[]): GoldenLayout.Stack | GoldenLayout.Column | GoldenLayout.Row  {
+        containerId = idAsString(containerId);
         const workspaces = this.layouts.reduce<GoldenLayout[]>((acc, w) => {
             if (w.layout) {
                 acc.push(w.layout);
@@ -125,8 +127,15 @@ class WorkspaceStore {
             return acc;
         }, [] as GoldenLayout[]);
 
-        const result = workspaces.reduce((acc, w) => acc ||
-            w.root.getItemsById(containerId)[0], undefined as GoldenLayout.ContentItem);
+        const result = workspaces.reduce<GoldenLayout.Stack | GoldenLayout.Column | GoldenLayout.Row>((acc, w) => {
+            const contentItem = w.root.getItemsById(containerId)[0];
+
+            if (contentItem?.type === "component") {
+                return acc;
+            }
+
+            return acc || contentItem;
+        }, undefined);
 
         return result;
     }
@@ -138,6 +147,10 @@ class WorkspaceStore {
 
     public getWorkspaceContentItem(workspaceId: string): GoldenLayout.Component {
         return this.workspaceLayout.root.getItemsById(workspaceId)[0] as GoldenLayout.Component;
+    }
+
+    public getWorkspaceTabElement(workspaceId: string): GoldenLayout.Tab {
+        return this.getWorkspaceContentItem(workspaceId)?.tab;
     }
 
     private getByContainerIdCore(id: string): Workspace {

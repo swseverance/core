@@ -247,4 +247,40 @@ export interface WindowStreamData {
         config: SwimlaneWindowSnapshotConfig;
     };
 }
+
+export interface LockWindowConfig {
+    windowPlacementId: string,
+    config?: {
+        allowExtract?: boolean,
+        showCloseButton?: boolean
+    }
+}
+
+export interface LockContainerConfig {
+    itemId: string,
+    type: "row" | "column" | "group",
+    config?: {
+        allowExtract?: boolean,
+        allowDrop?: boolean,
+        showMaximizeButton?: boolean,
+        showEjectButton?: boolean,
+        showAddWindowButton?: boolean
+    }
+}
+
+export interface LockWorkspaceConfig {
+    workspaceId: string,
+    config?: {
+        allowDrop?: boolean,
+        allowDropLeft?: boolean,
+        allowDropTop?: boolean,
+        allowDropRight?: boolean,
+        allowDropBottom?: boolean,
+        allowExtract?: boolean,
+        lockSplitters?: boolean,
+        showCloseButton?: boolean,
+        showSaveButton?: boolean,
+        showWindowAddButtons?: boolean
+    }
+}
 // #endregion

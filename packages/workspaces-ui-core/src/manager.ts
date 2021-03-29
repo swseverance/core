@@ -2,17 +2,17 @@ import { LayoutController } from "./layout/controller";
 import { WindowSummary, Workspace, WorkspaceOptionsWithTitle, WorkspaceOptionsWithLayoutName, ComponentFactory, LoadingStrategy } from "./types/internal";
 import { LayoutEventEmitter } from "./layout/eventEmitter";
 import { IFrameController } from "./iframeController";
-import store from "./store";
+import store from "./state/store";
 import registryFactory, { UnsubscribeFunction } from "callback-registry";
 import GoldenLayout from "@glue42/golden-layout";
 import { LayoutsManager } from "./layouts";
-import { LayoutStateResolver } from "./layout/stateResolver";
+import { LayoutStateResolver } from "./state/resolver";
 import scReader from "./config/startupReader";
 import { idAsString, getAllWindowsFromConfig, getElementBounds, getWorkspaceContextName } from "./utils";
 import { WorkspacesConfigurationFactory } from "./config/factory";
 import { WorkspacesEventEmitter } from "./eventEmitter";
 import { Glue42Web } from "@glue42/web";
-import { RestoreWorkspaceConfig } from "./interop/types";
+import { LockColumnArguments, LockContainerArguments, LockGroupArguments, LockRowArguments, LockWindowArguments, LockWorkspaceArguments, RestoreWorkspaceConfig } from "./interop/types";
 import { TitleGenerator } from "./config/titleGenerator";
 import startupReader from "./config/startupReader";
 import componentStateMonitor from "./componentStateMonitor";
@@ -435,6 +435,125 @@ export class WorkspacesManager {
         this._controller.showSaveIcon(workspaceId);
     }
 
+    public async lockWorkspace(lockConfig: LockWorkspaceArguments) {
+        if (!lockConfig.config) {
+            lockConfig.config = {
+                allowDrop: false,
+                allowDropLeft: false,
+                allowDropTop: false,
+                allowDropRight: false,
+                allowDropBottom: false,
+                allowExtract: false,
+                lockSplitters: true,
+                showCloseButton: false,
+                showSaveButton: false,
+                showWindowAddButtons: false
+            };
+        }
+
+        if (typeof lockConfig.config.allowDrop !== "undefined") {
+            lockConfig.config.allowDropLeft = lockConfig.config.allowDropLeft ?? lockConfig.config.allowDrop;
+            lockConfig.config.allowDropTop = lockConfig.config.allowDropTop ?? lockConfig.config.allowDrop;
+            lockConfig.config.allowDropRight = lockConfig.config.allowDropRight ?? lockConfig.config.allowDrop;
+            lockConfig.config.allowDropBottom = lockConfig.config.allowDropBottom ?? lockConfig.config.allowDrop;
+        }
+
+        const { allowDrop, allowExtract, lockSplitters, showCloseButton, showSaveButton, showWindowAddButtons } = lockConfig.config;
+        const { workspaceId } = lockConfig;
+
+        if (allowDrop === false) {
+            this._controller.disableWorkspaceDrop(workspaceId, lockConfig.config);
+        } else {
+            this._controller.enableWorkspaceDrop(workspaceId, lockConfig.config);
+        }
+
+        if (allowExtract === false) {
+            this._controller.disableWorkspaceExtract(workspaceId);
+        } else {
+            this._controller.enableWorkspaceExtract(workspaceId);
+        }
+
+        if (lockSplitters === true) {
+            this._controller.disableSplitters(workspaceId);
+        } else {
+            this._controller.enableSplitters(workspaceId);
+        }
+
+        if (showCloseButton === false) {
+            this._controller.disableWorkspaceCloseButton(workspaceId);
+        } else {
+            this._controller.enableWorkspaceCloseButton(workspaceId);
+        }
+
+        if (showSaveButton === false) {
+            this._controller.disableWorkspaceSaveButton(workspaceId);
+        } else {
+            this._controller.enableWorkspaceSaveButton(workspaceId);
+        }
+
+        if (showWindowAddButtons === false) {
+            this._controller.disableWindowAddButtons(workspaceId);
+        } else {
+            this._controller.enableWindowAddButtons(workspaceId);
+        }
+    }
+
+    public async lockContainer(lockConfig: LockContainerArguments) {
+        if (!lockConfig.config && lockConfig.type === "column") {
+            lockConfig.config = {
+                allowDrop: false,
+            };
+        } else if (!lockConfig.config && lockConfig.type === "row") {
+            lockConfig.config = {
+                allowDrop: false
+            };
+        } else if (!lockConfig.config && lockConfig.type === "group") {
+            lockConfig.config = {
+                allowDrop: false,
+                allowExtract: false,
+                showAddWindowButton: false,
+                showEjectButton: false,
+                showMaximizeButton: false
+            };
+        }
+
+        switch (lockConfig.type) {
+            case "column":
+                this.handleColumnLockRequested(lockConfig);
+                break;
+            case "row":
+                this.handleRowLockRequested(lockConfig);
+                break;
+            case "group":
+                this.handleGroupLockRequested(lockConfig);
+                break;
+        }
+    }
+
+    public async lockWindow(lockConfig: LockWindowArguments) {
+        if (!lockConfig.config) {
+            lockConfig.config = {
+                allowExtract: false,
+                showCloseButton: false,
+            };
+        }
+
+        const { allowExtract, showCloseButton } = lockConfig.config;
+        const { windowPlacementId } = lockConfig;
+
+        if (allowExtract === false) {
+            this._controller.disableWindowExtract(windowPlacementId);
+        } else {
+            this._controller.enableWindowExtract(windowPlacementId, allowExtract);
+        }
+
+        if (showCloseButton === false) {
+            this._controller.disableWindowCloseButton(windowPlacementId);
+        } else {
+            this._controller.enableWindowCloseButton(windowPlacementId, showCloseButton);
+        }
+    }
+
     public async hibernateWorkspace(workspaceId: string) {
         const workspace = store.getById(workspaceId);
 
@@ -728,8 +847,6 @@ export class WorkspacesManager {
                     workspaceSummary: this.stateResolver.getWorkspaceSummary(workspace.id)
                 }
             });
-
-
         });
 
         this._controller.emitter.onAddButtonClicked(async ({ laneId, workspaceId, bounds, parentType }) => {
@@ -1059,6 +1176,63 @@ export class WorkspacesManager {
                 }
             });
         });
+    }
+
+    private handleGroupLockRequested(data: LockGroupArguments) {
+        const { allowExtract, showAddWindowButton, showEjectButton, showMaximizeButton, allowDrop } = data.config;
+        if (allowExtract === false) {
+            this._controller.disableGroupExtract(data.itemId);
+        } else {
+            this._controller.enableGroupExtract(data.itemId, allowExtract);
+        }
+
+        if (showAddWindowButton === false) {
+            this._controller.disableGroupAddWindowButton(data.itemId);
+        } else {
+            this._controller.enableGroupAddWindowButton(data.itemId, showAddWindowButton);
+        }
+
+        if (showEjectButton === false) {
+            this._controller.disableGroupEjectButton(data.itemId);
+        } else {
+            this._controller.enableGroupEjectButton(data.itemId, showEjectButton);
+        }
+
+        if (showMaximizeButton === false) {
+            this._controller.disableGroupMaximizeButton(data.itemId);
+        } else {
+            this._controller.enableGroupMaximizeButton(data.itemId, showMaximizeButton);
+        }
+
+        if (allowDrop === false) {
+            this._controller.disableGroupDrop(data.itemId);
+        } else {
+            this._controller.enableGroupDrop(data.itemId, allowDrop);
+        }
+
+        const workspace = store.getByContainerId(data.itemId);
+        if (workspace?.layout) {
+            this.reportLayoutStructure(workspace.layout);
+        }
+    }
+
+    private handleRowLockRequested(data: LockRowArguments) {
+        const { allowDrop } = data.config;
+        if (allowDrop === false) {
+            this._controller.disableRowDrop(data.itemId);
+        } else {
+            this._controller.enableRowDrop(data.itemId, allowDrop);
+        }
+    }
+
+    private handleColumnLockRequested(data: LockColumnArguments) {
+        const { allowDrop } = data.config;
+
+        if (allowDrop === false) {
+            this._controller.disableColumnDrop(data.itemId);
+        } else {
+            this._controller.enableColumnDrop(data.itemId, allowDrop);
+        }
     }
 }
 

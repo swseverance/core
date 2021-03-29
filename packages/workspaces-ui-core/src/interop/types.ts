@@ -142,6 +142,21 @@ export interface ResumeWorkspaceRequest {
     operationArguments: WorkspaceSelector;
 }
 
+export interface LockWorkspaceRequest {
+    operation: "lockWorkspace";
+    operationArguments: LockWorkspaceArguments;
+}
+
+export interface LockWindowRequest {
+    operation: "lockWindow";
+    operationArguments: LockWindowArguments;
+}
+
+export interface LockContainerRequest {
+    operation: "lockContainer";
+    operationArguments: LockContainerArguments;
+}
+
 //#endregion
 
 //#region Arguments
@@ -218,6 +233,60 @@ export interface MoveWindowToArguments {
     itemId: string;
     containerId: string;
 }
+
+export interface LockWorkspaceArguments {
+    workspaceId: string;
+    config?: {
+        lockSplitters?: boolean;
+        allowDrop?: boolean;
+        allowDropLeft?: boolean;
+        allowDropTop?: boolean;
+        allowDropRight?: boolean;
+        allowDropBottom?: boolean;
+        allowExtract?: boolean;
+        showCloseButton?: boolean;
+        showWindowAddButtons?: boolean;
+        showSaveButton?: boolean;
+    };
+}
+
+export interface LockWindowArguments {
+    windowPlacementId: string;
+    config?: {
+        showCloseButton?: boolean;
+        allowExtract?: boolean;
+    };
+}
+
+export interface LockGroupArguments {
+    type: "group";
+    itemId: string;
+    config?: {
+        allowExtract?: boolean;
+        allowDrop?: boolean;
+        showMaximizeButton?: boolean;
+        showEjectButton?: boolean;
+        showAddWindowButton?: boolean;
+    };
+}
+
+export interface LockRowArguments {
+    type: "row";
+    itemId: string;
+    config?: {
+        allowDrop?: boolean;
+    };
+}
+
+export interface LockColumnArguments {
+    type: "column";
+    itemId: string;
+    config: {
+        allowDrop?: boolean;
+    };
+}
+
+export type LockContainerArguments = LockGroupArguments | LockColumnArguments | LockRowArguments;
 
 //#endregion
 

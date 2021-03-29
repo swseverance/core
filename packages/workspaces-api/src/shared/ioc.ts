@@ -5,13 +5,13 @@ import { InteropTransport } from "../communication/interop-transport";
 import { BaseBuilder } from "../builders/baseBuilder";
 import { ParentBuilder } from "../builders/parentBuilder";
 import { WorkspaceBuilder } from "../builders/workspaceBuilder";
-import { ModelMaps, ModelTypes, FramePrivateData, WindowPrivateData, WorkspacePrivateData, ParentPrivateData } from "../types/privateData";
+import { ModelMaps, ModelTypes, FramePrivateData, WindowPrivateData, WorkspacePrivateData, ParentPrivateData, GroupPrivateData, RowPrivateData, ColumnPrivateData } from "../types/privateData";
 import { PrivateDataManager } from "./privateDataManager";
 import { FrameCreateConfig, ModelCreateConfig, WindowCreateConfig, WorkspaceIoCCreateConfig, ParentCreateConfig } from "../types/ioc";
 import { Frame } from "../models/frame";
 import { Window } from "../models/window";
 import { Workspace } from "../models/workspace";
-import { ChildSnapshotResult, SwimlaneWindowSnapshotConfig, ParentSnapshotConfig } from "../types/protocol";
+import { ChildSnapshotResult, SwimlaneWindowSnapshotConfig, ParentSnapshotConfig, ColumnSnapshotConfig } from "../types/protocol";
 import { Child } from "../types/builders";
 import { Row } from "../models/row";
 import { Column } from "../models/column";
@@ -126,13 +126,15 @@ export class IoC {
 
                 const builtChildren = this.buildChildren(children, frame, workspace, newParent);
 
-                const parentPrivateData: ParentPrivateData = {
-                    id, parent, frame, workspace, config, type,
+                const parentPrivateData = {
+                    id, parent, frame, workspace,
+                    config,
+                    type,
                     controller: this.controller,
                     children: builtChildren,
                 };
 
-                this.privateDataManager.setParentData(newParent, parentPrivateData);
+                this.privateDataManager.setParentData(newParent, parentPrivateData as ParentPrivateData);
 
                 return newParent as ModelMaps[T];
             }

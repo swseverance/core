@@ -6,7 +6,6 @@ import { PrivateDataManager } from "../../shared/privateDataManager";
 import { ParentPrivateData, WorkspacePrivateData } from "../../types/privateData";
 import { Window } from "../../models/window";
 import { Glue42Workspaces } from "../../../workspaces";
-import { Row } from "../row";
 import { Group } from "../group";
 
 interface PrivateData {
@@ -187,8 +186,7 @@ export class Base {
 
     public getAllowExtract(model: Group) {
         const privateData = getData(this, model);
-
-        if (privateData.type === "workspace" || privateData.config.type !== "group") {
+        if (privateData.type !== "group") {
             throw new Error(`Cannot get allow extract from private data${privateData.type} with config ${privateData.type !== "workspace" ? privateData.config.type : ""}`);
         }
         return privateData.config.allowExtract;
@@ -196,7 +194,7 @@ export class Base {
 
     public getShowMaximizeButton(model: Group) {
         const privateData = getData(this, model);
-        if (privateData.type === "workspace" || privateData.config.type !== "group") {
+        if (privateData.type !== "group") {
             throw new Error(`Cannot get show maximize button from private data${privateData.type} with config ${privateData.type !== "workspace" ? privateData.config.type : ""}`);
         }
         return privateData.config.showMaximizeButton;
@@ -204,7 +202,7 @@ export class Base {
 
     public getShowEjectButton(model: Group) {
         const privateData = getData(this, model);
-        if (privateData.type === "workspace" || privateData.config.type !== "group") {
+        if (privateData.type !== "group") {
             throw new Error(`Cannot get show eject button from private data${privateData.type} with config ${privateData.type !== "workspace" ? privateData.config.type : ""}`);
         }
         return privateData.config.showEjectButton;
@@ -212,7 +210,7 @@ export class Base {
 
     public getShowAddWindowButton(model: Group) {
         const privateData = getData(this, model);
-        if (privateData.type === "workspace" || privateData.config.type !== "group") {
+        if (privateData.type !== "group") {
             throw new Error(`Cannot get add window button from private data${privateData.type} with config ${privateData.type !== "workspace" ? privateData.config.type : ""}`);
         }
         return privateData.config.showAddWindowButton;

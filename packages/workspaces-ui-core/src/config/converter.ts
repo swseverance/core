@@ -54,6 +54,11 @@ export class ConfigConverter {
                 glConfig.content.push(this.getGroupWithEmptyVisibleWindow());
             }
 
+            if (!glConfig.workspacesConfig) {
+                glConfig.workspacesConfig = {};
+            }
+
+            glConfig.workspacesConfig.allowDrop = config.config?.allowDrop;
             glConfig.width = this.convertSizeToRendererConfigSafely(config.config?.width as any);
             glConfig.height = this.convertSizeToRendererConfigSafely(config.config?.height as any);
 
@@ -65,6 +70,15 @@ export class ConfigConverter {
                 glConfig.content.push(this._configFactory.createEmptyVisibleWindowConfig());
             }
 
+            if (!glConfig.workspacesConfig) {
+                glConfig.workspacesConfig = {};
+            }
+
+            glConfig.workspacesConfig.allowDrop = config.config?.allowDrop;
+            glConfig.workspacesConfig.allowExtract = config.config?.allowExtract;
+            glConfig.workspacesConfig.showMaximizeButton = config.config?.showMaximizeButton;
+            glConfig.workspacesConfig.showEjectButton = config.config?.showEjectButton;
+            glConfig.workspacesConfig.showWindowAddButton = config.config?.showWindowAddButton;
             glConfig.activeItemIndex = config.config?.activeTabIndex;
             glConfig.width = this.convertSizeToRendererConfigSafely(config.config?.width as any);
             glConfig.height = this.convertSizeToRendererConfigSafely(config.config?.height as any);
@@ -84,7 +98,9 @@ export class ConfigConverter {
                 appName,
                 url: config.config?.url || (config as any).url,
                 title: config.config?.title || (config as any).title,
-                context: config.config?.context || (config as any).context
+                context: config.config?.context || (config as any).context,
+                allowExtract: config?.config?.allowExtract !== undefined ? config?.config?.allowExtract : (config as any).allowExtract,
+                showCloseButton: config?.config?.showCloseButton !== undefined ? config?.config?.showCloseButton : (config as any).showCloseButton,
             });
 
             if (parent.type !== "group") {
@@ -122,13 +138,15 @@ export class ConfigConverter {
                 frameId: wspsConfig.frameId,
                 workspaceId: wspsConfig.workspaceId,
                 title: wspsConfig.title,
-                positionIndex: wspsConfig.positionIndex
+                positionIndex: wspsConfig.positionIndex,
+                allowExtract: wspsConfig.allowExtract,
+                showCloseButton: wspsConfig.showCloseButton
             });
 
             return resultWindow;
         }
         const configAsAny = config as any;
-        const containerResult =  {
+        const containerResult = {
             id: idAsString(config.id),
             type: config.type === "stack" ? "group" : config.type,
             children: this.flat(config.content.map((c) => this.convertToApiConfigCore(c))),
@@ -138,9 +156,21 @@ export class ConfigConverter {
                 workspaceId: configAsAny.workspacesConfig?.workspaceId,
                 activeTabIndex: configAsAny.activeItemIndex,
                 width: configAsAny.width,
-                height: configAsAny.height
+                height: configAsAny.height,
+                allowDrop: configAsAny.workspacesConfig?.allowDrop,
+                allowExtract: configAsAny.workspacesConfig?.allowExtract,
+                showMaximizeButton: configAsAny.workspacesConfig?.showMaximizeButton,
+                showEjectButton: configAsAny.workspacesConfig?.showEjectButton,
+                showAddWindowButton: configAsAny.workspacesConfig?.showAddWindowButton,
             }
         };
+
+        if (containerResult.type !== "group") {
+            delete containerResult.config.allowExtract;
+            delete containerResult.config.showMaximizeButton;
+            delete containerResult.config.showEjectButton;
+            delete containerResult.config.showAddWindowButton;
+        }
 
         return containerResult;
     }

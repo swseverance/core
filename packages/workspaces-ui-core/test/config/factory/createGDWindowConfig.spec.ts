@@ -7,10 +7,12 @@ describe("createGDWindowConfig() Should", () => {
     const mockAppName = "mockAppName";
     const mockUrl = "mockUrl";
     const mockId = "mockId";
+    const mockAllowExtract = true;
+    const mockShowCloseButton = true;
 
     let factory: WorkspacesConfigurationFactory;
 
-    before(()=>{
+    before(() => {
         const glueStub: any = {
             appManager: {
                 instances: () => []
@@ -25,7 +27,9 @@ describe("createGDWindowConfig() Should", () => {
             windowId: mockWindowId,
             appName: mockAppName,
             url: mockUrl,
-            id: mockId
+            id: mockId,
+            allowExtract: mockAllowExtract,
+            showCloseButton: mockShowCloseButton
         });
 
         expect(result.componentState.windowId).to.eql(mockWindowId);
@@ -36,7 +40,9 @@ describe("createGDWindowConfig() Should", () => {
             windowId: mockWindowId,
             appName: mockAppName,
             url: mockUrl,
-            id: mockId
+            id: mockId,
+            allowExtract: mockAllowExtract,
+            showCloseButton: mockShowCloseButton
         });
 
         expect(result.componentState.url).to.eql(mockUrl);
@@ -47,7 +53,9 @@ describe("createGDWindowConfig() Should", () => {
             windowId: mockWindowId,
             appName: mockAppName,
             url: mockUrl,
-            id: mockId
+            id: mockId,
+            allowExtract: mockAllowExtract,
+            showCloseButton: mockShowCloseButton
         });
 
         expect(result.componentState.appName).to.eql(mockAppName);
@@ -58,7 +66,9 @@ describe("createGDWindowConfig() Should", () => {
             windowId: mockWindowId,
             appName: mockAppName,
             url: mockUrl,
-            id: mockId
+            id: mockId,
+            allowExtract: mockAllowExtract,
+            showCloseButton: mockShowCloseButton
         });
 
         expect(result.windowId).to.eql(mockWindowId);
@@ -69,7 +79,9 @@ describe("createGDWindowConfig() Should", () => {
             windowId: mockWindowId,
             appName: mockAppName,
             url: mockUrl,
-            id: mockId
+            id: mockId,
+            allowExtract: mockAllowExtract,
+            showCloseButton: mockShowCloseButton
         });
 
         expect(result.id).to.eql(mockId);
@@ -79,7 +91,9 @@ describe("createGDWindowConfig() Should", () => {
         const result = factory.createGDWindowConfig({
             windowId: mockWindowId,
             appName: mockAppName,
-            url: mockUrl
+            url: mockUrl,
+            allowExtract: mockAllowExtract,
+            showCloseButton: mockShowCloseButton
         });
 
         expect(result.id).to.not.be.undefined;
@@ -91,13 +105,17 @@ describe("createGDWindowConfig() Should", () => {
         const result = factory.createGDWindowConfig({
             windowId: mockWindowId,
             appName: mockAppName,
-            url: mockUrl
+            url: mockUrl,
+            allowExtract: mockAllowExtract,
+            showCloseButton: mockShowCloseButton
         });
 
         const secondResult = factory.createGDWindowConfig({
             windowId: mockWindowId,
             appName: mockAppName,
-            url: mockUrl
+            url: mockUrl,
+            allowExtract: mockAllowExtract,
+            showCloseButton: mockShowCloseButton
         });
 
         expect(result.componentName).to.not.eql(secondResult);

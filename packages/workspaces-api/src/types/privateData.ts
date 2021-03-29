@@ -1,4 +1,4 @@
-import { ParentSnapshotConfig, SwimlaneWindowSnapshotConfig, FrameSummaryResult, WorkspaceConfigResult, ChildSnapshotResult } from "./protocol";
+import { ParentSnapshotConfig, SwimlaneWindowSnapshotConfig, FrameSummaryResult, WorkspaceConfigResult, ChildSnapshotResult, GroupSnapshotConfig, RowSnapshotConfig, SimpleItemConfig, ColumnSnapshotConfig } from "./protocol";
 import { Frame } from "../models/frame";
 import { Workspace } from "../models/workspace";
 import { Row } from "../models/row";
@@ -30,11 +30,31 @@ export interface SwimlaneItemConfig {
     workspace: Workspace;
 }
 
-export interface ParentPrivateData extends SwimlaneItemConfig {
-    config: ParentSnapshotConfig;
-    type: SubParent;
+// export interface ParentPrivateData extends SwimlaneItemConfig {
+//     config: ParentSnapshotConfig;
+//     type: SubParent;
+//     children: Child[];
+// }
+
+export interface GroupPrivateData extends SwimlaneItemConfig {
+    config: GroupSnapshotConfig;
+    type: "group";
     children: Child[];
 }
+
+export interface RowPrivateData extends SwimlaneItemConfig {
+    config: RowSnapshotConfig;
+    type: "row";
+    children: Child[];
+}
+
+export interface ColumnPrivateData extends SwimlaneItemConfig {
+    config: ColumnSnapshotConfig;
+    type: "column";
+    children: Child[];
+}
+
+export type ParentPrivateData = GroupPrivateData | ColumnPrivateData | RowPrivateData;
 
 export interface WindowPrivateData extends SwimlaneItemConfig {
     config: SwimlaneWindowSnapshotConfig;

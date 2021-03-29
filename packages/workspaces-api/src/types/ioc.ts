@@ -1,4 +1,4 @@
-import { FrameSummaryResult, SwimlaneWindowSnapshotConfig, WorkspaceSnapshotResult, ParentSnapshotConfig, ChildSnapshotResult } from "./protocol";
+import { FrameSummaryResult, SwimlaneWindowSnapshotConfig, WorkspaceSnapshotResult, ParentSnapshotConfig, ChildSnapshotResult, GroupSnapshotConfig, ColumnSnapshotConfig, RowSnapshotConfig } from "./protocol";
 import { Workspace } from "../models/workspace";
 import { Row } from "../models/row";
 import { Column } from "../models/column";

@@ -2,14 +2,18 @@ import GoldenLayout from "@glue42/golden-layout";
 import registryFactory from "callback-registry";
 const ResizeObserver = require("resize-observer-polyfill").default || require("resize-observer-polyfill");
 import { idAsString, getAllWindowsFromConfig, createWaitFor, getElementBounds } from "../utils";
-import { Workspace, Window, FrameLayoutConfig, StartupConfig, ComponentState, LayoutWithMaximizedItem } from "../types/internal";
+import { Workspace, Window, FrameLayoutConfig, StartupConfig, ComponentState, LayoutWithMaximizedItem, WorkspaceDropOptions } from "../types/internal";
 import { LayoutEventEmitter } from "./eventEmitter";
-import store from "../store";
-import { LayoutStateResolver } from "./stateResolver";
+import store from "../state/store";
+import { LayoutStateResolver } from "../state/resolver";
 import { EmptyVisibleWindowName } from "../utils/constants";
 import { TabObserver } from "./tabObserver";
 import componentStateMonitor from "../componentStateMonitor";
 import { WorkspacesConfigurationFactory } from "../config/factory";
+import { WorkspaceContainerWrapper } from "../state/containerWrapper";
+import { WorkspaceWrapper } from "../state/workspaceWrapper";
+import { WorkspaceWindowWrapper } from "../state/windowWrapper";
+import uiExecutor from "../uiExecutor";
 
 export class LayoutController {
     private readonly _maximizedId = "__glMaximised";
@@ -491,6 +495,312 @@ export class LayoutController {
             const hibernationIcon = windowContentItem.tab.element[0].getElementsByClassName("lm_hibernationIcon")[0];
             hibernationIcon?.remove();
         }
+    }
+
+    public enableWorkspaceDrop(workspaceId: string, workspaceDropOptions: WorkspaceDropOptions) {
+        const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
+        const workspace = store.getById(workspaceId);
+        const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+
+        wrapper.allowDrop = workspaceDropOptions.allowDrop;
+        wrapper.allowDropLeft = workspaceDropOptions.allowDropLeft;
+        wrapper.allowDropTop = workspaceDropOptions.allowDropTop;
+        wrapper.allowDropRight = workspaceDropOptions.allowDropRight;
+        wrapper.allowDropBottom = workspaceDropOptions.allowDropBottom;
+    }
+
+    public disableWorkspaceDrop(workspaceId: string, workspaceDropOptions: WorkspaceDropOptions) {
+        const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
+        const workspace = store.getById(workspaceId);
+        const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+
+        wrapper.allowDrop = false;
+        wrapper.allowDropLeft = workspaceDropOptions.allowDropLeft;
+        wrapper.allowDropTop = workspaceDropOptions.allowDropTop;
+        wrapper.allowDropRight = workspaceDropOptions.allowDropRight;
+        wrapper.allowDropBottom = workspaceDropOptions.allowDropBottom;
+    }
+
+    public enableWindowAddButtons(workspaceId: string) {
+        const workspace = store.getById(workspaceId);
+        const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
+        const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+
+        wrapper.showAddWindowButtons = true;
+        uiExecutor.showWindowAddButtons(workspaceId);
+    }
+
+    public disableWindowAddButtons(workspaceId: string) {
+        const workspace = store.getById(workspaceId);
+        const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
+        const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+
+        wrapper.showAddWindowButtons = false;
+        uiExecutor.hideWindowAddButtons(workspaceId);
+    }
+
+    public enableWorkspaceSaveButton(workspaceId: string) {
+        const workspace = store.getById(workspaceId);
+        const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
+        const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+
+        wrapper.showSaveButton = true;
+        uiExecutor.showWorkspaceSaveButton(workspaceId);
+    }
+
+    public disableWorkspaceSaveButton(workspaceId: string) {
+        const workspace = store.getById(workspaceId);
+        const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
+        const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+
+        wrapper.showSaveButton = false;
+        uiExecutor.hideWorkspaceSaveButton(workspaceId);
+    }
+
+    public enableWorkspaceCloseButton(workspaceId: string) {
+        const workspace = store.getById(workspaceId);
+        const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
+        const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+
+        wrapper.showCloseButton = true;
+        uiExecutor.showWorkspaceCloseButton(workspaceId);
+    }
+
+    public disableWorkspaceCloseButton(workspaceId: string) {
+        const workspace = store.getById(workspaceId);
+        const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
+        const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+
+        wrapper.showCloseButton = false;
+        uiExecutor.hideWorkspaceCloseButton(workspaceId);
+    }
+
+    public enableSplitters(workspaceId: string) {
+        const workspace = store.getById(workspaceId);
+        const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
+        const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+
+        wrapper.lockSplitters = false;
+    }
+
+    public disableSplitters(workspaceId: string) {
+        const workspace = store.getById(workspaceId);
+        const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
+        const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+
+        wrapper.lockSplitters = true;
+    }
+
+    public enableWorkspaceExtract(workspaceId: string) {
+        const workspace = store.getById(workspaceId);
+        const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
+        const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+
+        wrapper.allowExtract = true;
+    }
+
+    public disableWorkspaceExtract(workspaceId: string) {
+        const workspace = store.getById(workspaceId);
+        const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
+        const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+
+        wrapper.allowExtract = false;
+    }
+
+    public enableWindowExtract(windowId: string, value: boolean | undefined) {
+        const windowContentItem = store.getWindowContentItem(windowId);
+        const wrapper = new WorkspaceWindowWrapper(windowContentItem, this._frameId);
+
+        wrapper.allowExtract = value;
+    }
+
+    public disableWindowExtract(windowId: string) {
+        const windowContentItem = store.getWindowContentItem(windowId);
+        const wrapper = new WorkspaceWindowWrapper(windowContentItem, this._frameId);
+
+        wrapper.allowExtract = false;
+    }
+
+    public enableWindowCloseButton(windowId: string, value: boolean | undefined) {
+        const windowContentItem = store.getWindowContentItem(windowId);
+        const wrapper = new WorkspaceWindowWrapper(windowContentItem, this._frameId);
+
+        wrapper.showCloseButton = value;
+
+        const workspace = store.getByWindowId(windowId);
+        const workspaceContentItem = store.getWorkspaceContentItem(workspace.id);
+        const workspaceWrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+        if (workspaceWrapper.showCloseButton) {
+            uiExecutor.showWindowCloseButton(windowId);
+        }
+    }
+
+    public disableWindowCloseButton(windowId: string) {
+        const windowContentItem = store.getWindowContentItem(windowId);
+        const wrapper = new WorkspaceWindowWrapper(windowContentItem, this._frameId);
+
+        wrapper.showCloseButton = false;
+
+        uiExecutor.hideWindowCloseButton(windowId);
+    }
+
+    public enableColumnDrop(itemId: string, allowDrop: boolean) {
+        const containerContenteItem = store.getContainer(itemId);
+
+        if (containerContenteItem.type !== "column") {
+            throw new Error(`Expected item with type column but received ${containerContenteItem.type} ${itemId}`);
+        }
+
+        const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
+        wrapper.allowDrop = allowDrop;
+        wrapper.populateChildrenAllowDrop(allowDrop);
+    }
+
+    public disableColumnDrop(itemId: string) {
+        const containerContenteItem = store.getContainer(itemId);
+
+        if (containerContenteItem.type !== "column") {
+            throw new Error(`Expected item with type column but received ${containerContenteItem.type} ${itemId}`);
+        }
+
+        const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
+        wrapper.allowDrop = false;
+        wrapper.populateChildrenAllowDrop(false);
+    }
+
+    public enableRowDrop(itemId: string, allowDrop: boolean) {
+        const containerContenteItem = store.getContainer(itemId);
+
+        if (containerContenteItem.type !== "row") {
+            throw new Error(`Expected item with type row but received ${containerContenteItem.type} ${itemId}`);
+        }
+
+        const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
+        wrapper.allowDrop = allowDrop;
+        wrapper.populateChildrenAllowDrop(allowDrop);
+    }
+
+    public disableRowDrop(itemId: string) {
+        const containerContenteItem = store.getContainer(itemId);
+
+        if (containerContenteItem.type !== "row") {
+            throw new Error(`Expected item with type row but received ${containerContenteItem.type} ${itemId}`);
+        }
+
+        const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
+        wrapper.allowDrop = false;
+        wrapper.populateChildrenAllowDrop(false);
+    }
+
+    public enableGroupDrop(itemId: string, allowDrop: boolean) {
+        const containerContenteItem = store.getContainer(itemId);
+
+        if (containerContenteItem.type !== "stack") {
+            throw new Error(`Expected item with type stack but received ${containerContenteItem.type} ${itemId}`);
+        }
+
+        const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
+        wrapper.allowDrop = allowDrop;
+    }
+
+    public disableGroupDrop(itemId: string) {
+        const containerContenteItem = store.getContainer(itemId);
+
+        if (containerContenteItem.type !== "stack") {
+            throw new Error(`Expected item with type stack but received ${containerContenteItem.type} ${itemId}`);
+        }
+
+        const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
+        wrapper.allowDrop = false;
+    }
+
+    public enableGroupMaximizeButton(itemId: string, showMaximizeButton: boolean) {
+        const containerContenteItem = store.getContainer(itemId);
+
+        if (containerContenteItem.type !== "stack") {
+            throw new Error(`Expected item with type stack but received ${containerContenteItem.type} ${itemId}`);
+        }
+
+        const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
+        wrapper.showMaximizeButton = showMaximizeButton;
+        uiExecutor.showMaximizeButton(itemId);
+    }
+    public disableGroupMaximizeButton(itemId: string) {
+        const containerContenteItem = store.getContainer(itemId);
+
+        if (containerContenteItem.type !== "stack") {
+            throw new Error(`Expected item with type stack but received ${containerContenteItem.type} ${itemId}`);
+        }
+
+        const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
+        wrapper.showMaximizeButton = false;
+        uiExecutor.hideMaximizeButton(itemId);
+    }
+    public enableGroupEjectButton(itemId: string, showEjectButton: boolean) {
+        const containerContenteItem = store.getContainer(itemId);
+
+        if (containerContenteItem.type !== "stack") {
+            throw new Error(`Expected item with type stack but received ${containerContenteItem.type} ${itemId}`);
+        }
+
+        const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
+        wrapper.showEjectButton = showEjectButton;
+        uiExecutor.showEjectButton(itemId);
+    }
+    public disableGroupEjectButton(itemId: string) {
+        const containerContenteItem = store.getContainer(itemId);
+
+        if (containerContenteItem.type !== "stack") {
+            throw new Error(`Expected item with type stack but received ${containerContenteItem.type} ${itemId}`);
+        }
+
+        const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
+        wrapper.showEjectButton = false;
+        uiExecutor.hideEjectButton(itemId);
+    }
+
+    public enableGroupAddWindowButton(itemId: string, showAddWindowButton: boolean) {
+        const containerContenteItem = store.getContainer(itemId);
+
+        if (containerContenteItem.type !== "stack") {
+            throw new Error(`Expected item with type stack but received ${containerContenteItem.type} ${itemId}`);
+        }
+
+        const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
+        wrapper.showAddWindowButton = showAddWindowButton;
+        uiExecutor.showAddWindowButton(itemId);
+    }
+
+    public disableGroupAddWindowButton(itemId: string) {
+        const containerContenteItem = store.getContainer(itemId);
+
+        if (containerContenteItem.type !== "stack") {
+            throw new Error(`Expected item with type stack but received ${containerContenteItem.type} ${itemId}`);
+        }
+
+        const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
+        wrapper.showAddWindowButton = false;
+        uiExecutor.hideAddWindowButton(itemId);
+    }
+    public enableGroupExtract(itemId: string, allowExtract: boolean) {
+        const containerContenteItem = store.getContainer(itemId);
+
+        if (containerContenteItem.type !== "stack") {
+            throw new Error(`Expected item with type stack but received ${containerContenteItem.type} ${itemId}`);
+        }
+
+        const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
+        wrapper.allowExtract = allowExtract;
+    }
+    public disableGroupExtract(itemId: string) {
+        const containerContenteItem = store.getContainer(itemId);
+
+        if (containerContenteItem.type !== "stack") {
+            throw new Error(`Expected item with type stack but received ${containerContenteItem.type} ${itemId}`);
+        }
+
+        const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
+        wrapper.allowExtract = false;
     }
 
     private initWorkspaceContents(id: string, config: GoldenLayout.Config | GoldenLayout.ItemConfig) {

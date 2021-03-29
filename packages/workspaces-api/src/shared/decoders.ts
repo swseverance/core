@@ -41,7 +41,10 @@ import {
     FrameStateResult,
     WorkspaceSelector,
     WindowSelector,
-    ItemSelector
+    ItemSelector,
+    LockWorkspaceConfig,
+    LockWindowConfig,
+    LockContainerConfig
 } from "../types/protocol";
 import { WorkspaceEventType, WorkspaceEventAction } from "../types/subscription";
 import { Glue42Workspaces } from "../../workspaces";
@@ -562,8 +565,7 @@ export const workspaceSelectorDecoder: Decoder<WorkspaceSelector> = object({
     workspaceId: nonEmptyStringDecoder,
 });
 
-// TODO fix typings
-export const lockWorkspaceDecoder: Decoder<(Glue42Workspaces.WorkspaceLockConfig & WorkspaceSelector)> = object({
+export const lockWorkspaceDecoder: Decoder<LockWorkspaceConfig> = object({
     workspaceId: nonEmptyStringDecoder,
     config: optional(object({
         allowDrop: optional(boolean()),
@@ -579,19 +581,17 @@ export const lockWorkspaceDecoder: Decoder<(Glue42Workspaces.WorkspaceLockConfig
     }))
 });
 
-// TODO fix typings
-export const lockWindowDecoder: Decoder<Glue42Workspaces.WorkspaceWindowLockConfig & WindowSelector> = object({
+export const lockWindowDecoder: Decoder<LockWindowConfig> = object({
     windowPlacementId: nonEmptyStringDecoder,
     config: optional(object({
         allowExtract: optional(boolean()),
         showCloseButton: optional(boolean())
     }))
-
 });
 
-// TODO fix typings
-export const lockContainerDecoder: Decoder<Glue42Workspaces.GroupLockConfig & ItemSelector> = object({
+export const lockContainerDecoder: Decoder<LockContainerConfig> = object({
     itemId: nonEmptyStringDecoder,
+    type: oneOf(constant("row"), constant("column"), constant("group")),
     config: optional(object({
         allowExtract: optional(boolean()),
         allowDrop: optional(boolean()),
