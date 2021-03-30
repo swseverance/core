@@ -4,6 +4,8 @@ import { LayoutStateResolver } from "./resolver";
 import { idAsString } from "../utils";
 import { Workspace, WorkspaceOptionsWithLayoutName, WorkspaceSummary } from "../types/internal";
 import { EmptyVisibleWindowName } from "../utils/constants";
+import { WorkspaceWindowWrapper } from "./windowWrapper";
+import { WorkspaceContainerWrapper } from "./containerWrapper";
 
 export class WorkspaceWrapper {
     constructor(
@@ -11,6 +13,10 @@ export class WorkspaceWrapper {
         private readonly workspace: Workspace,
         private readonly workspaceContentItem: GoldenLayout.Component,
         private readonly frameId: string) {
+    }
+
+    public get id() {
+        return this.workspace.id;
     }
 
     public get title() {
@@ -81,11 +87,11 @@ export class WorkspaceWrapper {
         glConfig.workspacesOptions.lockSplitters = this.lockSplitters;
         glConfig.workspacesOptions.lastActive = workspace.lastActive;
 
-        glConfig.workspacesOptions.name = glConfig.workspacesOptions.name || glConfig.workspacesOptions.title;
-
         if (!glConfig.workspacesOptions.title) {
             glConfig.workspacesOptions.title = store.getWorkspaceTitle(workspace.id);
         }
+
+        glConfig.workspacesOptions.name = glConfig.workspacesOptions.name || glConfig.workspacesOptions.title;
 
         this.transformComponentsToWindowSummary(glConfig);
         this.transformParentsToContainerSummary(glConfig);
@@ -139,6 +145,8 @@ export class WorkspaceWrapper {
             (this.workspace.layout.config.workspacesOptions as any).allowDrop = value;
         }
         (this.workspaceContentItem.config.workspacesConfig as any).allowDrop = value;
+
+        this.populateChildrenAllowDrop(value);
     }
 
     public get allowDropLeft(): boolean {
@@ -231,6 +239,8 @@ export class WorkspaceWrapper {
             (this.workspace.layout.config.workspacesOptions as any).allowExtract = value;
         }
         (this.workspaceContentItem.config.workspacesConfig as any).allowExtract = value;
+
+        this.populateChildrenAllowExtract(value);
     }
 
     public get lockSplitters(): boolean {
@@ -332,5 +342,60 @@ export class WorkspaceWrapper {
         }
 
         glConfig.content?.map((c: any) => this.transformParentsToContainerSummary(c));
+    }
+
+    private populateChildrenAllowDrop(value?: boolean) {
+        const { layout } = this.workspace;
+
+        if (!layout) {
+            return;
+        }
+
+        const populateRecursive = (item: GoldenLayout.ContentItem) => {
+            if (item.type === "component") {
+                return;
+            }
+
+            const containerWrapper = new WorkspaceContainerWrapper(item, this.frameId, this.workspace.id);
+            containerWrapper.allowDrop = value;
+
+            item.contentItems.forEach((ci) => {
+                populateRecursive(ci);
+            });
+        };
+
+        layout.root.contentItems.forEach((ci) => {
+            populateRecursive(ci);
+        });
+    }
+
+    private populateChildrenAllowExtract(value?: boolean) {
+        const { layout } = this.workspace;
+
+        if (!layout) {
+            return;
+        }
+
+        const populateRecursive = (item: GoldenLayout.ContentItem) => {
+            if (item.type === "component") {
+                const windowWrapper = new WorkspaceWindowWrapper(item, this.frameId);
+
+                windowWrapper.allowExtract = value;
+                return;
+            }
+
+            if (item.type === "stack") {
+                const containerWrapper = new WorkspaceContainerWrapper(item, this.frameId, this.workspace.id);
+                containerWrapper.allowExtract = value;
+            }
+
+            item.contentItems.forEach((ci) => {
+                populateRecursive(ci);
+            });
+        };
+
+        layout.root.contentItems.forEach((ci) => {
+            populateRecursive(ci);
+        });
     }
 }

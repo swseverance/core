@@ -355,7 +355,7 @@ describe('createWorkspace() ', function () {
                         {
                             type: "window",
                             context,
-                            appName: "GTF_Glue_Isolated_Support"
+                            appName: "noGlueApp"
                         }
                     ]
                 }

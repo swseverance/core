@@ -347,4 +347,5 @@ export type ControlArguments = SaveLayoutRequest | DeleteLayoutRequest |
     CloseItemRequest | MaximizeItemRequest | RestoreItemRequest | AddWindowRequest | AddContainerRequest | SetItemTitleRequest |
     AddWorkspaceChildrenRequest | EjectRequest | CreateWorkspaceRequest | ForceLoadWindowRequest | FocusItemRequest |
     BundleWorkspaceRequest | IsWindowInWorkspaceRequest | GetFrameSummaryRequest | MoveFrameRequest | GetFrameSnapshotRequest |
-    GetSnapshotRequest | MoveWindowToRequest | GenerateLayoutRequest | PingRequest | HibernateWorkspaceRequest | ResumeWorkspaceRequest;
+    GetSnapshotRequest | MoveWindowToRequest | GenerateLayoutRequest | PingRequest | HibernateWorkspaceRequest | ResumeWorkspaceRequest |
+    LockWorkspaceRequest | LockContainerRequest | LockWindowRequest;

@@ -1,7 +1,7 @@
 import GoldenLayout from "@glue42/golden-layout";
 import registryFactory from "callback-registry";
 const ResizeObserver = require("resize-observer-polyfill").default || require("resize-observer-polyfill");
-import { idAsString, getAllWindowsFromConfig, createWaitFor, getElementBounds } from "../utils";
+import { idAsString, getAllWindowsFromConfig, createWaitFor, getElementBounds, getAllItemsFromConfig } from "../utils";
 import { Workspace, Window, FrameLayoutConfig, StartupConfig, ComponentState, LayoutWithMaximizedItem, WorkspaceDropOptions } from "../types/internal";
 import { LayoutEventEmitter } from "./eventEmitter";
 import store from "../state/store";
@@ -56,7 +56,7 @@ export class LayoutController {
         await this.initWorkspaceConfig(config.workspaceLayout);
         this.refreshLayoutSize();
         await Promise.all(config.workspaceConfigs.map(async (c) => {
-            await this.initWorkspaceContents(c.id, c.config);
+            await this.initWorkspaceContents(c.id, c.config, false);
             this.emitter.raiseEvent("workspace-added", { workspace: store.getById(c.id) });
         }));
 
@@ -77,7 +77,7 @@ export class LayoutController {
 
         if (!workspace.layout) {
             this.hideAddButton(workspace.id);
-            await this.initWorkspaceContents(workspace.id, config);
+            await this.initWorkspaceContents(workspace.id, config, true);
             return;
         }
 
@@ -100,6 +100,18 @@ export class LayoutController {
         this.registerWindowComponent(workspace.layout, idAsString(placementId));
 
         const emptyVisibleWindow = contentItem.getComponentsByName(this._emptyVisibleWindowName)[0];
+
+        const workspaceContentItem = store.getWorkspaceContentItem(workspace.id);
+        const workspaceWrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+
+        if (config.type === "component") {
+            this.applyLockConfig(config, contentItem, workspaceWrapper);
+        } else {
+            const allItems = [...getAllItemsFromConfig(config.content), config];
+            allItems.forEach((item) => {
+                this.applyLockConfig(item, contentItem, workspaceWrapper);
+            });
+        }
 
         return new Promise<void>((res) => {
             const unsub = this.emitter.onContentComponentCreated((component) => {
@@ -143,7 +155,7 @@ export class LayoutController {
                 config.id = containerId;
             }
             this.hideAddButton(workspace.id);
-            await this.initWorkspaceContents(workspace.id, config);
+            await this.initWorkspaceContents(workspace.id, config, true);
             return idAsString(containerId);
         }
 
@@ -181,6 +193,17 @@ export class LayoutController {
                 //     url: w.componentState.url,
                 //     windowId: w.componentState.windowId,
                 // }, workspace.id);
+            });
+        }
+
+        if (config.content) {
+            const allItems = [...getAllItemsFromConfig(config.content), config];
+
+            const workspaceContentItem = store.getWorkspaceContentItem(workspace.id);
+            const workspaceWrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
+
+            allItems.forEach((item: GoldenLayout.ItemConfig) => {
+                this.applyLockConfig(item, contentItem, workspaceWrapper);
             });
         }
 
@@ -269,7 +292,7 @@ export class LayoutController {
 
         stack.addChild(componentConfig, undefined, !componentConfig.noTabHeader);
 
-        await this.initWorkspaceContents(id, config);
+        await this.initWorkspaceContents(id, config, false);
 
         this.setupContentLayouts(id);
 
@@ -282,7 +305,7 @@ export class LayoutController {
             // Making sure that the property doesn't leak in a workspace summary or a saved layout
             delete config.workspacesOptions.reuseWorkspaceId;
         }
-        return this.initWorkspaceContents(id, config);
+        return this.initWorkspaceContents(id, config, false);
     }
 
     public removeWorkspace(workspaceId: string) {
@@ -653,7 +676,6 @@ export class LayoutController {
 
         const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
         wrapper.allowDrop = allowDrop;
-        wrapper.populateChildrenAllowDrop(allowDrop);
     }
 
     public disableColumnDrop(itemId: string) {
@@ -665,7 +687,6 @@ export class LayoutController {
 
         const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
         wrapper.allowDrop = false;
-        wrapper.populateChildrenAllowDrop(false);
     }
 
     public enableRowDrop(itemId: string, allowDrop: boolean) {
@@ -677,7 +698,6 @@ export class LayoutController {
 
         const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
         wrapper.allowDrop = allowDrop;
-        wrapper.populateChildrenAllowDrop(allowDrop);
     }
 
     public disableRowDrop(itemId: string) {
@@ -689,7 +709,6 @@ export class LayoutController {
 
         const wrapper = new WorkspaceContainerWrapper(containerContenteItem, this._frameId);
         wrapper.allowDrop = false;
-        wrapper.populateChildrenAllowDrop(false);
     }
 
     public enableGroupDrop(itemId: string, allowDrop: boolean) {
@@ -803,7 +822,7 @@ export class LayoutController {
         wrapper.allowExtract = false;
     }
 
-    private initWorkspaceContents(id: string, config: GoldenLayout.Config | GoldenLayout.ItemConfig) {
+    private initWorkspaceContents(id: string, config: GoldenLayout.Config | GoldenLayout.ItemConfig, useWorkspaceSpecificConfig: boolean) {
         if (!config || (config.type !== "component" && !config.content.length)) {
             store.addOrUpdate(id, []);
             this.showAddButton(id);
@@ -843,6 +862,18 @@ export class LayoutController {
                 ]
             };
         }
+
+        const workspaceContentItem = store.getWorkspaceContentItem(id);
+
+        // TODO fix typings
+        const optionsFromItem = (workspaceContentItem.config as any).workspacesConfig;
+        const optionsFromConfig = (config as GoldenLayout.Config).workspacesOptions;
+
+        const mergedOptions = useWorkspaceSpecificConfig ? Object.assign({}, optionsFromItem, optionsFromConfig) : optionsFromConfig;
+
+        workspaceContentItem.config.workspacesConfig = mergedOptions;
+        (config as GoldenLayout.Config).workspacesOptions = mergedOptions;
+
         const layout = new GoldenLayout(config as GoldenLayout.Config, $(`#nestHere${id}`));
         store.addOrUpdate(id, []);
 
@@ -1364,5 +1395,30 @@ export class LayoutController {
         }
 
         return elements[0] as HTMLElement;
+    }
+
+    private applyLockConfig(itemConfig: GoldenLayout.ItemConfig, parent: GoldenLayout.ContentItem, workspaceWrapper: WorkspaceWrapper) {
+        const isParentWorksapce = parent.config.id === workspaceWrapper.id;
+        const parentAllowDrop = isParentWorksapce ? workspaceWrapper.allowDrop : (parent.config.workspacesConfig as any).allowDrop;
+
+        if (itemConfig.type === "stack") {
+            if (typeof (itemConfig.workspacesConfig as any).allowDrop === "undefined") {
+                (itemConfig.workspacesConfig as any).allowDrop = (itemConfig.workspacesConfig as any).allowDrop ?? parentAllowDrop;
+            }
+
+            if (typeof (itemConfig.workspacesConfig as any).allowExtract === "undefined") {
+                const parentAllowExtract = workspaceWrapper.allowExtract;
+                (itemConfig.workspacesConfig as any).allowExtract = (itemConfig.workspacesConfig as any).allowExtract ?? parentAllowExtract;
+            }
+        } else if (itemConfig.type === "row" || itemConfig.type === "column") {
+            if (typeof (itemConfig.workspacesConfig as any).allowDrop === "undefined") {
+                (itemConfig.workspacesConfig as any).allowDrop = (itemConfig.workspacesConfig as any).allowDrop ?? parentAllowDrop;
+            }
+        } else if (itemConfig.type === "component") {
+            if (typeof (itemConfig.workspacesConfig as any).allowExtract === "undefined") {
+                const parentAllowExtract = isParentWorksapce ? workspaceWrapper.allowExtract : (parent.config.workspacesConfig as any).allowExtract;
+                (itemConfig.workspacesConfig as any).allowExtract = (itemConfig.workspacesConfig as any).allowExtract ?? parentAllowExtract;
+            }
+        }
     }
 }

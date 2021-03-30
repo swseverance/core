@@ -599,4 +599,4 @@ export const lockContainerDecoder: Decoder<LockContainerConfig> = object({
         showEjectButton: optional(boolean()),
         showAddWindowButton: optional(boolean()),
     }))
-})
+});

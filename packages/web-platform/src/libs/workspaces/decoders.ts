@@ -3,7 +3,7 @@
 import { Glue42Workspaces } from "@glue42/workspaces-api";
 import { anyJson, array, boolean, constant, Decoder, intersection, lazy, number, object, oneOf, optional, string } from "decoder-validate";
 import { nonEmptyStringDecoder, nonNegativeNumberDecoder, windowLayoutItemDecoder } from "../../shared/decoders";
-import { AddContainerConfig, AddItemResult, AddWindowConfig, BaseChildSnapshotConfig, BundleConfig, ChildSnapshotResult, ContainerStreamData, ContainerSummaryResult, DeleteLayoutConfig, ExportedLayoutsResult, FrameHello, FrameSnapshotResult, FrameStateConfig, FrameStateResult, FrameStreamData, FrameSummariesResult, FrameSummaryResult, GetFrameSummaryConfig, IsWindowInSwimlaneResult, LayoutSummariesResult, LayoutSummary, MoveFrameConfig, MoveWindowConfig, OpenWorkspaceConfig, ParentSnapshotConfig, PingResult, ResizeItemConfig, SetItemTitleConfig, SimpleItemConfig, SimpleWindowOperationSuccessResult, SwimlaneWindowSnapshotConfig, WindowStreamData, WorkspaceConfigResult, WorkspaceCreateConfigProtocol, WorkspaceEventAction, WorkspaceEventType, WorkspaceSelector, WorkspacesLayoutImportConfig, WorkspaceSnapshotResult, WorkspacesOperationsTypes, WorkspaceStreamData, WorkspaceSummariesResult, WorkspaceSummaryResult, WorkspaceWindowData } from "./types";
+import { AddContainerConfig, AddItemResult, AddWindowConfig, BaseChildSnapshotConfig, BundleConfig, ChildSnapshotResult, ContainerStreamData, ContainerSummaryResult, DeleteLayoutConfig, ExportedLayoutsResult, FrameHello, FrameSnapshotResult, FrameStateConfig, FrameStateResult, FrameStreamData, FrameSummariesResult, FrameSummaryResult, GetFrameSummaryConfig, IsWindowInSwimlaneResult, LayoutSummariesResult, LayoutSummary, LockContainerConfig, LockWindowConfig, LockWorkspaceConfig, MoveFrameConfig, MoveWindowConfig, OpenWorkspaceConfig, ParentSnapshotConfig, PingResult, ResizeItemConfig, SetItemTitleConfig, SimpleItemConfig, SimpleWindowOperationSuccessResult, SwimlaneWindowSnapshotConfig, WindowStreamData, WorkspaceConfigResult, WorkspaceCreateConfigProtocol, WorkspaceEventAction, WorkspaceEventType, WorkspaceSelector, WorkspacesLayoutImportConfig, WorkspaceSnapshotResult, WorkspacesOperationsTypes, WorkspaceStreamData, WorkspaceSummariesResult, WorkspaceSummaryResult, WorkspaceWindowData } from "./types";
 
 export const workspacesOperationDecoder: Decoder<WorkspacesOperationsTypes> = oneOf<
     "isWindowInWorkspace" | "createWorkspace" | "getAllFramesSummaries" | "getFrameSummary" |
@@ -11,7 +11,8 @@ export const workspacesOperationDecoder: Decoder<WorkspacesOperationsTypes> = on
     "deleteLayout" | "saveLayout" | "importLayout" | "exportAllLayouts" | "restoreItem" | "maximizeItem" |
     "focusItem" | "closeItem" | "resizeItem" | "moveFrame" | "getFrameSnapshot" | "forceLoadWindow" |
     "ejectWindow" | "setItemTitle" | "moveWindowTo" | "addWindow" | "addContainer" |
-    "bundleWorkspace" | "changeFrameState" | "getFrameState" | "frameHello" | "hibernateWorkspace" | "resumeWorkspace" | "getWorkspacesConfig"
+    "bundleWorkspace" | "changeFrameState" | "getFrameState" | "frameHello" | "hibernateWorkspace" | "resumeWorkspace" | "getWorkspacesConfig" |
+    "lockWorkspace" | "lockContainer" | "lockWindow"
 >(
     constant("isWindowInWorkspace"),
     constant("createWorkspace"),
@@ -44,7 +45,10 @@ export const workspacesOperationDecoder: Decoder<WorkspacesOperationsTypes> = on
     constant("frameHello"),
     constant("hibernateWorkspace"),
     constant("resumeWorkspace"),
-    constant("getWorkspacesConfig")
+    constant("getWorkspacesConfig"),
+    constant("lockWorkspace"),
+    constant("lockContainer"),
+    constant("lockWindow"),
 );
 
 export const frameHelloDecoder: Decoder<FrameHello> = object({
@@ -567,4 +571,39 @@ export const workspaceLayoutSaveConfigDecoder: Decoder<Glue42Workspaces.Workspac
     name: nonEmptyStringDecoder,
     workspaceId: nonEmptyStringDecoder,
     saveContext: optional(boolean())
+});
+
+export const lockWorkspaceDecoder: Decoder<LockWorkspaceConfig> = object({
+    workspaceId: nonEmptyStringDecoder,
+    config: optional(object({
+        allowDrop: optional(boolean()),
+        allowDropLeft: optional(boolean()),
+        allowDropTop: optional(boolean()),
+        allowDropRight: optional(boolean()),
+        allowDropBottom: optional(boolean()),
+        allowExtract: optional(boolean()),
+        lockSplitters: optional(boolean()),
+        showCloseButton: optional(boolean()),
+        showSaveButton: optional(boolean()),
+    }))
+});
+
+export const lockWindowDecoder: Decoder<LockWindowConfig> = object({
+    windowPlacementId: nonEmptyStringDecoder,
+    config: optional(object({
+        allowExtract: optional(boolean()),
+        showCloseButton: optional(boolean())
+    }))
+});
+
+export const lockContainerDecoder: Decoder<LockContainerConfig> = object({
+    itemId: nonEmptyStringDecoder,
+    type: oneOf(constant("row"), constant("column"), constant("group")),
+    config: optional(object({
+        allowExtract: optional(boolean()),
+        allowDrop: optional(boolean()),
+        showMaximizeButton: optional(boolean()),
+        showEjectButton: optional(boolean()),
+        showAddWindowButton: optional(boolean()),
+    }))
 });

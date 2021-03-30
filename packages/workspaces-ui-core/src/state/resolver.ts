@@ -1,9 +1,8 @@
-import { WindowSummary, WorkspaceSummary, ContainerSummary, WorkspaceOptionsWithLayoutName, WorkspaceConfig } from "../types/internal";
+import { WindowSummary, WorkspaceSummary, ContainerSummary } from "../types/internal";
 import store from "./store";
-import GoldenLayout, { ItemConfig } from "@glue42/golden-layout";
+import GoldenLayout from "@glue42/golden-layout";
 import { LayoutEventEmitter } from "../layout/eventEmitter";
 import { idAsString } from "../utils";
-import { EmptyVisibleWindowName } from "../utils/constants";
 import { IFrameController } from "../iframeController";
 import { WorkspaceWindowWrapper } from "./windowWrapper";
 import { WorkspaceWrapper } from "./workspaceWrapper";

@@ -193,6 +193,18 @@ export class GlueFacade {
                     await this.handleResumeWorkspace(args.operationArguments)
                     successCallback(undefined);
                     break;
+                case "lockWorkspace":
+                    await this.handleLockWorkspace(args.operationArguments);
+                    successCallback(undefined);
+                    break;
+                case "lockContainer":
+                    await this.handleLockContainer(args.operationArguments);
+                    successCallback(undefined);
+                    break;
+                case "lockWindow":
+                    await this.handleLockWindow(args.operationArguments);
+                    successCallback(undefined);
+                    break;
                 default:
                     errorCallback(`Invalid operation - ${((args as unknown) as { operation: string }).operation}`);
             }

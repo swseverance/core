@@ -286,7 +286,6 @@ export class BaseController {
                         workspace,
                         config: newChildSnapshot.config as ParentSnapshotConfig
                     };
-                    console.log("createConfig", createConfig);
                     childToAdd = this.ioc.getModel<"child">(childType, createConfig);
                 }
 

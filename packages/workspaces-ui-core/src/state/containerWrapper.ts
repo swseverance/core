@@ -17,6 +17,8 @@ export class WorkspaceContainerWrapper {
 
     public set allowDrop(value: boolean | undefined) {
         (this.containerContentItem.config.workspacesConfig as any).allowDrop = value;
+
+        this.populateChildrenAllowDrop(value);
     }
 
     public get allowExtract() {
@@ -112,7 +114,7 @@ export class WorkspaceContainerWrapper {
         return this.findElementInConfig(idAsString(this.containerContentItem.config.id), workspaceConfig);
     }
 
-    public populateChildrenAllowDrop(value: boolean | undefined) {
+    private populateChildrenAllowDrop(value: boolean | undefined) {
         const lockChildren = (children: ContentItem[]) => {
             children.forEach((c) => {
                 if (c.type === "component") {
@@ -134,11 +136,15 @@ export class WorkspaceContainerWrapper {
         const lockChildren = (children: ContentItem[]) => {
             children.forEach((c) => {
                 if (c.type === "component") {
-                    const wrapper = new WorkspaceWindowWrapper(c, this.frameId);
-
-                    wrapper.allowExtract = value;
-
+                    const windowWrapper = new WorkspaceWindowWrapper(c, this.frameId);
+    
+                    windowWrapper.allowExtract = value;
                     return;
+                }
+    
+                if (c.type === "stack") {
+                    const containerWrapper = new WorkspaceContainerWrapper(c, this.frameId);
+                    containerWrapper.allowExtract = value;
                 }
 
                 lockChildren(c.contentItems);

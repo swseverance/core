@@ -50,7 +50,10 @@ export type WorkspacesOperationsTypes = "isWindowInWorkspace" |
     "frameHello" |
     "hibernateWorkspace" |
     "resumeWorkspace" |
-    "getWorkspacesConfig";
+    "getWorkspacesConfig" |
+    "lockWorkspace" |
+    "lockContainer" |
+    "lockWindow";
 
 export interface FrameQueryConfig {
     frameId?: string;
@@ -284,3 +287,39 @@ export interface WindowStreamData {
 }
 
 export type WorkspaceConfigWithReuseWorkspaceId = Glue42Workspaces.WorkspaceConfig & { reuseWorkspaceId: string };
+
+export interface LockWindowConfig {
+    windowPlacementId: string,
+    config?: {
+        allowExtract?: boolean,
+        showCloseButton?: boolean
+    }
+}
+
+export interface LockContainerConfig {
+    itemId: string,
+    type: "row" | "column" | "group",
+    config?: {
+        allowExtract?: boolean,
+        allowDrop?: boolean,
+        showMaximizeButton?: boolean,
+        showEjectButton?: boolean,
+        showAddWindowButton?: boolean
+    }
+}
+
+export interface LockWorkspaceConfig {
+    workspaceId: string,
+    config?: {
+        allowDrop?: boolean,
+        allowDropLeft?: boolean,
+        allowDropTop?: boolean,
+        allowDropRight?: boolean,
+        allowDropBottom?: boolean,
+        allowExtract?: boolean,
+        lockSplitters?: boolean,
+        showCloseButton?: boolean,
+        showSaveButton?: boolean,
+        showWindowAddButtons?: boolean
+    }
+}
