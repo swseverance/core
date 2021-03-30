@@ -1,4 +1,4 @@
-describe.only("lock() Should", () => {
+describe("lock() Should", () => {
     const basicConfig = {
         children: [
             {
@@ -56,6 +56,8 @@ describe.only("lock() Should", () => {
     };
 
     let workspace;
+    before(()=> coreReady);
+
     beforeEach(async () => {
         workspace = await glue.workspaces.createWorkspace(basicConfig);
         await Promise.all(workspace.getAllWindows().map(w=>w.forceLoad()));
@@ -71,7 +73,7 @@ describe.only("lock() Should", () => {
     // showCloseButton?: boolean;
 
     ["allowExtract", "showCloseButton"].forEach((propertyUnderTest) => {
-        it(`Should set ${propertyUnderTest} to false when invoked without arguments`, async () => {
+        it.only(`Should set ${propertyUnderTest} to false when invoked without arguments`, async () => {
             const window = workspace.getAllWindows()[0];
 
             await window.lock();

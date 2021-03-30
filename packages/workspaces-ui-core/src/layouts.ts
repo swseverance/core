@@ -98,7 +98,6 @@ export class LayoutsManager {
         const rendererFriendlyConfig = this._configConverter.convertToRendererConfig(savedWorkspace);
 
         this.addWorkspaceIds(rendererFriendlyConfig);
-        // this.addWindowIds(rendererFriendlyConfig);
 
         return {
             config: rendererFriendlyConfig as GoldenLayout.Config,

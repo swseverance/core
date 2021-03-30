@@ -1,4 +1,4 @@
-describe.only("lock() Should", () => {
+describe("lock() Should", () => {
     const basicConfig = {
         children: [
             {
