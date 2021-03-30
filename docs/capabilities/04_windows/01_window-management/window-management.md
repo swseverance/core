@@ -8,8 +8,6 @@ Using the [Window Management API](../../../reference/core/latest/windows/index.h
 - listen for and handle events related to opening and closing windows;
 - automatically save and restore the positions and contexts of your application windows;
 
-*For detailed information on the Window Management API, see the [Window Management](https://docs.glue42.com/glue42-concepts/windows/window-management/javascript/index.html) documentation.* 
-
 ## Configuration
 
 Use the `windows` property of the configuration object when initializing the Glue42 [Web Platform](https://www.npmjs.com/package/@glue42/web-platform) library in the [Main application](../../developers/core-concepts/web-platform/overview/index.html) to specify custom settings for the Window Management library:
@@ -37,9 +35,13 @@ const { glue } = await GlueWebPlatform(config);
 | `windowResponseTimeout` | Sets the timeout (in ms) that the Glue42 library will wait for a valid success response from the target window when a window operation is being executed (e.g., moving a window). If no response has been received within this period, the Glue42 library will assume that either the window is not Glue42 enabled, or Glue42 has not been initialized yet. |
 | `defaultWindowOpenBounds` | Default bounds for opening a new window or an application instance. |
 
-The examples in the next sections demonstrate using the Window Management API. To see the code and experiment with it, open the embedded examples directly in [CodeSandbox](https://codesandbox.io).
+The [Live Examples](#live_examples) section demonstrates using the Window Management API. To see the code and experiment with it, open the embedded examples directly in [CodeSandbox](https://codesandbox.io).
 
-## Opening Windows
+
+
+## Live Examples
+
+### Opening Windows
 
 The application below demonstrates opening a new window with basic configuration (context and size) by using the [`open()`](../../../reference/core/latest/windows/index.html#!API-open) method of the Window Management API.
 
@@ -52,7 +54,7 @@ Use the input fields in Application A to assign a name (required) to the new win
     <iframe src="https://jp8hk.csb.app" style="border: none;"></iframe>
 </div>
 
-<!-- ## Window Discovery
+<!-- ### Window Discovery
 
 The application below demonstrates discovering a window by name.
 
@@ -62,7 +64,7 @@ Input the name of the window you want to search for and click the search button.
 
 example 11 -->
 
-## Window Events
+### Window Events
 
 The applications below demonstrate handling window events - opening and closing windows.
 
@@ -77,7 +79,7 @@ Open several new windows by using the input fields in Application A to assign a 
     <iframe src="https://6wgpf.csb.app" style="border: none;"></iframe>
 </div>
 
-<!-- ## Window Operations
+<!-- ### Window Operations
 
 The application below demonstrates manipulating already opened windows.
 

@@ -7,7 +7,7 @@ The [Shared Contexts API](../../../reference/core/latest/shared%20contexts/index
 - instruct the "Clients" app to publish updates to a context object holding the `id` of the currently selected client;
 - instruct the "Portfolio" app to subscribe for updates of that same context object and specify how the "Portfolio" app should handle the received data in order to update its current state;
 
-The [Examples](#examples) section demonstrates using the Shared Contexts API. To see the code and experiment with it, open the embedded examples directly in [CodeSandbox](https://codesandbox.io).
+The [Live Examples](#live_examples) section demonstrates using the Shared Contexts API. To see the code and experiment with it, open the embedded examples directly in [CodeSandbox](https://codesandbox.io).
 
 ## Retrieving Context Data
 
@@ -92,7 +92,7 @@ To destroy a context object, use the [`destroy()`](../../../reference/core/lates
 await glue.contexts.destroy("app-styling");
 ```
 
-## Examples
+## Live Examples
 
 ### Setting and Getting Context
 

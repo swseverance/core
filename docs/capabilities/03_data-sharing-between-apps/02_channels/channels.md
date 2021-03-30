@@ -70,7 +70,7 @@ const { glue } = await GlueWebPlatform(config);
 
 The only required properties in a Channel definition object are `name` and `color`. The `color` property expects an HTML color name or a hex value. You can add any number of additional custom properties to the `meta` object. The `data` property holds context data specific to the Channel.
 
-The [Examples](#examples) section demonstrates using the Channels API. To see the code and experiment with it, open the embedded examples directly in [CodeSandbox](https://codesandbox.io). 
+The [Live Examples](#live_examples) section demonstrates using the Channels API. To see the code and experiment with it, open the embedded examples directly in [CodeSandbox](https://codesandbox.io). 
 
 ## Current Channel
 
@@ -205,7 +205,7 @@ const handler = (newChannel) => {
 glue.channels.onChanged(handler);
 ```
 
-## Examples
+## Live Examples
 
 ### Discover and Navigate
 

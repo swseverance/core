@@ -49,7 +49,7 @@ The [Main app](../../developers/core-concepts/web-platform/overview/index.html) 
 
 *The supported application definition formats are **Glue42 Core** and [FDC3](https://fdc3.finos.org/schemas/next/app-directory#tag/Application). The only requirement for an FDC3 application definition to be usable in **Glue42 Core** is to have a valid `details.url` property or a `url` top-level property in its `manifest` JSON string property. You can see an example FDC3 application definition in the [FDC3 Compliance: App Directory](../../getting-started/fdc3-compliance/index.html#fdc3_for_glue42_core-app_directory) section.*
 
-The [Examples](#examples) section demonstrates using the Application Management API. To see the code and experiment with it, open the embedded examples directly in [CodeSandbox](https://codesandbox.io).
+The [Live Examples](#live_examples) section demonstrates using the Application Management API. To see the code and experiment with it, open the embedded examples directly in [CodeSandbox](https://codesandbox.io).
 
 ## Listing Applications
 
@@ -193,7 +193,7 @@ const handler = instance => console.log(instance.id);
 app.onInstanceStopped(handler);
 ```
 
-## Examples
+## Live Examples
 
 ### Handling Applications, Application and Instance Events
 
