@@ -119,7 +119,6 @@ describe("resume() Should", () => {
 
         await workspace.hibernate();
         await workspace.resume();
-        await new Promise(r => setTimeout(r, 1000));
         await workspace.refreshReference();
 
         await Promise.all(workspace.getAllWindows().map(w => w.forceLoad()));

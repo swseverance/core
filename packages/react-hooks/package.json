@@ -25,9 +25,9 @@
         "build": "rollup -c",
         "lint": "eslint . --ext .js,.ts,.tsx --max-warnings 0",
         "lint:fix": "eslint --fix . --ext .js,.ts,.tsx",
-        "audit": "node ../../scripts/audit/index.js",
         "preversion": "npm run build && npm run test && npm run audit",
-        "version": "npm run build"
+        "version": "npm run build",
+        "audit": "node ../../scripts/audit/index.js"
     },
     "author": {
         "name": "Glue42",

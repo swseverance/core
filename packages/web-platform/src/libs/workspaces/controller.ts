@@ -13,7 +13,6 @@ import { IoC } from "../../shared/ioc";
 import { WindowMoveResizeConfig } from "../windows/types";
 import { StateController } from "../../controllers/state";
 import { WorkspaceHibernationWatcher } from "./hibernationWatcher";
-import callbackRegistry from "callback-registry";
 import { workspacesConfigDecoder } from "../../shared/decoders";
 import deepMerge from "deepmerge";
 import { defaultHibernationConfig, defaultLoadingConfig } from "./defaultConfig";
@@ -21,7 +20,6 @@ import { defaultHibernationConfig, defaultLoadingConfig } from "./defaultConfig"
 export class WorkspacesController implements LibController {
     private started = false;
     private settings!: Glue42WebPlatform.Workspaces.Config;
-    private readonly registry = callbackRegistry();
 
     private operations: { [key in WorkspacesOperationsTypes]: BridgeOperation } = {
         frameHello: { name: "frameHello", dataDecoder: frameHelloDecoder, execute: this.handleFrameHello.bind(this) },
