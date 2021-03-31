@@ -1,6 +1,6 @@
 # [**Glue42 Core**](https://glue42.com/core/) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Glue42/core/blob/master/LICENSE) [![npm version](https://badge.fury.io/js/%40glue42%2Fweb.svg)](https://badge.fury.io/js/%40glue42%2Fweb) [![CI](https://github.com/Glue42/Core/workflows/Node.js%20CI/badge.svg?branch=master)](https://github.com/Glue42/core/actions) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Glue42/core/blob/master/CONTRIBUTING.md)
 
-[**Glue42 Core**](https://docs.glue42.com/core/what-is-glue42-core/index.html) is a toolkit for integrating web applications. With the powerful interoperability and window management features of **Glue42 Core** you can enable multiple apps to share information between each other and unify them in streamlined coherent workflows.
+[**Glue42 Core**](https://core-docs.glue42.com/getting-started/what-is-glue42-core/index.html) is a toolkit for integrating web applications. With the powerful interoperability and window management features of **Glue42 Core** you can enable multiple apps to share information between each other and unify them in streamlined coherent workflows.
 
 **Glue42 Core** works in all modern browsers and focuses on use cases with Progressive Web Applications.
 
@@ -18,7 +18,7 @@
 
 **Glue42 Core** supports persistence of window layouts. Users can conveniently resume working on a task from the exact state in which they left it, saving time and effort to recreate the necessary layout of open apps and window arrangement.
 
-For a more detailed look at all available features and functionalities, see the **Glue42 Core** [Capabilities](https://docs.glue42.com/core/capabilities/overview/index.html) documentation.
+For a more detailed look at all available features and functionalities, see the **Glue42 Core** [Capabilities](https://core-docs.glue42.com/capabilities/application-management/index.html) documentation.
 
 ### Glue42 Enterprise Compatibility
 
@@ -28,7 +28,7 @@ To find out what advanced features and solutions **Glue42 Enterprise** offers, s
 
 ### React Bindings
 
-In addition to the standard JavaScript API, the [Interop](https://docs.glue42.com/glue42-concepts/data-sharing-between-apps/interop/overview/index.html) methods are exposed through framework specific bindings for the most popular web frameworks, further facilitating the integration of **Glue42 Core** functionalities in your existing codebase. Currently, we have [React bindings](https://docs.glue42.com/core/getting-started/setting-application/react/index.html) based on Hooks. Angular bindings will be available soon.
+In addition to the standard JavaScript API, the [Interop](https://docs.glue42.com/glue42-concepts/data-sharing-between-apps/interop/overview/index.html) methods are exposed through framework specific bindings for the most popular web frameworks, further facilitating the integration of **Glue42 Core** functionalities in your existing codebase. Currently, we have [React bindings](https://core-docs.glue42.com/getting-started/setting-application/react/index.html) based on Hooks. Angular bindings will be available soon.
 
 ## Roadmap
 
@@ -36,11 +36,11 @@ To see and help us shape the direction of **Glue42 Core**, review the [new featu
 
 ## Glue42 Core Documentation
 
-The **Glue42 Core** [documentation](https://docs.glue42.com/core/what-is-glue42-core/index.html) contains detailed information about the platform [capabilities](https://docs.glue42.com/core/capabilities/overview/index.html), [getting started](https://docs.glue42.com/core/getting-started/quick-start/index.html) guides, an [API reference](https://docs.glue42.com/reference/core/latest/glue42%20web/index.html) section and full JavaScript and React [tutorials](https://docs.glue42.com/core/tutorials/index.html). 
+The **Glue42 Core** [documentation](https://core-docs.glue42.com/getting-started/what-is-glue42-core/index.html) contains detailed information about the platform [capabilities](https://core-docs.glue42.com/capabilities/application-management/index.html), [getting started](https://core-docs.glue42.com/getting-started/quick-start/index.html) guides, an [API reference](https://core-docs.glue42.com/reference/core/latest/glue42%20web/index.html) section and full JavaScript and React [tutorials](https://core-docs.glue42.com/tutorials/index.html). 
 
 ### Getting Started and Tutorials
 
-The [Getting Started](https://docs.glue42.com/core/getting-started/quick-start/index.html) section provides detailed explanations on how to set up and configure all Glue42 elements. You can also find full JavaScript and React [tutorials](https://docs.glue42.com/core/tutorials/index.html) containing starting and solution files.
+The [Getting Started](https://core-docs.glue42.com/getting-started/quick-start/index.html) section provides detailed explanations on how to set up and configure all Glue42 elements. You can also find full JavaScript and React [tutorials](https://core-docs.glue42.com/tutorials/index.html) containing starting and solution files.
 
 ## Demos
 

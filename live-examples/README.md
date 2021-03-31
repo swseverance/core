@@ -1,6 +1,6 @@
 # Glue42 Core Live Snippets
 
-This folder contains live snippet examples for the [Glue42 Core documentation](https://docs.glue42.com/core).
+This folder contains live snippet examples for the [Glue42 Core documentation](https://core-docs.glue42.com).
 
 ## Examples
 
@@ -38,10 +38,10 @@ This folder contains live snippet examples for the [Glue42 Core documentation](h
 
 Each example project contains the following:
 
-- [Glue42 Core Environment](https://docs.glue42.com/core/core-concepts/environment/overview/index.html) configs.
-- A `lib` folder with a built of the [`Glue42 Web`](https://docs.glue42.com/reference/core/latest/glue42%20web/index.html) library.
+- [Glue42 Core Environment](https://core-docs.glue42.com/developers/core-concepts/environment/overview/index.html) configs.
+- A `lib` folder with a built of the [`Glue42 Web`](https://core-docs.glue42.com/reference/core/latest/glue42%20web/index.html) library.
 - A `scripts` folder with common functionality (e.g., DOM manipulation utils) or common logic between the applications in an example.
-- A `glue` folder - the [Glue42 Core](https://docs.glue42.com/core/what-is-glue42-core/index.html) assets. If creating a new example, make sure to have the Glue42 Core assets built in the example folder.
+- A `glue` folder - the [Glue42 Core](https://core-docs.glue42.com/getting-started/what-is-glue42-core/index.html) assets. If creating a new example, make sure to have the Glue42 Core assets built in the example folder.
 
 ## Setting Up For Local Development
 
