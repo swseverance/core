@@ -13,7 +13,6 @@ import { IoC } from "../../shared/ioc";
 import { WindowMoveResizeConfig } from "../windows/types";
 import { StateController } from "../../controllers/state";
 import { WorkspaceHibernationWatcher } from "./hibernationWatcher";
-import callbackRegistry from "callback-registry";
 import { workspacesConfigDecoder } from "../../shared/decoders";
 import deepMerge from "deepmerge";
 import { defaultHibernationConfig, defaultLoadingConfig } from "./defaultConfig";
@@ -21,7 +20,6 @@ import { defaultHibernationConfig, defaultLoadingConfig } from "./defaultConfig"
 export class WorkspacesController implements LibController {
     private started = false;
     private settings!: Glue42WebPlatform.Workspaces.Config;
-    private readonly registry = callbackRegistry();
 
     private operations: { [key in WorkspacesOperationsTypes]: BridgeOperation } = {
         frameHello: { name: "frameHello", dataDecoder: frameHelloDecoder, execute: this.handleFrameHello.bind(this) },
@@ -77,7 +75,9 @@ export class WorkspacesController implements LibController {
 
         this.settings = this.applyDefaults(config.workspaces);
 
-        this.hibernationWatcher.start(this, this.settings.hibernation);
+        if (this.settings.hibernation) {
+            this.hibernationWatcher.start(this, this.settings.hibernation);
+        }
 
         await Promise.all([
             this.glueController.createWorkspacesStream(),
@@ -95,7 +95,7 @@ export class WorkspacesController implements LibController {
         return logger.get("workspaces.controller");
     }
 
-    public async handleControl(args: any): Promise<void> {
+    public async handleControl(args: any): Promise<any> {
         if (!this.started) {
             throw new Error("Cannot handle this workspaces control message, because the controller has not been started");
         }
@@ -136,7 +136,7 @@ export class WorkspacesController implements LibController {
     public handleClientUnloaded(windowId: string, win: Window): void {
         this.logger?.trace(`handling unloading of ${windowId}`);
 
-        if (win.closed) {
+        if (!win || win.closed) {
             this.logger?.trace(`${windowId} detected as closed, checking if frame and processing close`);
             this.framesController.handleFrameDisappeared(windowId);
         }
@@ -144,19 +144,11 @@ export class WorkspacesController implements LibController {
 
     public handleWorkspaceEvent(data: WorkspaceEventPayload): void {
         this.glueController.pushWorkspacesMessage(data);
-        this.handleWorkspaceEventCore(data);
-    }
 
-    public subscribeForFrameEvent(callback: (data: WorkspaceEventPayload) => void) {
-        return this.registry.add("frame", callback);
-    }
+        if (this.settings.hibernation) {
+            this.hibernationWatcher.notifyEvent(data);
+        }
 
-    public subscribeForWorkspaceEvent(callback: (data: WorkspaceEventPayload) => void) {
-        return this.registry.add("workspace", callback);
-    }
-
-    public subscribeForWindowEvent(callback: (data: WorkspaceEventPayload) => void) {
-        return this.registry.add("window", callback);
     }
 
     public async closeItem(config: SimpleItemConfig, commandId: string): Promise<void> {
@@ -625,7 +617,6 @@ export class WorkspacesController implements LibController {
 
         const frame = await this.framesController.getFrameInstance({ frameId: config.itemId });
 
-
         const moveConfig: WindowMoveResizeConfig = {
             windowId: config.itemId,
             top: config.top,
@@ -636,10 +627,6 @@ export class WorkspacesController implements LibController {
         await this.glueController.callWindow<WindowMoveResizeConfig, void>(this.ioc.windowsController.moveResizeOperation, moveConfig, frame.windowId);
 
         this.logger?.trace(`[${commandId}] frame with id ${frame.windowId} was successfully moved, responding to caller`);
-    }
-
-    private handleWorkspaceEventCore(data: WorkspaceEventPayload) {
-        this.registry.execute(data.type, data);
     }
 
     private applyDefaults(config: Glue42WebPlatform.Workspaces.Config): Glue42WebPlatform.Workspaces.Config {

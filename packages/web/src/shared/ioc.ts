@@ -13,7 +13,7 @@ import { LayoutsController } from "../layouts/controller";
 import { NotificationsController } from "../notifications/controller";
 import { IntentsController } from "../intents/controller";
 import { ChannelsController } from "../channels/controller";
-
+import { SystemController } from "../system/controller";
 
 export class IoC {
     private _windowsControllerInstance!: WindowsController;
@@ -22,6 +22,7 @@ export class IoC {
     private _notificationsControllerInstance!: NotificationsController;
     private _intentsControllerInstance!: IntentsController;
     private _channelsControllerInstance!: ChannelsController;
+    private _systemControllerInstance!: SystemController;
     private _bridgeInstance!: GlueBridge;
 
     public controllers: { [key in LibDomains]: LibController } = {
@@ -30,7 +31,8 @@ export class IoC {
         layouts: this.layoutsController,
         notifications: this.notificationsController,
         intents: this.intentsController,
-        channels: this.channelsController
+        channels: this.channelsController,
+        system: this.systemController
     }
 
     constructor(private readonly coreGlue: Glue42Core.GlueCore) { }
@@ -73,6 +75,14 @@ export class IoC {
         }
 
         return this._intentsControllerInstance;
+    }
+
+    public get systemController(): SystemController {
+        if (!this._systemControllerInstance) {
+            this._systemControllerInstance = new SystemController();
+        }
+
+        return this._systemControllerInstance;
     }
 
     public get channelsController(): ChannelsController {

@@ -13,8 +13,10 @@ export class SessionStorageController {
     private readonly nonGlueNamespace = "g42_core_nonglue";
     private readonly workspaceWindowsNamespace = "g42_core_workspace_clients";
     private readonly workspaceFramesNamespace = "g42_core_workspace_frames";
+    private readonly workspaceHibernationNamespace = "g42_core_workspace_hibernation";
     private readonly layoutNamespace = "g42_core_layouts";
     private readonly appDefsNamespace = "g42_core_app_definitions";
+    private readonly appDefsInmemoryNamespace = "g42_core_app_definitions_inmemory";
 
     constructor() {
         this.sessionStorage = window.sessionStorage;
@@ -27,7 +29,9 @@ export class SessionStorageController {
             this.workspaceWindowsNamespace,
             this.workspaceFramesNamespace,
             this.layoutNamespace,
-            this.appDefsNamespace
+            this.appDefsNamespace,
+            this.workspaceHibernationNamespace,
+            this.appDefsInmemoryNamespace
         ].forEach((namespace) => {
             const data = this.sessionStorage.getItem(namespace);
 
@@ -41,23 +45,66 @@ export class SessionStorageController {
         return logger.get("session.storage");
     }
 
-    public getAllApps(): BaseApplicationData[] {
-        const appsString = JSON.parse(this.sessionStorage.getItem(this.appDefsNamespace) as string);
+    public getTimeout(workspaceId: string): number | undefined {
+        const timers: Array<{ workspaceId: string; timeout: number }> = JSON.parse(this.sessionStorage.getItem(this.workspaceHibernationNamespace) as string);
+
+        return timers.find((timer) => timer.workspaceId === workspaceId)?.timeout;
+    }
+
+    public removeTimeout(workspaceId: string): void {
+        const timers: Array<{ workspaceId: string; timeout: number }> = JSON.parse(this.sessionStorage.getItem(this.workspaceHibernationNamespace) as string);
+
+        const timer = timers.find((timer) => timer.workspaceId === workspaceId);
+
+        if (timer) {
+            this.sessionStorage.setItem(this.workspaceHibernationNamespace, JSON.stringify(timers.filter((timer) => timer.workspaceId !== workspaceId)));
+        }
+
+    }
+
+    public saveTimeout(workspaceId: string, timeout: number): void {
+        const allData: Array<{ workspaceId: string; timeout: number }> = JSON.parse(this.sessionStorage.getItem(this.workspaceHibernationNamespace) as string);
+
+        if (allData.some((data) => data.workspaceId === workspaceId)) {
+            return;
+        }
+
+        allData.push({ workspaceId, timeout });
+
+        this.sessionStorage.setItem(this.workspaceHibernationNamespace, JSON.stringify(allData));
+    }
+
+    public exportClearTimeouts(): Array<{ workspaceId: string; timeout: number }> {
+        const timers: Array<{ workspaceId: string; timeout: number }> = JSON.parse(this.sessionStorage.getItem(this.workspaceHibernationNamespace) as string);
+
+        this.sessionStorage.setItem(this.workspaceHibernationNamespace, JSON.stringify([]));
+
+        return timers;
+    }
+
+    public getAllApps(type: "remote" | "inmemory"): BaseApplicationData[] {
+        const namespace = type === "remote" ? this.appDefsNamespace : this.appDefsInmemoryNamespace;
+
+        const appsString = JSON.parse(this.sessionStorage.getItem(namespace) as string);
 
         return appsString;
     }
 
-    public overwriteApps(apps: BaseApplicationData[]): void {
-        this.sessionStorage.setItem(this.appDefsNamespace, JSON.stringify(apps));
+    public overwriteApps(apps: BaseApplicationData[], type: "remote" | "inmemory"): void {
+        const namespace = type === "remote" ? this.appDefsNamespace : this.appDefsInmemoryNamespace;
+
+        this.sessionStorage.setItem(namespace, JSON.stringify(apps));
     }
 
-    public removeApp(name: string): BaseApplicationData | undefined {
-        const all = this.getAllApps();
+    public removeApp(name: string, type: "remote" | "inmemory"): BaseApplicationData | undefined {
+        const namespace = type === "remote" ? this.appDefsNamespace : this.appDefsInmemoryNamespace;
+
+        const all = this.getAllApps(type);
 
         const app = all.find((app) => app.name === name);
 
         if (app) {
-            this.sessionStorage.setItem(this.appDefsNamespace, JSON.stringify(all.filter((a) => a.name !== name)));
+            this.sessionStorage.setItem(namespace, JSON.stringify(all.filter((a) => a.name !== name)));
         }
 
         return app;
@@ -83,6 +130,10 @@ export class SessionStorageController {
         allData.push(frameData);
 
         this.sessionStorage.setItem(this.workspaceFramesNamespace, JSON.stringify(allData));
+    }
+
+    public getPlatformFrame(): FrameSessionData | undefined {
+        return this.getAllFrames().find((frame) => frame.isPlatform);
     }
 
     public getAllFrames(): FrameSessionData[] {

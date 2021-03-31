@@ -9,11 +9,19 @@ function resolveAfter<T>(ms: number = 0, result?: T): Promise<T> {
 
 export function rejectAfter<T>(ms: number = 0, promise: Promise<T>, error?: T): Promise<T> {
     let timeout: any;
-    promise.finally(() => {
+    const clearTimeoutIfThere = () => {
         if (timeout) {
             clearTimeout(timeout);
         }
-    });
+    };
+    promise
+        .then(() => {
+            clearTimeoutIfThere();
+        })
+        .catch(() => {
+            clearTimeoutIfThere();
+        });
+
     return new Promise((resolve, reject) => {
         timeout = setTimeout(() => reject(error), ms);
     });

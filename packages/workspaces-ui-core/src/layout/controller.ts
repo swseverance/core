@@ -519,6 +519,16 @@ export class LayoutController {
             hibernationIcon?.remove();
         }
     }
+    public refreshWorkspaceSize(workspaceId: string) {
+        const workspaceContainer = document.getElementById(`nestHere${workspaceId}`);
+        const workspace = store.getById(workspaceId);
+
+        if (workspaceContainer && workspace.layout) {
+            const bounds = getElementBounds(workspaceContainer);
+
+            workspace.layout.updateSize(bounds.width, bounds.height);
+        }
+    }
 
     public enableWorkspaceDrop(workspaceId: string, workspaceDropOptions: WorkspaceDropOptions) {
         const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
@@ -885,6 +895,12 @@ export class LayoutController {
 
         const layoutContainer = $(`#nestHere${id}`);
 
+        const resizeObserver = new ResizeObserver(() => {
+            this.emitter.raiseEvent("workspace-container-resized", { workspaceId: id });
+        });
+
+        resizeObserver.observe(layoutContainer[0]);
+
         layout.on("initialised", () => {
             const allWindows = getAllWindowsFromConfig(layout.toConfig().content);
 
@@ -1218,7 +1234,9 @@ export class LayoutController {
             const currLayout = store.getById(id).layout;
             if (currLayout) {
                 // The size must be passed in order to handle resizes like maximize of the browser
-                currLayout.updateSize($(item.element).width(), $(item.element).height());
+                const containerElement = $(`#nestHere${id}`);
+                const bounds = getElementBounds(containerElement[0]);
+                currLayout.updateSize(bounds.width, bounds.height);
             }
         }, id);
     }

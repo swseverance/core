@@ -10,11 +10,14 @@ import { LibDomains } from "./types";
 export const nonEmptyStringDecoder: Decoder<string> = string().where((s) => s.length > 0, "Expected a non-empty string");
 export const nonNegativeNumberDecoder: Decoder<number> = number().where((num) => num >= 0, "Expected a non-negative number");
 
-export const libDomainDecoder: Decoder<LibDomains> = oneOf<"windows" | "appManager" | "layouts" | "intents">(
+export const libDomainDecoder: Decoder<LibDomains> = oneOf<"system" | "windows" | "appManager" | "layouts" | "intents" | "notifications" | "channels">(
+    constant("system"),
     constant("windows"),
     constant("appManager"),
     constant("layouts"),
-    constant("intents")
+    constant("intents"),
+    constant("notifications"),
+    constant("channels")
 );
 
 export const windowOperationTypesDecoder: Decoder<WindowOperationTypes> = oneOf<"openWindow" | "getBounds" | "windowHello" | "windowAdded" | "windowRemoved" | "getUrl" | "moveResize" | "focus" | "close" | "getTitle" | "setTitle">(

@@ -8,6 +8,8 @@ import { getWorkspaceContextName } from "./utils";
 import { WorkspacesConfigurationFactory } from "./config/factory";
 import { ConfigConverter } from "./config/converter";
 
+declare const window: Window & { glue42core: { workspacesFrameCache?: boolean } };
+
 export class LayoutsManager {
     private _initialWorkspaceConfig: GoldenLayout.Config;
     private readonly _layoutsType = "Workspace";
@@ -73,6 +75,10 @@ export class LayoutsManager {
     }
 
     public getLastSession() {
+        const workspacesFrameCache = window.glue42core?.workspacesFrameCache ?? true;
+        if (!workspacesFrameCache) {
+            return;
+        }
         const workspacesFrame = storage.get(storage.LAST_SESSION_KEY) || [];
         const rendererFriendlyFrameConfig = workspacesFrame.map((wc: WorkspaceItem) => {
             this.addWorkspaceIds(wc);
@@ -114,7 +120,7 @@ export class LayoutsManager {
     }
 
     public async save(options: SaveWorkspaceConfig): Promise<WorkspaceLayout> {
-        const { workspace, title, name, saveContext } = options;
+        const { workspace, name, saveContext } = options;
         if (!workspace.layout && !workspace.hibernateConfig) {
             throw new Error("An empty layout cannot be saved");
         }
@@ -123,9 +129,11 @@ export class LayoutsManager {
 
         const workspaceConfig = await this.saveWorkspaceCore(workspace);
 
-        if (title) {
-            workspaceConfig.config.title = title;
+        // Its superfluous to add the title to the layout since its never used
+        if (workspaceConfig.config.title) {
+            delete workspaceConfig.config.title;
         }
+
         let workspaceContext = undefined;
 
         if (saveContext) {
@@ -162,6 +170,11 @@ export class LayoutsManager {
         workspace.layout.config.workspacesOptions.name = name;
         const workspaceConfig = await this.saveWorkspaceCore(workspace);
 
+        // Its superfluous to add the title to the layout since its never used
+        if (workspaceConfig.config.title) {
+            delete workspaceConfig.config.title;
+        }
+
         return {
             name,
             type: this._layoutsType as "Workspace",
@@ -177,6 +190,10 @@ export class LayoutsManager {
     }
 
     public async saveWorkspacesFrame(workspaces: Workspace[]) {
+        const workspacesFrameCache = window.glue42core?.workspacesFrameCache ?? true;
+        if (!workspacesFrameCache) {
+            return;
+        }
         const configPromises = workspaces.map((w) => {
             return this.saveWorkspaceCoreSync(w);
         });
