@@ -580,7 +580,6 @@ export class WorkspacesController implements LibController {
 
         const frame = await this.framesController.getFrameInstance({ frameId: config.itemId });
 
-
         const moveConfig: WindowMoveResizeConfig = {
             windowId: config.itemId,
             top: config.top,
@@ -591,10 +590,6 @@ export class WorkspacesController implements LibController {
         await this.glueController.callWindow<WindowMoveResizeConfig, void>(this.ioc.windowsController.moveResizeOperation, moveConfig, frame.windowId);
 
         this.logger?.trace(`[${commandId}] frame with id ${frame.windowId} was successfully moved, responding to caller`);
-    }
-
-    private handleWorkspaceEventCore(data: WorkspaceEventPayload) {
-        this.registry.execute(data.type, data);
     }
 
     private applyDefaults(config: Glue42WebPlatform.Workspaces.Config): Glue42WebPlatform.Workspaces.Config {
