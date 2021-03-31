@@ -10,8 +10,8 @@
         "build:dev": "rollup --config ./rollup.config.js",
         "build:all": "npm run build:dev && cd ../workspaces-ui-react && npm run build && cd ../../templates/workspaces-react && npm run build",
         "test": "cross-env TS_NODE_PROJECT=./tsconfig.test.json mocha -r ts-node/register test/**/*.spec.ts",
-        "audit": "node ../../scripts/audit/index.js",
         "preversion": "npm run build && npm run test && npm run audit",
+        "audit": "node ../../scripts/audit/index.js",
         "version": "npm run build"
     },
     "publishConfig": {

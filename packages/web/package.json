@@ -22,9 +22,9 @@
         "publish:beta": "npm publish --tag beta",
         "build": "rollup -c",
         "generate-docs-new-structure": "glue-js-documentation-builder build-reference --project g4e -q reference --modules ./web.d.ts,./node_modules/@glue42/workspaces-api/workspaces.d.ts,./node_modules/@glue42/core/glue.d.ts --newStructure --ignoreModules Connection,Bus,Metrics,Logger",
-        "audit": "node ../../scripts/audit/index.js",
         "preversion": "npm run build && npm run test && npm run audit",
-        "version": "npm run build"
+        "version": "npm run build",
+        "audit": "node ../../scripts/audit/index.js"
     },
     "author": {
         "name": "Glue42",

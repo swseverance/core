@@ -734,6 +734,17 @@ export class WorkspacesManager {
             return this.eject(item);
         });
 
+        const resizedTimeouts: { [id: string]: NodeJS.Timeout } = {};
+        this._controller.emitter.onWorkspaceContainerResized((workspaceId) => {
+            const id = idAsString(workspaceId);
+            if (resizedTimeouts[id]) {
+                clearTimeout(resizedTimeouts[id]);
+            }
+            resizedTimeouts[id] = setTimeout(() => {
+                this._controller.refreshWorkspaceSize(id);
+            }, 16); // 60 FPS
+        });
+
         // debouncing because there is potential for 1ms spam
         let shownTimeout: NodeJS.Timeout = undefined;
         componentStateMonitor.onWorkspaceContentsShown((workspaceId: string) => {
@@ -742,7 +753,7 @@ export class WorkspacesManager {
                 return;
             }
             if (shownTimeout) {
-                clearTimeout(resizedTimeout);
+                clearTimeout(shownTimeout);
             }
 
             shownTimeout = setTimeout(() => {
@@ -772,26 +783,6 @@ export class WorkspacesManager {
             }
 
             workspace.lastActive = Date.now();
-        });
-
-        // debouncing because there is potential for 1ms spam
-        let resizedTimeout: NodeJS.Timeout = undefined;
-        componentStateMonitor.onWorkspaceContentsResized((workspaceId: string) => {
-            const workspace = store.getActiveWorkspace();
-            if (!workspace.layout || workspaceId !== workspace.id) {
-                return;
-            }
-
-            if (resizedTimeout) {
-                clearTimeout(resizedTimeout);
-            }
-
-            resizedTimeout = setTimeout(() => {
-                const containerElement = $(`#nestHere${workspace.id}`);
-                const bounds = getElementBounds(containerElement[0]);
-                workspace.layout.updateSize(bounds.width, bounds.height);
-            }, 50);
-
         });
     }
 
