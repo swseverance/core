@@ -1,3 +1,5 @@
+5.4.5
+fix: resolved dependency vulnerabilities
 5.4.4
 fix: metrics - use applicationName for service
 5.4.3
