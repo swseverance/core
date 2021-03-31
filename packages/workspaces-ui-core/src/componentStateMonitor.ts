@@ -1,5 +1,6 @@
 import { ComponentFactory, DecoratedComponentFactory, VisibilityState } from "./types/internal";
 import createRegistry from "callback-registry";
+const ResizeObserver = require("resize-observer-polyfill").default || require("resize-observer-polyfill");
 
 class ComponentStateMonitor {
 
@@ -58,6 +59,7 @@ class ComponentStateMonitor {
                 this.visibilityState.workspaceContents.push([...args]);
 
                 this.subscribeForWorkspaceContentsVisibility(args[0]?.workspaceId);
+                this.subscribeForWorkspaceContentsResize(args[0]?.workspaceId);
                 return componentsFactory.createWorkspaceContents(...args);
             };
         }
@@ -93,6 +95,10 @@ class ComponentStateMonitor {
         this.callbackRegistry.add("workspace-contents-hidden", callback);
     }
 
+    public onWorkspaceContentsResized(callback: (workspaceId: string) => void) {
+        this.callbackRegistry.add("workspace-contents-resized", callback);
+    }
+
     private subscribeForWorkspaceContentsVisibility(workspaceId: string) {
         const contentsElement = document.getElementById(`nestHere${workspaceId}`);
         if (!contentsElement) {
@@ -102,6 +108,18 @@ class ComponentStateMonitor {
             attributes: true,
             attributeFilter: ["style"]
         });
+    }
+
+    private subscribeForWorkspaceContentsResize(workspaceId: string) {
+        const contentsElement = document.getElementById(`nestHere${workspaceId}`);
+        if (!contentsElement) {
+            return;
+        }
+        const resizeObserver = new ResizeObserver(() => {
+            this.callbackRegistry.execute("workspace-contents-resized", workspaceId);
+        });
+
+        resizeObserver.observe(contentsElement);
     }
 
     private getWorkspaceIdFromContents(element: HTMLElement) {

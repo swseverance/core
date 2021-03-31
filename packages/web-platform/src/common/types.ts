@@ -6,7 +6,7 @@ import { Glue42WebPlatform } from "../../platform";
 
 export type Glue42API = Glue42.Glue;
 export type Glue42Config = Glue42.Config;
-export type LibDomains = "windows" | "appManager" | "layouts" | "workspaces" | "intents" | "channels";
+export type LibDomains = "system" | "windows" | "appManager" | "layouts" | "workspaces" | "intents" | "channels";
 
 export interface InternalWindowsConfig {
     windowResponseTimeoutMs: number;
@@ -15,6 +15,7 @@ export interface InternalWindowsConfig {
 
 export interface InternalApplicationsConfig {
     local: Array<Glue42Web.AppManager.Definition | Glue42WebPlatform.Applications.FDC3Definition>;
+    remote?: Glue42WebPlatform.RemoteStore;
 }
 
 export interface InternalLayoutsConfig {
@@ -36,6 +37,7 @@ export interface InternalPlatformConfig {
         definitions: Glue42WebPlatform.Plugins.PluginDefinition[];
     };
     workspaces?: Glue42WebPlatform.Workspaces.Config;
+    environment: any;
 }
 
 export interface CoreClientData {
@@ -45,7 +47,7 @@ export interface CoreClientData {
 
 export interface LibController {
     start(config: InternalPlatformConfig): Promise<void>;
-    handleControl(args: any): Promise<void>;
+    handleControl(args: any): Promise<any>;
     handleClientUnloaded?(windowId: string, win: Window): void;
 }
 
@@ -86,4 +88,10 @@ export interface ApplicationStartConfig {
     relativeTo?: string;
     relativeDirection?: "top" | "left" | "right" | "bottom";
     waitForAGMReady?: boolean;
+}
+
+export type SystemOperationTypes = "getEnvironment" | "getBase";
+
+export interface ControlMessage extends Glue42WebPlatform.Plugins.ControlMessage {
+    commandId?: string;
 }

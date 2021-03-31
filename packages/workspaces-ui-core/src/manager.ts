@@ -98,6 +98,11 @@ export class WorkspacesManager {
     }
 
     public subscribeForWindowClicked = (cb: () => void) => {
+        if (!this._frameController) {
+            // tslint:disable-next-line: no-console
+            console.warn("Your subscription to window clicked wasn't successful, because the Workspaces library isn't initialized yet");
+            return () => { };
+        }
         return this._frameController.onFrameContentClicked(cb);
     }
 
@@ -131,9 +136,7 @@ export class WorkspacesManager {
             savedConfig.workspacesOptions.context = options?.context;
         }
 
-        if (options?.title) {
-            (savedConfig.workspacesOptions as WorkspaceOptionsWithTitle).title = options?.title;
-        }
+        (savedConfig.workspacesOptions as WorkspaceOptionsWithTitle).title = options?.title || name;
 
         if (savedConfig && savedConfig.workspacesOptions && !savedConfig.workspacesOptions.name) {
             savedConfig.workspacesOptions.name = name;
@@ -343,6 +346,7 @@ export class WorkspacesManager {
                     clearTimeout(timeout);
                 }
             });
+
             const win = this._glue.windows.list().find((w) => w.id === windowId);
 
             if (win) {
@@ -419,7 +423,6 @@ export class WorkspacesManager {
         if (!workspace) {
             throw new Error(`Could not find workspace ${workspaceId} in any of the frames`);
         }
-
         const hibernatedConfig = workspace.hibernateConfig;
 
         if (!hibernatedConfig.workspacesOptions) {
@@ -539,55 +542,6 @@ export class WorkspacesManager {
         }
     }
 
-    private subscribeForComponentSelectedAndVisible(
-        componentId: string,
-        workspaceId: string,
-        callback: (componentId: string, workspaceId: string) => void) {
-        let unsubWspClosed: UnsubscribeFunction;
-        let unsubWindowClosed: UnsubscribeFunction;
-        let unsubComponentSelection: UnsubscribeFunction;
-        let unsubWorkspaceSelection: UnsubscribeFunction;
-
-        const cleanUp = () => {
-            if (unsubWspClosed) {
-                unsubWspClosed();
-            }
-
-            if (unsubComponentSelection) {
-                unsubComponentSelection();
-            }
-
-            if (unsubWorkspaceSelection) {
-                unsubWorkspaceSelection();
-            }
-        };
-
-        unsubWindowClosed = this.workspacesEventEmitter.onWindowEvent((action, payload) => {
-            if (action === "removed" && payload.windowSummary.itemId === idAsString(componentId)) {
-                cleanUp();
-            }
-        });
-
-        unsubWspClosed = this.workspacesEventEmitter.onWorkspaceEvent((action, payload) => {
-            if (action === "closed" && payload.workspaceSummary.id === workspaceId) {
-                cleanUp();
-            }
-        });
-
-        unsubComponentSelection = this._controller.emitter.onComponentSelectedInWorkspace((component, selectedWorkspace) => {
-            if (selectedWorkspace === workspaceId && idAsString(component.config.id) === componentId) {
-                callback(componentId, workspaceId);
-            }
-        });
-
-        unsubWorkspaceSelection = this._controller.emitter.onWorkspaceSelectionChanged((selectedWorkspace) => {
-            if (selectedWorkspace.id === workspaceId) {
-                callback(componentId, workspaceId);
-            }
-        });
-
-        return () => cleanUp();
-    }
 
     private async reinitializeWorkspace(id: string, config: GoldenLayout.Config) {
         await this._controller.reinitializeWorkspace(id, config);
@@ -821,14 +775,22 @@ export class WorkspacesManager {
             this._applicationFactory.start(component, workspaceId);
         });
 
+        // debouncing because there is potential for 1ms spam
+        let shownTimeout: NodeJS.Timeout = undefined;
         componentStateMonitor.onWorkspaceContentsShown((workspaceId: string) => {
             const workspace = store.getActiveWorkspace();
             if (!workspace?.layout || workspaceId !== workspace.id) {
                 return;
             }
-            const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
-            const bounds = getElementBounds(workspaceContentItem.element);
-            workspace.layout.updateSize(bounds.width, bounds.height);
+            if (shownTimeout) {
+                clearTimeout(shownTimeout);
+            }
+
+            shownTimeout = setTimeout(() => {
+                const containerElement = $(`#nestHere${workspace.id}`);
+                const bounds = getElementBounds(containerElement[0]);
+                workspace.layout.updateSize(bounds.width, bounds.height);
+            }, 50);
             const stacks = workspace.layout.root.getItemsByFilter((e) => e.type === "stack");
 
             this._frameController.selectionChangedDeep(stacks.map(s => idAsString(s.getActiveContentItem().config.id)), []);
@@ -851,6 +813,26 @@ export class WorkspacesManager {
             }
 
             workspace.lastActive = Date.now();
+        });
+
+        // debouncing because there is potential for 1ms spam
+        let resizedTimeout: NodeJS.Timeout = undefined;
+        componentStateMonitor.onWorkspaceContentsResized((workspaceId: string) => {
+            const workspace = store.getActiveWorkspace();
+            if (!workspace.layout || workspaceId !== workspace.id) {
+                return;
+            }
+
+            if (resizedTimeout) {
+                clearTimeout(resizedTimeout);
+            }
+
+            resizedTimeout = setTimeout(() => {
+                const containerElement = $(`#nestHere${workspace.id}`);
+                const bounds = getElementBounds(containerElement[0]);
+                workspace.layout.updateSize(bounds.width, bounds.height);
+            }, 50);
+
         });
     }
 
@@ -1016,24 +998,28 @@ export class WorkspacesManager {
     private checkForEmptyWorkspace(workspace: Workspace): boolean {
         // Closing all workspaces except the last one
         if (store.layouts.length === 1) {
-            try {
-                if (this._isLayoutInitialized) {
+            if (this._isLayoutInitialized && (window as any).glue42core.isPlatformFrame) {
+                workspace.windows = [];
+                workspace.layout?.destroy();
+                workspace.layout = undefined;
+                this._controller.showAddButton(workspace.id);
+                const currentTitle = store.getWorkspaceTitle(workspace.id);
+                const title = this._configFactory.getWorkspaceTitle(store.workspaceTitles.filter((wt) => wt !== currentTitle));
+                this._controller.setWorkspaceTitle(workspace.id, title);
+
+                return true;
+            } else if (this._isLayoutInitialized) {
+                try {
                     this._facade.executeAfterControlIsDone(() => {
                         window.close();
                     });
-                    return true;
+                } catch (error) {
+                    // Try to close my window if it fails fallback to frame with one empty workspace
                 }
-            } catch (error) {
-                console.log("ERROR", error);
-                // Try to close my window if it fails fallback to frame with one empty workspace
+
+                return true;
             }
-            workspace.windows = [];
-            workspace.layout?.destroy();
-            workspace.layout = undefined;
-            this._controller.showAddButton(workspace.id);
-            const currentTitle = store.getWorkspaceTitle(workspace.id);
-            const title = this._configFactory.getWorkspaceTitle(store.workspaceTitles.filter((wt) => wt !== currentTitle));
-            this._controller.setWorkspaceTitle(workspace.id, title);
+
         } else {
             this._controller.removeWorkspace(workspace.id);
         }
@@ -1058,6 +1044,12 @@ export class WorkspacesManager {
                     unsub();
                 }
             });
+
+            if (this.stateResolver.isWindowLoaded(itemId)) {
+                res();
+                clearTimeout(timeout);
+                unsub();
+            }
         });
     }
 }

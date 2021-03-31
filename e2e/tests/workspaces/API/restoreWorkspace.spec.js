@@ -399,6 +399,12 @@ describe('restoreWorkspace() Should', function () {
             expect(secondWorkspace.title).to.eql(testTitle);
         });
 
+        it("set the title to the layoutName when a title isn't passed", async () => {
+            const workspace = await glue.workspaces.restoreWorkspace(layoutName);
+
+            expect(workspace.title).to.eql(layoutName);
+        });
+
         it("resolve when there are multiple frames opened and one of the middle ones (by starting order) contains the target workspace", async () => {
             const workspaceTwo = await glue.workspaces.restoreWorkspace(layoutName, { newFrame: true });
             const workspaceThree = await glue.workspaces.restoreWorkspace(layoutName, { newFrame: true });

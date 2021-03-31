@@ -74,7 +74,9 @@ export class WorkspacesController implements LibController {
 
         this.settings = this.applyDefaults(config.workspaces);
 
-        this.hibernationWatcher.start(this, this.settings.hibernation);
+        if (this.settings.hibernation) {
+            this.hibernationWatcher.start(this, this.settings.hibernation);
+        }
 
         await Promise.all([
             this.glueController.createWorkspacesStream(),
@@ -92,7 +94,7 @@ export class WorkspacesController implements LibController {
         return logger.get("workspaces.controller");
     }
 
-    public async handleControl(args: any): Promise<void> {
+    public async handleControl(args: any): Promise<any> {
         if (!this.started) {
             throw new Error("Cannot handle this workspaces control message, because the controller has not been started");
         }
@@ -133,7 +135,7 @@ export class WorkspacesController implements LibController {
     public handleClientUnloaded(windowId: string, win: Window): void {
         this.logger?.trace(`handling unloading of ${windowId}`);
 
-        if (win.closed) {
+        if (!win || win.closed) {
             this.logger?.trace(`${windowId} detected as closed, checking if frame and processing close`);
             this.framesController.handleFrameDisappeared(windowId);
         }
@@ -141,19 +143,11 @@ export class WorkspacesController implements LibController {
 
     public handleWorkspaceEvent(data: WorkspaceEventPayload): void {
         this.glueController.pushWorkspacesMessage(data);
-        this.handleWorkspaceEventCore(data);
-    }
 
-    public subscribeForFrameEvent(callback: (data: WorkspaceEventPayload) => void) {
-        return this.registry.add("frame", callback);
-    }
+        if (this.settings.hibernation) {
+            this.hibernationWatcher.notifyEvent(data);
+        }
 
-    public subscribeForWorkspaceEvent(callback: (data: WorkspaceEventPayload) => void) {
-        return this.registry.add("workspace", callback);
-    }
-
-    public subscribeForWindowEvent(callback: (data: WorkspaceEventPayload) => void) {
-        return this.registry.add("window", callback);
     }
 
     public async closeItem(config: SimpleItemConfig, commandId: string): Promise<void> {

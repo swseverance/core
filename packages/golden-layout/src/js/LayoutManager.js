@@ -297,8 +297,8 @@ lm.utils.copy(lm.LayoutManager.prototype, {
 			this.root.callDownwards('setSize', [this.width, this.height]);
 
 			if (this._maximizedItem) {
-				this._maximizedItem.element.width(width);
-				this._maximizedItem.element.height(height);
+				this._maximizedItem.element.width(this.width);
+				this._maximizedItem.element.height(this.height);
 				this._maximizedItem.callDownwards('setSize');
 			}
 

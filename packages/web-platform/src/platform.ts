@@ -41,16 +41,9 @@ export class Platform {
     private checkSingleton(): void {
         const glue42CoreNamespace = (window as any).glue42core;
 
-        if (!glue42CoreNamespace) {
-            (window as any).glue42core = { platformStarted: true };
-            return;
-        }
-
-        if (glue42CoreNamespace.platformStarted) {
+        if (glue42CoreNamespace && glue42CoreNamespace.platformStarted) {
             throw new Error("The Glue42 Core Platform has already been started for this application.");
         }
-
-        glue42CoreNamespace.platformStarted = true;
     }
 
     private processConfig(config: Glue42WebPlatform.Config = {}): void {
@@ -59,6 +52,15 @@ export class Platform {
         this.validatePlugins(verifiedConfig);
 
         this.platformConfig = deepMerge<InternalPlatformConfig>(defaultPlatformConfig, verifiedConfig as any);
+
+        const glue42core = {
+            platformStarted: true,
+            isPlatformFrame: !!config?.workspaces?.isFrame,
+            environment: this.platformConfig.environment,
+            workspacesFrameCache: typeof config.workspaces?.frameCache === "boolean" ? config.workspaces?.frameCache : true
+        };
+
+        (window as any).glue42core = glue42core;
     }
 
     private validatePlugins(verifiedConfig: Glue42WebPlatform.Config): void {

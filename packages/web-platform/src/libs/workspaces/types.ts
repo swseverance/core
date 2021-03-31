@@ -73,6 +73,7 @@ export interface FrameInstance {
 export interface FrameSessionData {
     windowId: string;
     active: boolean;
+    isPlatform: boolean;
 }
 
 // #region incoming

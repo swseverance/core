@@ -48,7 +48,7 @@ export class LayoutsController implements LibController {
         this.logger?.trace("initialization is completed");
     }
 
-    public async handleControl(args: any): Promise<void> {
+    public async handleControl(args: any): Promise<any> {
         if (!this.started) {
             new Error("Cannot handle this windows control message, because the controller has not been started");
         }

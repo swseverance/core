@@ -319,7 +319,9 @@ export class ApplicationFactory {
 
             const newlyOpenedWindow = this._glue.windows.findById(windowId);
             newlyOpenedWindow.getTitle().then((winTitle) => {
-                component.setTitle(winTitle);
+                if (this.vaidateTitle(windowTitle)) {
+                    component.setTitle(winTitle);
+                }
             }).catch((e) => {
                 console.warn("Failed while setting the window title", e);
             });

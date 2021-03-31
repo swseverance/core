@@ -155,7 +155,7 @@ const GlueCore = (userConfig?: Glue42Core.Config, ext?: Glue42Core.Extension): P
             logger: _logger.subLogger("metrics"),
             canUpdateMetric,
             system: "Glue42",
-            service: identity?.service ?? internalConfig.application,
+            service: identity?.service ?? glue42gd?.applicationName ?? internalConfig.application,
             instance: identity?.instance ?? identity?.windowId ?? shortid(),
             disableAutoAppSystem,
             pagePerformanceMetrics: typeof config !== "boolean" ? config?.pagePerformanceMetrics : undefined

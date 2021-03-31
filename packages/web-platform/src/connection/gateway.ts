@@ -27,7 +27,7 @@ export class Gateway {
             });
         }
 
-        this._gatewayWebInstance = this.create({});
+        this._gatewayWebInstance = this.create({ clients: { inactive_seconds: 0 } });
 
         await this._gatewayWebInstance.start();
     }
@@ -39,7 +39,14 @@ export class Gateway {
         clientPort.onmessage = (event): void => {
             const data = event.data?.glue42core;
 
+            if ((clientPort as any).closed) {
+                return;
+            }
+
             if (data && data.type === Glue42CoreMessageTypes.clientUnload.name) {
+
+                (clientPort as any).closed = true;
+
                 if (removeFromPlatform) {
                     removeFromPlatform(data.data.clientId);
                 }

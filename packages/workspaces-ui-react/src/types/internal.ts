@@ -28,8 +28,9 @@ export interface WorkspacesWrapperProps {
   glue?: any;
 }
 
-export interface WorkspaceContentsProps {
+export interface WorkspaceContentsProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   workspaceId: string;
+  containerElement?: HTMLElement;
 }
 
 export interface CreateWorkspaceContentsRequestOptions extends CreateElementRequestOptions {

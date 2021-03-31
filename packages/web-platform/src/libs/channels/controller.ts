@@ -26,7 +26,7 @@ export class ChannelsController implements LibController {
         this.logger?.trace("initialization is completed");
     }
 
-    public async handleControl(): Promise<void> {
+    public async handleControl(): Promise<any> {
         // noop
     }
 

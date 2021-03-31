@@ -2,7 +2,7 @@
 import GlueCore, { Glue42Core } from "@glue42/core";
 import GlueWeb, { Glue42Web, Glue42WebFactoryFunction } from "@glue42/web";
 import { GlueClientControlName, GlueWebPlatformControlName, GlueWebPlatformStreamName, GlueWebPlatformWorkspacesStreamName, GlueWorkspaceFrameClientControlName } from "../common/constants";
-import { BridgeOperation, InternalPlatformConfig, LibDomains } from "../common/types";
+import { BridgeOperation, ControlMessage, InternalPlatformConfig, LibDomains } from "../common/types";
 import { PortsBridge } from "../connection/portsBridge";
 import { generate } from "shortid";
 import { SessionStorageController } from "./session";
@@ -10,6 +10,7 @@ import logger from "../shared/logger";
 import { PromisePlus } from "../shared/promisePlus";
 import { waitFor } from "../shared/utils";
 import { UnsubscribeFunction } from "callback-registry";
+import { FrameSessionData } from "../libs/workspaces/types";
 
 export class GlueController {
     private _systemGlue!: Glue42Core.GlueCore;
@@ -36,16 +37,10 @@ export class GlueController {
         logger.setLogger(this._systemGlue.logger);
     }
 
-    public async initClientGlue(config?: Glue42Web.Config, factory?: Glue42WebFactoryFunction): Promise<Glue42Web.API> {
+    public async initClientGlue(config?: Glue42Web.Config, factory?: Glue42WebFactoryFunction, isWorkspaceFrame?: boolean): Promise<Glue42Web.API> {
         const port = await this.portsBridge.createInternalClient();
 
-        const platformWindowData = this.sessionStorage.getWindowDataByName("Platform");
-
-        this._platformClientWindowId = platformWindowData ? platformWindowData.windowId : generate();
-
-        if (!platformWindowData) {
-            this.sessionStorage.saveWindowData({ name: "Platform", windowId: this.platformWindowId });
-        }
+        this.registerClientWindow(isWorkspaceFrame);
 
         const webConfig = {
             application: "Platform",
@@ -59,7 +54,7 @@ export class GlueController {
         return this._clientGlue;
     }
 
-    public async createPlatformSystemMethod(handler: (args: unknown, caller: Glue42Web.Interop.Instance, success: (args?: unknown) => void, error: (error?: string | object) => void) => void): Promise<void> {
+    public async createPlatformSystemMethod(handler: (args: ControlMessage, caller: Glue42Web.Interop.Instance, success: (args?: ControlMessage) => void, error: (error?: string | object) => void) => void): Promise<void> {
         await this.createMethodAsync(GlueWebPlatformControlName, handler);
     }
 
@@ -203,7 +198,31 @@ export class GlueController {
         return this._systemGlue.contexts.set(name, data);
     }
 
-    private async createMethodAsync(name: string, handler: (args: unknown, caller: Glue42Web.Interop.Instance, success: (args?: unknown) => void, error: (error?: string | object) => void) => void): Promise<void> {
+    private registerClientWindow(isWorkspaceFrame?: boolean): void {
+
+        if (isWorkspaceFrame) {
+            const platformFrame = this.sessionStorage.getPlatformFrame();
+
+            this._platformClientWindowId = platformFrame ? platformFrame.windowId : generate();
+
+            if (!platformFrame) {
+                const platformFrameData: FrameSessionData = { windowId: this._platformClientWindowId, active: true, isPlatform: true };
+                this.sessionStorage.saveFrameData(platformFrameData);
+            }
+
+            return;
+        }
+
+        const platformWindowData = this.sessionStorage.getWindowDataByName("Platform");
+
+        this._platformClientWindowId = platformWindowData ? platformWindowData.windowId : generate();
+
+        if (!platformWindowData) {
+            this.sessionStorage.saveWindowData({ name: "Platform", windowId: this.platformWindowId });
+        }
+    }
+
+    private async createMethodAsync(name: string, handler: (args: any, caller: Glue42Web.Interop.Instance, success: (args?: any) => void, error: (error?: string | object) => void) => void): Promise<void> {
         await this._systemGlue.interop.registerAsync(name, handler);
     }
 

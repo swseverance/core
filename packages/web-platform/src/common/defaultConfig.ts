@@ -28,9 +28,12 @@ export const defaultPlatformConfig: InternalPlatformConfig = {
             level: "info"
         }
     },
-    glue: {}
+    glue: {},
+    environment: {}
 };
 
 export const defaultTargetString = "*";
 
 export const defaultFetchTimeoutMs = 3000;
+
+export const defaultOpenerTimeoutMs = 1000;

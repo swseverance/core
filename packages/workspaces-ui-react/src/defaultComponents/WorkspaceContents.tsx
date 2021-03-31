@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { WorkspaceContentsProps } from "../types/internal";
 
-const WorkspaceContents: React.FC<WorkspaceContentsProps> = ({ workspaceId }) => {
+const WorkspaceContents: React.FC<WorkspaceContentsProps> = ({ workspaceId, containerElement, ...props }) => {
     const containerRef = React.createRef<HTMLDivElement>();
 
     useEffect(() => {
@@ -25,7 +25,7 @@ const WorkspaceContents: React.FC<WorkspaceContentsProps> = ({ workspaceId }) =>
     }, [workspaceId]);
 
     return (
-        <div style={{ width: "100%", height: "100%" }} ref={containerRef}>
+        <div style={{ width: "100%", height: "100%" }}  {...props} ref={containerRef}>
         </div >
     );
 };

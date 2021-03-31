@@ -20,6 +20,13 @@ export namespace Glue42WebPlatform {
         * @default 3000
          */
         requestTimeout?: number;
+
+        /**
+        * Name-value pairs of headers, which will be appended to every request to the provided url.
+        */
+        customHeaders?: {
+            [key: string]: string;
+        };
     }
 
     export interface Supplier<T> {
@@ -158,6 +165,7 @@ export namespace Glue42WebPlatform {
 
         export interface Config {
             local?: Array<Glue42Web.AppManager.Definition | FDC3Definition>;
+            remote?: RemoteStore;
         }
     }
 
@@ -187,10 +195,23 @@ export namespace Glue42WebPlatform {
 
     export namespace Plugins {
 
+        export interface ControlMessage {
+            domain: "system" | "windows" | "appManager" | "layouts" | "workspaces" | "intents" | "channels";
+            operation: string;
+            data: any;
+            commandId?: string;
+        }
+        
+        export interface PlatformControls {
+            control: (args: ControlMessage) => Promise<any>;
+            logger?: Glue42Web.Logger.API;
+        }
+
         export interface PluginDefinition {
             name: string;
-            config: unknown;
-            start: (glue: Glue42Web.API, config: unknown) => void;
+            start: (glue: Glue42Web.API, config: unknown, platform: PlatformControls) => void;
+            config?: unknown;
+            critical?: boolean;
         }
 
         export interface Config {
@@ -265,6 +286,8 @@ export namespace Glue42WebPlatform {
             src: string;
             hibernation?: HibernationConfig;
             loadingStrategy?: LoadingConfig;
+            isFrame?: boolean;
+            frameCache?: boolean;
         }
     }
 
@@ -285,6 +308,7 @@ export namespace Glue42WebPlatform {
         gateway?: Gateway.Config;
         glue?: Glue42Web.Config;
         workspaces?: Workspaces.Config;
+        environment?: any;
         glueFactory?: (config?: Glue42Web.Config) => Promise<Glue42Web.API>;
     }
 

@@ -76,17 +76,16 @@ export class IFrameController {
         const frame = this._idToFrame[id];
         if (frame) {
             delete this._idToFrame[id];
-            try {
-                frame.contentWindow.dispatchEvent(new Event("beforeunload"));
-            } catch (error) {
-                // tslint:disable-next-line: no-console
-                // console.warn(error);
-            }
-            frame.remove();
-
-            this._registry.execute("frame-removed", id);
+            frame.contentWindow.postMessage({
+                glue42core: {
+                    type: "manualUnload"
+                }
+            }, "*");
+            setImmediate(() => {
+                frame.remove();
+                this._registry.execute("frame-removed", id);
+            });
         }
-
     }
 
     public onFrameLoaded(callback: (frameId: string) => void) {

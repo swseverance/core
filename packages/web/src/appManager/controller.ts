@@ -7,7 +7,7 @@ import { allApplicationDefinitionsDecoder, appManagerOperationTypesDecoder, impo
 import { IoC } from "../shared/ioc";
 import { LibController } from "../shared/types";
 import { WindowHello } from "../windows/protocol";
-import { AppsImportOperation, AppHelloSuccess, ApplicationData, ApplicationStartConfig, AppRemoveConfig, InstanceData, operations, BaseApplicationData, AppsExportOperation, DefinitionParseResult } from "./protocol";
+import { AppsImportOperation, AppHelloSuccess, ApplicationStartConfig, AppRemoveConfig, InstanceData, operations, BaseApplicationData, AppsExportOperation, DefinitionParseResult } from "./protocol";
 import {
     default as CallbackRegistryFactory,
     CallbackRegistry,
@@ -119,7 +119,7 @@ export class AppManagerController implements LibController {
             onInstanceStopped: this.onInstanceStopped.bind(this)
         };
 
-        return Object.freeze(api);
+        return api;
     }
 
     private addOperationsExecutors(): void {
