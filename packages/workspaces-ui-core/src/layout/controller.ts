@@ -492,6 +492,16 @@ export class LayoutController {
             hibernationIcon?.remove();
         }
     }
+    public refreshWorkspaceSize(workspaceId: string) {
+        const workspaceContainer = document.getElementById(`nestHere${workspaceId}`);
+        const workspace = store.getById(workspaceId);
+
+        if (workspaceContainer && workspace.layout) {
+            const bounds = getElementBounds(workspaceContainer);
+
+            workspace.layout.updateSize(bounds.width, bounds.height);
+        }
+    }
 
     private initWorkspaceContents(id: string, config: GoldenLayout.Config | GoldenLayout.ItemConfig) {
         if (!config || (config.type !== "component" && !config.content.length)) {
@@ -543,6 +553,12 @@ export class LayoutController {
         });
 
         const layoutContainer = $(`#nestHere${id}`);
+
+        const resizeObserver = new ResizeObserver(() => {
+            this.emitter.raiseEvent("workspace-container-resized", { workspaceId: id });
+        });
+
+        resizeObserver.observe(layoutContainer[0]);
 
         layout.on("initialised", () => {
             const allWindows = getAllWindowsFromConfig(layout.toConfig().content);

@@ -29,6 +29,10 @@ export class LayoutEventEmitter {
         return this._registry.add("workspace-content-container-resized", callback);
     }
 
+    public onWorkspaceContainerResized(callback: (workspaceId: string) => void): () => void {
+        return this._registry.add("workspace-container-resized", callback);
+    }
+
     public onContentItemResized(callback: (target: Element, id: string) => void): () => void {
         return this._registry.add("content-item-resized", callback);
     }
@@ -130,7 +134,7 @@ export class LayoutEventEmitter {
     }
 
     public raiseEvent(name: "stack-maximized" | "stack-restored", data: { stack: GoldenLayout.ContentItem }): Promise<void> | Array<Promise<void>>;
-    public raiseEvent(name: "workspace-save-requested", data: { workspaceId: string }): Promise<void> | Array<Promise<void>>;
+    public raiseEvent(name: "workspace-save-requested" | "workspace-container-resized", data: { workspaceId: string }): Promise<void> | Array<Promise<void>>;
     public raiseEvent(name: "workspace-selection-changed", data: { workspace: Workspace; toBack: Window[] }): Promise<void> | Array<Promise<void>>;
     public raiseEvent(name: "content-item-created", data: { workspaceId: string; item: GoldenLayout.ContentItem }): Promise<void> | Array<Promise<void>>;
     public raiseEvent(name: "content-component-created" | "workspace-global-selection-changed", data: { component: GoldenLayout.ContentItem; workspaceId: string }): Promise<void> | Array<Promise<void>>;
