@@ -93,9 +93,27 @@ class WorkspaceStore {
         workspace.windows.push(window);
     }
 
+    public removeWindow(window: Window, workspaceId: string) {
+        const workspace = this.getById(workspaceId);
+
+        workspace.windows = workspace.windows.filter(w => w.id !== window.id);
+    }
+
     public getByWindowId(windowId: string | string[]): Workspace {
         windowId = idAsString(windowId);
-        return this.layouts.find((l) => l.windows.some((w) => w.id === windowId || w.windowId === windowId));
+        const resultFromWindowCollection = this.layouts.find((l) => l.windows.some((w) => w.id === windowId || w.windowId === windowId));
+
+        if (resultFromWindowCollection) {
+            return resultFromWindowCollection;
+        }
+
+        return this.layouts.find((l) => {
+            if (!l?.layout) {
+                return false;
+            }
+
+            return l.layout.root.getItemsById(windowId);
+        });
     }
 
     public getWindowContentItem(windowId: string): GoldenLayout.Component {
@@ -118,7 +136,7 @@ class WorkspaceStore {
         return windowIdResult;
     }
 
-    public getContainer(containerId: string | string[]): GoldenLayout.Stack | GoldenLayout.Column | GoldenLayout.Row  {
+    public getContainer(containerId: string | string[]): GoldenLayout.Stack | GoldenLayout.Column | GoldenLayout.Row {
         containerId = idAsString(containerId);
         const workspaces = this.layouts.reduce<GoldenLayout[]>((acc, w) => {
             if (w.layout) {

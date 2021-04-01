@@ -27,6 +27,10 @@ export interface WorkspaceConfigResult {
     isHibernated: boolean;
     lockSplitters: boolean;
     allowDrop: boolean;
+    allowDropLeft: boolean;
+    allowDropTop: boolean;
+    allowDropRight: boolean;
+    allowDropBottom: boolean;
     allowExtract: boolean;
     showCloseButton: boolean;
     showWindowAddButtons: boolean;
@@ -70,12 +74,19 @@ export interface SwimlaneWindowSnapshotConfig extends BaseChildSnapshotConfig {
     showCloseButton: boolean;
 }
 
-export interface ChildSnapshotResult {
+export interface WindowSnapshotResult {
     id: string;
-    type: "window" | "row" | "column" | "group";
-    children?: ChildSnapshotResult[];
-    config: ParentSnapshotConfig | SwimlaneWindowSnapshotConfig;
+    type: "window";
+    config: SwimlaneWindowSnapshotConfig;
 }
+
+export interface SubParentSnapshotResult {
+    id: string;
+    type: "row" | "column" | "group";
+    children: ChildSnapshotResult[];
+    config: ParentSnapshotConfig
+}
+export type ChildSnapshotResult = WindowSnapshotResult | SubParentSnapshotResult;
 
 export interface FrameSnapshotResult {
     id: string;

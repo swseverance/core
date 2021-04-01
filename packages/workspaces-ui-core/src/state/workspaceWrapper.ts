@@ -80,6 +80,10 @@ export class WorkspaceWrapper {
         glConfig.workspacesOptions.isHibernated = this.isHibernated;
         glConfig.workspacesOptions.isSelected = this.isSelected;
         glConfig.workspacesOptions.allowDrop = this.allowDrop;
+        glConfig.workspacesOptions.allowDropLeft = this.allowDropLeft;
+        glConfig.workspacesOptions.allowDropTop = this.allowDropTop;
+        glConfig.workspacesOptions.allowDropRight = this.allowDropRight;
+        glConfig.workspacesOptions.allowDropBottom = this.allowDropBottom;
         glConfig.workspacesOptions.allowExtract = this.allowExtract;
         glConfig.workspacesOptions.showWindowAddButtons = this.showAddWindowButtons;
         glConfig.workspacesOptions.showCloseButton = this.showCloseButton;
@@ -112,6 +116,10 @@ export class WorkspaceWrapper {
             isSelected: this.isSelected,
             lastActive: this.workspace.lastActive,
             allowDrop: this.allowDrop,
+            allowDropLeft: this.allowDropLeft,
+            allowDropTop: this.allowDropTop,
+            allowDropRight: this.allowDropRight,
+            allowDropBottom: this.allowDropBottom,
             allowExtract: this.allowExtract,
             lockSplitters: this.lockSplitters,
             showCloseButton: this.showCloseButton,

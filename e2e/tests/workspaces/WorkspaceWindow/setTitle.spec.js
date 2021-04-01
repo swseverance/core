@@ -92,6 +92,23 @@ describe("setTitle() Should", () => {
         expect(windowsAfterRename[0].title).to.eql(randomTitle);
     });
 
+    it("change the title when it is invoked after the window was loaded", async () => {
+        await workspace.addWindow(windowConfig);
+
+        await workspace.refreshReference();
+
+        const windows = workspace.getAllWindows();
+        const window = windows[0];
+
+        await window.forceLoad();
+        const randomTitle = gtf.getWindowName();
+
+        await window.setTitle(randomTitle);
+        await workspace.refreshReference();
+
+        expect(window.title).to.eql(randomTitle);
+    });
+
     Array.from([undefined, null, [], 42, {}]).forEach((input) => {
         it(`reject when invoked with ${JSON.stringify(input)}`, async () => {
             let errorThrown = false;

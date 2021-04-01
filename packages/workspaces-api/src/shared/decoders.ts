@@ -44,7 +44,9 @@ import {
     ItemSelector,
     LockWorkspaceConfig,
     LockWindowConfig,
-    LockContainerConfig
+    LockContainerConfig,
+    SubParentSnapshotResult,
+    WindowSnapshotResult
 } from "../types/protocol";
 import { WorkspaceEventType, WorkspaceEventAction } from "../types/subscription";
 import { Glue42Workspaces } from "../../workspaces";
@@ -282,7 +284,11 @@ export const workspaceConfigResultDecoder: Decoder<WorkspaceConfigResult> = obje
     lockSplitters: boolean(),
     showCloseButton: boolean(),
     showSaveButton: boolean(),
-    showWindowAddButtons: boolean()
+    showWindowAddButtons: boolean(),
+    allowDropLeft: boolean(),
+    allowDropTop: boolean(),
+    allowDropRight: boolean(),
+    allowDropBottom: boolean()
 });
 
 // todo: remove number positionIndex when fixed
@@ -302,45 +308,40 @@ export const swimlaneWindowSnapshotConfigDecoder: Decoder<SwimlaneWindowSnapshot
         isMaximized: optional(boolean()),
         isFocused: boolean(),
         title: optional(string()),
-        appName: optional(nonEmptyStringDecoder)
+        appName: optional(nonEmptyStringDecoder),
+        allowExtract: boolean(),
+        showCloseButton: boolean()
     })
 ) as any;
 
-export const childSnapshotResultDecoder: Decoder<ChildSnapshotResult> = object({
-    id: nonEmptyStringDecoder,
-    config: oneOf<ParentSnapshotConfig | SwimlaneWindowSnapshotConfig>(
-        parentSnapshotConfigDecoder,
-        swimlaneWindowSnapshotConfigDecoder
-    ),
-    children: optional(lazy(() => array(childSnapshotResultDecoder))),
-    type: oneOf<"window" | "row" | "column" | "group">(
-        constant("window"),
+export const customWorkspaceSubParentSnapshotDecoder: Decoder<SubParentSnapshotResult> = object({
+    id: optional(nonEmptyStringDecoder),
+    config: parentSnapshotConfigDecoder,
+    children: optional(lazy(() => array(customWorkspaceChildSnapshotDecoder))),
+    type: oneOf<"row" | "column" | "group">(
         constant("row"),
         constant("column"),
         constant("group")
     )
 });
+
+export const customWorkspaceWindowSnapshotDecoder: Decoder<WindowSnapshotResult> = object({
+    id: optional(nonEmptyStringDecoder),
+    config: swimlaneWindowSnapshotConfigDecoder,
+    type: constant("window")
+});
+
+export const customWorkspaceChildSnapshotDecoder: Decoder<ChildSnapshotResult> = oneOf<WindowSnapshotResult | SubParentSnapshotResult>(
+    customWorkspaceWindowSnapshotDecoder,
+    customWorkspaceSubParentSnapshotDecoder);
+
+export const childSnapshotResultDecoder: Decoder<ChildSnapshotResult> = customWorkspaceChildSnapshotDecoder;
 
 export const workspaceSnapshotResultDecoder: Decoder<WorkspaceSnapshotResult> = object({
     id: nonEmptyStringDecoder,
     config: workspaceConfigResultDecoder,
     children: array(childSnapshotResultDecoder),
     frameSummary: frameSummaryDecoder
-});
-
-export const customWorkspaceChildSnapshotDecoder: Decoder<ChildSnapshotResult> = object({
-    id: optional(nonEmptyStringDecoder),
-    config: oneOf<ParentSnapshotConfig | SwimlaneWindowSnapshotConfig>(
-        parentSnapshotConfigDecoder,
-        swimlaneWindowSnapshotConfigDecoder
-    ),
-    children: optional(lazy(() => array(customWorkspaceChildSnapshotDecoder))),
-    type: oneOf<"window" | "row" | "column" | "group">(
-        constant("window"),
-        constant("row"),
-        constant("column"),
-        constant("group")
-    )
 });
 
 export const windowLayoutItemDecoder: Decoder<Glue42Workspaces.WindowLayoutItem> = object({

@@ -72,6 +72,22 @@ export class Workspace implements Glue42Workspaces.Workspace {
         return getData(this).config.allowDrop;
     }
 
+    public get allowDropLeft(): boolean {
+        return getData(this).config.allowDropLeft;
+    }
+
+    public get allowDropTop(): boolean {
+        return getData(this).config.allowDropTop;
+    }
+
+    public get allowDropRight(): boolean {
+        return getData(this).config.allowDropRight;
+    }
+
+    public get allowDropBottom(): boolean {
+        return getData(this).config.allowDropBottom;
+    }
+
     public get allowExtract(): boolean {
         return getData(this).config.allowExtract;
     }

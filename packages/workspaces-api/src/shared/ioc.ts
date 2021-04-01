@@ -210,7 +210,7 @@ export class IoC {
                     children: child.children,
                     frame, workspace, parent
                 });
-                default: throw new Error(`Unsupported child type: ${child.type}`);
+                default: throw new Error(`Unsupported child type: ${(child as any).type}`);
             }
         });
     }

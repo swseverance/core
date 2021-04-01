@@ -105,11 +105,11 @@ export class LayoutController {
         const workspaceWrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
 
         if (config.type === "component") {
-            this.applyLockConfig(config, contentItem, workspaceWrapper);
+            this.applyLockConfig(config, contentItem, workspaceWrapper, parentId === workspace.id);
         } else {
             const allItems = [...getAllItemsFromConfig(config.content), config];
             allItems.forEach((item) => {
-                this.applyLockConfig(item, contentItem, workspaceWrapper);
+                this.applyLockConfig(item, contentItem, workspaceWrapper, parentId === workspace.id);
             });
         }
 
@@ -203,7 +203,7 @@ export class LayoutController {
             const workspaceWrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
 
             allItems.forEach((item: GoldenLayout.ItemConfig) => {
-                this.applyLockConfig(item, contentItem, workspaceWrapper);
+                this.applyLockConfig(item, contentItem, workspaceWrapper, parentId === workspace.id);
             });
         }
 
@@ -481,6 +481,9 @@ export class LayoutController {
         const contentItem = store.getWindowContentItem(placementId);
         const parentStack = contentItem.parent;
 
+        if (parentStack.contentItems.length === 1) {
+            return true;
+        }
         return parentStack.getActiveContentItem().config.id === placementId;
     }
 
@@ -1415,9 +1418,8 @@ export class LayoutController {
         return elements[0] as HTMLElement;
     }
 
-    private applyLockConfig(itemConfig: GoldenLayout.ItemConfig, parent: GoldenLayout.ContentItem, workspaceWrapper: WorkspaceWrapper) {
-        const isParentWorksapce = parent.config.id === workspaceWrapper.id;
-        const parentAllowDrop = isParentWorksapce ? workspaceWrapper.allowDrop : (parent.config.workspacesConfig as any).allowDrop;
+    private applyLockConfig(itemConfig: GoldenLayout.ItemConfig, parent: GoldenLayout.ContentItem, workspaceWrapper: WorkspaceWrapper, isParentWorkspace: boolean) {
+        const parentAllowDrop = isParentWorkspace ? workspaceWrapper.allowDrop : (parent.config.workspacesConfig as any).allowDrop;
 
         if (itemConfig.type === "stack") {
             if (typeof (itemConfig.workspacesConfig as any).allowDrop === "undefined") {
@@ -1434,7 +1436,7 @@ export class LayoutController {
             }
         } else if (itemConfig.type === "component") {
             if (typeof (itemConfig.workspacesConfig as any).allowExtract === "undefined") {
-                const parentAllowExtract = isParentWorksapce ? workspaceWrapper.allowExtract : (parent.config.workspacesConfig as any).allowExtract;
+                const parentAllowExtract = isParentWorkspace ? workspaceWrapper.allowExtract : (parent.config.workspacesConfig as any).allowExtract;
                 (itemConfig.workspacesConfig as any).allowExtract = (itemConfig.workspacesConfig as any).allowExtract ?? parentAllowExtract;
             }
         }

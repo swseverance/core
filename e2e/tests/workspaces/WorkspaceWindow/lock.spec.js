@@ -73,7 +73,7 @@ describe("lock() Should", () => {
     // showCloseButton?: boolean;
 
     ["allowExtract", "showCloseButton"].forEach((propertyUnderTest) => {
-        it.only(`Should set ${propertyUnderTest} to false when invoked without arguments`, async () => {
+        it(`Should set ${propertyUnderTest} to false when invoked without arguments`, async () => {
             const window = workspace.getAllWindows()[0];
 
             await window.lock();

@@ -288,7 +288,17 @@ export const workspaceConfigResultDecoder: Decoder<WorkspaceConfigResult> = obje
     layoutName: optional(nonEmptyStringDecoder),
     isHibernated: boolean(),
     isSelected: boolean(),
-    lastActive: number()
+    lastActive: number(),
+    allowDrop: boolean(),
+    allowExtract: boolean(),
+    lockSplitters: boolean(),
+    showCloseButton: boolean(),
+    showSaveButton: boolean(),
+    showWindowAddButtons: boolean(),
+    allowDropLeft: boolean(),
+    allowDropTop: boolean(),
+    allowDropRight: boolean(),
+    allowDropBottom: boolean()
 });
 
 // todo: remove number positionIndex when fixed

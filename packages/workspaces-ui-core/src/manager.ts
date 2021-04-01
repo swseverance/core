@@ -245,7 +245,8 @@ export class WorkspacesManager {
         await this._controller.addWindow(itemConfig, parentId);
 
         const workspace = store.getById(parentId) || store.getByContainerId(parentId);
-        const component = store.getWindowContentItem(idAsString(itemConfig.id));
+        const allWindowsInConfig = getAllWindowsFromConfig([itemConfig]);
+        const component = store.getWindowContentItem(idAsString(allWindowsInConfig[0].id));
 
         this._applicationFactory.start(component, workspace.id);
     }
@@ -392,21 +393,35 @@ export class WorkspacesManager {
     }
 
     public async moveWindowTo(itemId: string, containerId: string) {
+        const sourceWorkspace = store.getByWindowId(itemId);
         const targetWorkspace = store.getByContainerId(containerId) || store.getById(containerId);
         if (!targetWorkspace) {
             throw new Error(`Could not find container ${containerId} in frame ${this._frameId}`);
+        }
+
+        if (!sourceWorkspace) {
+            throw new Error(`Could not find window ${itemId} in frame ${this._frameId}`);
         }
 
         if (this._stateResolver.isWorkspaceHibernated(targetWorkspace.id)) {
             throw new Error(`Could not move window ${itemId} to workspace ${targetWorkspace.id} because its hibernated`);
         }
 
+        if (this._stateResolver.isWorkspaceHibernated(sourceWorkspace.id)) {
+            throw new Error(`Could not move window ${itemId} from workspace ${sourceWorkspace.id} because its hibernated`);
+        }
+
         const targetWindow = store.getWindowContentItem(itemId);
         if (!targetWindow) {
             throw new Error(`Could not find window ${itemId} in frame ${this._frameId}`);
         }
-        this.closeTab(targetWindow);
-        return this._controller.addWindow(targetWindow.config, containerId);
+        const movedWindow = sourceWorkspace.windows.find(w => w.id === itemId || w.windowId === itemId)
+
+        this._controller.removeLayoutElement(itemId);
+        store.removeWindow(movedWindow, sourceWorkspace.id);
+        store.addWindow(movedWindow, targetWorkspace.id);
+        // this.closeTab(targetWindow);
+        await this._controller.addWindow(targetWindow.config, containerId);
     }
 
     public generateWorkspaceLayout(name: string, itemId: string) {

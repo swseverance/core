@@ -259,7 +259,6 @@ export class BaseController {
 
         const newChildren = children.map((newChildSnapshot) => {
             let childToAdd = existingChildren.find((c) => c.id === newChildSnapshot.id);
-            const childType = newChildSnapshot.type;
 
             if (childToAdd) {
                 this.privateDataManager.remapChild(childToAdd, {
@@ -268,20 +267,31 @@ export class BaseController {
                     config: newChildSnapshot.config
                 });
             } else {
-                const createConfig: WindowCreateConfig | ParentCreateConfig = {
-                    id: newChildSnapshot.id,
-                    parent,
-                    frame: workspace.frame,
-                    workspace,
-                    config: newChildSnapshot.config,
-                    children: childType === "window" ? undefined : []
-                };
+                let createConfig: WindowCreateConfig | ParentCreateConfig;
+                
+                if (newChildSnapshot.type === "window") {
+                    createConfig = {
+                        id: newChildSnapshot.id,
+                        parent,
+                        frame: workspace.frame,
+                        workspace,
+                        config: newChildSnapshot.config,
+                    };
+                } else {
+                    createConfig = {
+                        id: newChildSnapshot.id,
+                        parent,
+                        frame: workspace.frame,
+                        workspace,
+                        config: newChildSnapshot.config,
+                        children: []
+                    };
+                }
 
-                childToAdd = this.ioc.getModel<"child">(childType, createConfig);
-
+                childToAdd = this.ioc.getModel<"child">(newChildSnapshot.type, createConfig);
             }
 
-            if (childType !== "window") {
+            if (newChildSnapshot.type !== "window") {
                 this.refreshChildren({
                     workspace, existingChildren,
                     children: newChildSnapshot.children,
