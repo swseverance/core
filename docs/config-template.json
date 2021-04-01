@@ -1,0 +1,7 @@
+{
+    "menuItem": "JavaScript in the menu",
+    "title": "JavaScript as a title",
+    "displayTitle": true,
+    "expanded": true,
+    "titleType": "chapter | title | subtitle | technology"
+}

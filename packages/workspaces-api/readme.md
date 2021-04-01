@@ -4,4 +4,4 @@ The **Workspaces** library offers advanced window management functionalities. Us
 
 The Glue42 Workspaces enable the users to compose a custom arrangement of applications by treating each application as an individual building block that can be added, removed, moved or resized within a Workspace. The Frame can hold multiple Workspaces (as tabs) and can also be maximized, minimized or resized. 
 
-*For detailed information on the Workspaces API, see the [**Workspaces**](https://docs.glue42.com/core/capabilities/workspaces/index.html) documentation.*
+*For detailed information on the Workspaces API, see the [**Workspaces**](https://core-docs.glue42.com/capabilities/windows/workspaces/index.html) documentation.*
