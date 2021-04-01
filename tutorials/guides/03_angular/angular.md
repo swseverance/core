@@ -18,7 +18,7 @@ As an end result, the users want to be able to run two apps as Progressive Web A
 
 This tutorial assumes that you are familiar with Angular 2+ and the concepts of JavaScript and asynchronous programming.
 
-It is also recommended to have the [Web Platform](../../developers/core-concepts/web-platform/overview/index.html), [Web Client](../../developers/core-concepts/glue42-client/overview/index.html) and [Glue42 Web](../../reference/core/latest/glue42%20web/index.html) documentation available for reference.
+It is also recommended to have the [Web Platform](../../developers/core-concepts/web-platform/overview/index.html), [Web Client](../../developers/core-concepts/web-client/overview/index.html) and [Glue42 Web](../../reference/core/latest/glue42%20web/index.html) documentation available for reference.
 
 ## Tutorial Structure
 

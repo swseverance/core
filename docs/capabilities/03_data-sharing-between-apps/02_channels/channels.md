@@ -39,7 +39,7 @@ Different applications on the same Channel may use different parts of the data. 
 
 The Glue42 Channels are enabled by default for all applications in a **Glue42 Core** project. If you decide to migrate your app to [**Glue42 Enterprise**](https://docs.glue42.com/getting-started/what-is-glue42/general-overview/index.html), no code change will be necessary as the Glue42 Channels will be automatically enabled for your app there as well.
 
-Use the `channels` property of the configuration object when initializing the Glue42 [Web Platform](https://www.npmjs.com/package/@glue42/web-platform) library in the [Main application](../../developers/core-concepts/web-platform/overview/index.html) to define the Channels that will be available for your project:
+Use the `channels` property of the configuration object when initializing the Glue42 [Web Platform](https://www.npmjs.com/package/@glue42/web-platform) library in the [Main application](../../../developers/core-concepts/web-platform/overview/index.html) to define the Channels that will be available for your project:
 
 ```javascript
 import GlueWebPlatform from "@glue42/web-platform";

@@ -10,7 +10,7 @@ Using the [Window Management API](../../../reference/core/latest/windows/index.h
 
 ## Configuration
 
-Use the `windows` property of the configuration object when initializing the Glue42 [Web Platform](https://www.npmjs.com/package/@glue42/web-platform) library in the [Main application](../../developers/core-concepts/web-platform/overview/index.html) to specify custom settings for the Window Management library:
+Use the `windows` property of the configuration object when initializing the Glue42 [Web Platform](https://www.npmjs.com/package/@glue42/web-platform) library in the [Main application](../../../developers/core-concepts/web-platform/overview/index.html) to specify custom settings for the Window Management library:
 
 ```javascript
 import GlueWebPlatform from "@glue42/web-platform";
@@ -254,7 +254,7 @@ const bounds = {
 await myWindow.moveResize(bounds);
 ```
 
-*Note that programmatically moving and resizing the window of the [Main application](../../developers/core-concepts/web-platform/overview/index.html) isn't possible.*
+*Note that programmatically moving and resizing the window of the [Main application](../../../developers/core-concepts/web-platform/overview/index.html) isn't possible.*
 
 ### Focus
 
@@ -264,7 +264,7 @@ To bring a window on focus, use the  [`focus()`](../../../reference/core/latest/
 await myWindow.focus();
 ```
 
-*Note that programmatically focusing the window of the [Main application](../../developers/core-concepts/web-platform/overview/index.html) isn't possible.*
+*Note that programmatically focusing the window of the [Main application](../../../developers/core-concepts/web-platform/overview/index.html) isn't possible.*
 
 ### Close
 
@@ -274,11 +274,11 @@ To close a Glue42 Window, use the [`close()`](../../../reference/core/latest/win
 await myWindow.close();
 ```
 
-*Note that programmatically closing the window of the [Main application](../../developers/core-concepts/web-platform/overview/index.html) isn't possible.*
+*Note that programmatically closing the window of the [Main application](../../../developers/core-concepts/web-platform/overview/index.html) isn't possible.*
 
 ## Context
 
-Each Glue42 Window has a dedicated [context](../../../data-sharing-between-apps/shared-contexts/javascript/index.html). The window context is a JavaScript object which may contain any information regarding the window instance in the form of key/value pairs. 
+Each Glue42 Window has a dedicated [context](../../data-sharing-between-apps/shared-contexts/javascript/index.html). The window context is a JavaScript object which may contain any information regarding the window instance in the form of key/value pairs. 
 
 Contexts can be set/passed initially on window creation and updated at runtime. Context changes can be tracked by subscribing to an event which fires when the window context has been updated (see [Window Events](#window_events)).
 
