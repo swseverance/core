@@ -112,7 +112,7 @@ class WorkspaceStore {
                 return false;
             }
 
-            return l.layout.root.getItemsById(windowId);
+            return l.layout.root.getItemsById(windowId)[0];
         });
     }
 

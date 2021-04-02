@@ -22,7 +22,7 @@ export class WorkspaceContainerWrapper {
     }
 
     public get allowExtract() {
-        return (this.containerContentItem.config.workspacesConfig as any).allowExtract;
+        return (this.containerContentItem.config.workspacesConfig as any).allowExtract ?? true;
     }
 
     public set allowExtract(value: boolean | undefined) {

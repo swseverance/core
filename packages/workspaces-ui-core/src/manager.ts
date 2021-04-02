@@ -298,6 +298,10 @@ export class WorkspacesManager {
         if (config.workspacesOptions?.reuseWorkspaceId) {
             const workspace = store.getById(id);
 
+            if (!workspace) {
+                throw new Error(`Could not find workspace ${config.workspacesOptions?.reuseWorkspaceId} to reuse`);
+            }
+
             workspace.windows
                 .map((w) => store.getWindowContentItem(w.id))
                 .filter((w) => w)
@@ -385,8 +389,11 @@ export class WorkspacesManager {
     }
 
     public getFrameSummary(itemId: string) {
+        console.log("getting summary", itemId);
         const workspace = store.getByContainerId(itemId) || store.getByWindowId(itemId) || store.getById(itemId);
         const isFrameId = this._frameId === itemId;
+
+        console.log("FOUND WORKSPACE", workspace);
         return {
             id: (workspace || isFrameId) ? this._frameId : "none"
         };
@@ -732,6 +739,11 @@ export class WorkspacesManager {
                 });
             });
 
+
+            if (!dragElement) {
+                return;
+            }
+
             mutationObserver.observe(dragElement, {
                 attributes: true
             });
@@ -906,7 +918,7 @@ export class WorkspacesManager {
         this._controller.emitter.onComponentSelectedInWorkspace((component, workspaceId) => {
             this._applicationFactory.start(component, workspaceId);
         });
-        
+
         const resizedTimeouts: { [id: string]: NodeJS.Timeout } = {};
         this._controller.emitter.onWorkspaceContainerResized((workspaceId) => {
             const id = idAsString(workspaceId);

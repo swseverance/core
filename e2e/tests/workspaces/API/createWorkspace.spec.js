@@ -589,6 +589,7 @@ describe('createWorkspace() ', function () {
             const workspaceOne = await glue.workspaces.createWorkspace(Object.assign(JSON.parse(JSON.stringify(basicConfig)), { frame: { newFrame: true } }));
             const workspaceTwo = await glue.workspaces.createWorkspace(Object.assign(JSON.parse(JSON.stringify(basicConfig)), { frame: { newFrame: true } }));
             const workspaceThree = await glue.workspaces.createWorkspace(Object.assign(JSON.parse(JSON.stringify(basicConfig)), { frame: { newFrame: true } }));
+
             const workspaceFour = await glue.workspaces.createWorkspace(Object.assign(JSON.parse(JSON.stringify(secondBasicConfig)), { config: { reuseWorkspaceId: workspaceTwo.id } }));
 
             const allWorkspaces = await glue.workspaces.getAllWorkspaces();
