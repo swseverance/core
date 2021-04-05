@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { WorkspaceSnapshotResult, WindowStreamData } from "../types/protocol";
-import { checkThrowCallback, nonEmptyStringDecoder } from "../shared/decoders";
+import { checkThrowCallback, lockWorkspaceDecoder, nonEmptyStringDecoder, workspaceLockConfigDecoder } from "../shared/decoders";
 import { PrivateDataManager } from "../shared/privateDataManager";
 import { FrameCreateConfig } from "../types/ioc";
 import { Window } from "./window";
@@ -64,8 +64,8 @@ export class Workspace implements Glue42Workspaces.Workspace {
         return getData(this).frame;
     }
 
-    public get lockSplitters(): boolean {
-        return getData(this).config.lockSplitters;
+    public get allowSplitters(): boolean {
+        return getData(this).config.allowSplitters;
     }
 
     public get allowDrop(): boolean {
@@ -94,10 +94,6 @@ export class Workspace implements Glue42Workspaces.Workspace {
 
     public get showCloseButton(): boolean {
         return getData(this).config.showCloseButton;
-    }
-
-    public get showWindowAddButton(): boolean {
-        return getData(this).config.showWindowAddButtons;
     }
 
     public get showSaveButton(): boolean {
@@ -333,8 +329,30 @@ export class Workspace implements Glue42Workspaces.Workspace {
         await this.refreshReference();
     }
 
-    public async lock(config?: Glue42Workspaces.WorkspaceLockConfig): Promise<void> {
-        await getData(this).controller.lockWorkspace(this.id, config);
+    public async lock(config?: Glue42Workspaces.WorkspaceLockConfig | ((config: Glue42Workspaces.WorkspaceLockConfig) => Glue42Workspaces.WorkspaceLockConfig)): Promise<void> {
+        let lockConfigResult = undefined;
+
+        if (typeof config === "function") {
+            const currentLockConfig = {
+                allowDrop: this.allowDrop,
+                allowDropLeft: this.allowDropLeft,
+                allowDropTop: this.allowDropTop,
+                allowDropRight: this.allowDropRight,
+                allowDropBottom: this.allowDropBottom,
+                allowExtract: this.allowExtract,
+                allowSplitters: this.allowSplitters,
+                showCloseButton: this.showCloseButton,
+                showSaveButton: this.showSaveButton
+            };
+
+            lockConfigResult = config(currentLockConfig);
+        } else {
+            lockConfigResult = config;
+        }
+
+        const verifiedConfig = lockConfigResult === undefined ? undefined : workspaceLockConfigDecoder.runWithException(lockConfigResult);
+
+        await getData(this).controller.lockWorkspace(this.id, verifiedConfig);
         await this.refreshReference();
     }
 

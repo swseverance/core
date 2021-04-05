@@ -1,5 +1,4 @@
 describe("lock()", () => {
-
     const basicConfig = {
         children: [
             {
@@ -49,6 +48,7 @@ describe("lock()", () => {
     };
 
     let workspace;
+    before(() => coreReady);
     beforeEach(async () => {
         workspace = await glue.workspaces.createWorkspace(basicConfig);
     });
@@ -109,6 +109,29 @@ describe("lock()", () => {
                 await workspace.refreshReference();
                 expect(row.allowDrop).to.eql(value);
             });
+
+            it(`Should set allowDrop to ${value} when invoked with a function which returns an object with allowDrop:${value} and the container is a row`, async () => {
+                const row = workspace.getAllRows().find(r => r.children.length === 2);
+
+                await row.lock(() => ({
+                    allowDrop: value
+                }));
+
+                await workspace.refreshReference();
+                expect(row.allowDrop).to.eql(value);
+            });
+
+            it(`Should invoke the builder function with allowDrop: ${value} when invoked with a function and the container is a row`, async () => {
+                const row = workspace.getAllRows().find(r => r.children.length === 2);
+
+                await row.lock(() => ({
+                    allowDrop: value
+                }));
+
+                await row.lock((config) => {
+                    expect(config.allowDrop).to.eql(value)
+                });
+            });
         });
 
         it("Should be able to override the parent allowDrop when the parent is disabled and the the container is explicitly set to to true", async () => {
@@ -132,14 +155,7 @@ describe("lock()", () => {
             await column.lock();
             await workspace.refreshReference();
 
-            // expect(column.id).to.eql(workspace.getAllColumns()[0].id);
-
-            // expect(workspace.getAllColumns()[0].allowDrop).to.eql(false);
-
-            const foundCol = workspace.getAllColumns().find(c => c.id === column.id);
-            const allColumns = workspace.getAllColumns();
-            expect(allColumns.length).to.eql(2);
-            expect(foundCol.allowDrop).to.be.false;
+            expect(column.allowDrop).to.eql(false);
         });
 
         it("Should set allowDrop to false of all its children when invoked without arguments and the container is a column", async () => {
@@ -179,6 +195,29 @@ describe("lock()", () => {
 
                 await workspace.refreshReference();
                 expect(column.allowDrop).to.eql(value);
+            });
+
+            it(`Should set allowDrop to ${value} when invoked with a function which returns and object with allowDrop:${value} and the container is a column`, async () => {
+                const column = workspace.getAllColumns()[0];
+
+                await column.lock(() => ({
+                    allowDrop: value
+                }));
+
+                await workspace.refreshReference();
+                expect(column.allowDrop).to.eql(value);
+            });
+
+            it(`Should invoke the builder function with allowDrop: ${value} when invoked with a function and the container is a column`, async () => {
+                const column = workspace.getAllColumns()[0];
+
+                await column.lock(() => ({
+                    allowDrop: value
+                }));
+
+                await column.lock((config) => {
+                    expect(config.allowDrop).to.eql(value)
+                });
             });
         });
 
@@ -231,6 +270,29 @@ describe("lock()", () => {
 
                     await workspace.refreshReference();
                     expect(group[propertyUnderTest]).to.eql(value);
+                });
+
+                it(`Should set ${propertyUnderTest} to ${value} when invoked with a function which returns an object with ${propertyUnderTest}:${value} and the container is a group`, async () => {
+                    const group = workspace.getAllGroups()[0];
+
+                    await group.lock(() => ({
+                        [`${propertyUnderTest}`]: value
+                    }));
+
+                    await workspace.refreshReference();
+                    expect(group[propertyUnderTest]).to.eql(value);
+                });
+
+                it(`Should invoke the builder function with ${propertyUnderTest}: ${value} when invoked with a function and the container is a group`, async () => {
+                    const group = workspace.getAllGroups()[0];
+
+                    await group.lock(() => ({
+                        [`${propertyUnderTest}`]: value
+                    }));
+
+                    await group.lock((config) => {
+                        expect(config[propertyUnderTest]).to.eql(value)
+                    });
                 });
             });
         });

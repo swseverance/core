@@ -138,7 +138,7 @@ describe("resume() Should", () => {
         expect(workspace.allowDropTop).to.be.false;
         expect(workspace.allowDropRight).to.be.false;
         expect(workspace.allowDropBottom).to.be.false;
-        expect(workspace.lockSplitters).to.be.true;
+        expect(workspace.allowSplitters).to.be.false;
         expect(workspace.showCloseButton).to.be.false;
         expect(workspace.showSaveButton).to.be.false;
     });

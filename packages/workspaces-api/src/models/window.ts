@@ -1,4 +1,4 @@
-import { checkThrowCallback, nonEmptyStringDecoder } from "../shared//decoders";
+import { checkThrowCallback, nonEmptyStringDecoder, windowLockConfigDecoder } from "../shared//decoders";
 import { SubscriptionConfig } from "../types/subscription";
 import { PrivateDataManager } from "../shared/privateDataManager";
 import { Row } from "./row";
@@ -198,9 +198,23 @@ export class Window implements Glue42Workspaces.WorkspaceWindow {
         await this.workspace.refreshReference();
     }
 
-    public async lock(config: Glue42Workspaces.WorkspaceWindowLockConfig): Promise<void> {
+    public async lock(config?: Glue42Workspaces.WorkspaceWindowLockConfig | ((config: Glue42Workspaces.WorkspaceWindowLockConfig) => Glue42Workspaces.WorkspaceWindowLockConfig)): Promise<void> {
+        let lockConfigResult = undefined;
+
+        if (typeof config === "function") {
+            const currentLockConfig = {
+                allowExtract: this.allowExtract,
+                showCloseButton: this.showCloseButton
+            };
+            lockConfigResult = config(currentLockConfig);
+        } else {
+            lockConfigResult = config;
+        }
+
+        const verifiedConfig = lockConfigResult === undefined ? undefined : windowLockConfigDecoder.runWithException(lockConfigResult);
         const windowPlacementId = getData(this).id;
-        await getData(this).controller.lockWindow(windowPlacementId, config);
+        await getData(this).controller.lockWindow(windowPlacementId, verifiedConfig);
+        await this.workspace.refreshReference();
     }
 
     public async onRemoved(callback: () => void): Promise<Glue42Workspaces.Unsubscribe> {

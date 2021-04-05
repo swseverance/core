@@ -85,10 +85,9 @@ export class WorkspaceWrapper {
         glConfig.workspacesOptions.allowDropRight = this.allowDropRight;
         glConfig.workspacesOptions.allowDropBottom = this.allowDropBottom;
         glConfig.workspacesOptions.allowExtract = this.allowExtract;
-        glConfig.workspacesOptions.showWindowAddButtons = this.showAddWindowButtons;
         glConfig.workspacesOptions.showCloseButton = this.showCloseButton;
         glConfig.workspacesOptions.showSaveButton = this.showSaveButton;
-        glConfig.workspacesOptions.lockSplitters = this.lockSplitters;
+        glConfig.workspacesOptions.allowSplitters = this.allowSplitters;
         glConfig.workspacesOptions.lastActive = workspace.lastActive;
 
         if (!glConfig.workspacesOptions.title) {
@@ -121,10 +120,9 @@ export class WorkspaceWrapper {
             allowDropRight: this.allowDropRight,
             allowDropBottom: this.allowDropBottom,
             allowExtract: this.allowExtract,
-            lockSplitters: this.lockSplitters,
+            allowSplitters: this.allowSplitters,
             showCloseButton: this.showCloseButton,
-            showSaveButton: this.showSaveButton,
-            showWindowAddButtons: this.showAddWindowButtons
+            showSaveButton: this.showSaveButton
         };
 
         if ((config.workspacesOptions as WorkspaceOptionsWithLayoutName).layoutName) {
@@ -251,22 +249,22 @@ export class WorkspaceWrapper {
         this.populateChildrenAllowExtract(value);
     }
 
-    public get lockSplitters(): boolean {
+    public get allowSplitters(): boolean {
         let result;
         if (this.workspace.layout) {
-            result = (this.workspace.layout.config.workspacesOptions as any).lockSplitters;
+            result = (this.workspace.layout.config.workspacesOptions as any).allowSplitters;
         } else {
-            result = (this.workspaceContentItem.config.workspacesConfig as any).lockSplitters;
+            result = (this.workspaceContentItem.config.workspacesConfig as any).allowSplitters;
         }
 
-        return result ?? false;
+        return result ?? true;
     }
 
-    public set lockSplitters(value: boolean) {
+    public set allowSplitters(value: boolean) {
         if (this.workspace?.layout) {
-            (this.workspace.layout.config.workspacesOptions as any).lockSplitters = value;
+            (this.workspace.layout.config.workspacesOptions as any).allowSplitters = value;
         }
-        (this.workspaceContentItem.config.workspacesConfig as any).lockSplitters = value;
+        (this.workspaceContentItem.config.workspacesConfig as any).allowSplitters = value;
     }
 
     public get showSaveButton(): boolean {

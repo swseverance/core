@@ -281,10 +281,9 @@ export const workspaceConfigResultDecoder: Decoder<WorkspaceConfigResult> = obje
     isSelected: boolean(),
     allowDrop: boolean(),
     allowExtract: boolean(),
-    lockSplitters: boolean(),
+    allowSplitters: boolean(),
     showCloseButton: boolean(),
     showSaveButton: boolean(),
-    showWindowAddButtons: boolean(),
     allowDropLeft: boolean(),
     allowDropTop: boolean(),
     allowDropRight: boolean(),
@@ -566,38 +565,51 @@ export const workspaceSelectorDecoder: Decoder<WorkspaceSelector> = object({
     workspaceId: nonEmptyStringDecoder,
 });
 
+export const workspaceLockConfigDecoder: Decoder<Glue42Workspaces.WorkspaceLockConfig> = object({
+    allowDrop: optional(boolean()),
+    allowDropLeft: optional(boolean()),
+    allowDropTop: optional(boolean()),
+    allowDropRight: optional(boolean()),
+    allowDropBottom: optional(boolean()),
+    allowExtract: optional(boolean()),
+    allowSplitters: optional(boolean()),
+    showCloseButton: optional(boolean()),
+    showSaveButton: optional(boolean()),
+});
+
 export const lockWorkspaceDecoder: Decoder<LockWorkspaceConfig> = object({
     workspaceId: nonEmptyStringDecoder,
-    config: optional(object({
-        allowDrop: optional(boolean()),
-        allowDropLeft: optional(boolean()),
-        allowDropTop: optional(boolean()),
-        allowDropRight: optional(boolean()),
-        allowDropBottom: optional(boolean()),
-        allowExtract: optional(boolean()),
-        lockSplitters: optional(boolean()),
-        showCloseButton: optional(boolean()),
-        showSaveButton: optional(boolean()),
-        showWindowAddButtons: optional(boolean()),
-    }))
+    config: optional(workspaceLockConfigDecoder)
+});
+
+export const windowLockConfigDecoder: Decoder<Glue42Workspaces.WorkspaceWindowLockConfig> = object({
+    allowExtract: optional(boolean()),
+    showCloseButton: optional(boolean())
 });
 
 export const lockWindowDecoder: Decoder<LockWindowConfig> = object({
     windowPlacementId: nonEmptyStringDecoder,
-    config: optional(object({
-        allowExtract: optional(boolean()),
-        showCloseButton: optional(boolean())
-    }))
+    config: optional(windowLockConfigDecoder)
+});
+
+export const rowLockConfigDecoder: Decoder<Glue42Workspaces.RowLockConfig> = object({
+    allowDrop: optional(boolean()),
+});
+
+export const columnLockConfigDecoder: Decoder<Glue42Workspaces.ColumnLockConfig> = object({
+    allowDrop: optional(boolean()),
+});
+
+export const groupLockConfigDecoder: Decoder<Glue42Workspaces.GroupLockConfig> = object({
+    allowExtract: optional(boolean()),
+    allowDrop: optional(boolean()),
+    showMaximizeButton: optional(boolean()),
+    showEjectButton: optional(boolean()),
+    showAddWindowButton: optional(boolean()),
 });
 
 export const lockContainerDecoder: Decoder<LockContainerConfig> = object({
     itemId: nonEmptyStringDecoder,
     type: oneOf(constant("row"), constant("column"), constant("group")),
-    config: optional(object({
-        allowExtract: optional(boolean()),
-        allowDrop: optional(boolean()),
-        showMaximizeButton: optional(boolean()),
-        showEjectButton: optional(boolean()),
-        showAddWindowButton: optional(boolean()),
-    }))
+    config: optional(oneOf(rowLockConfigDecoder, columnLockConfigDecoder, groupLockConfigDecoder))
 });

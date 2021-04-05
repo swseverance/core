@@ -1,5 +1,6 @@
 import { Base } from "./base/base";
 import { Glue42Workspaces } from "../../workspaces.d";
+import { rowLockConfigDecoder } from "../shared/decoders";
 
 interface PrivateData {
     base: Base;
@@ -91,8 +92,22 @@ export class Row implements Glue42Workspaces.Row {
         return getBase(this).close(this);
     }
 
-    public lock(config?: Glue42Workspaces.RowLockConfig): Promise<void> {
-        return getBase(this).lockContainer(this, config);
+    public lock(config?: Glue42Workspaces.RowLockConfig | ((config: Glue42Workspaces.RowLockConfig) => Glue42Workspaces.RowLockConfig)): Promise<void> {
+        let lockConfigResult = undefined;
+
+        if (typeof config === "function") {
+            const currentLockConfig = {
+                allowDrop: this.allowDrop,
+            };
+
+            lockConfigResult = config(currentLockConfig);
+        } else {
+            lockConfigResult = config;
+        }
+
+        const verifiedConfig = lockConfigResult === undefined ? undefined : rowLockConfigDecoder.runWithException(lockConfigResult);
+
+        return getBase(this).lockContainer(this, verifiedConfig);
     }
 
 }

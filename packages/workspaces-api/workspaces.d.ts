@@ -316,7 +316,7 @@ export namespace Glue42Workspaces {
     /** Provides fine grain control when locking a workspace */
     export interface WorkspaceLockConfig {
         /** Prevents the splitters for being draggable, so the windows cannot be resized */
-        lockSplitters?: boolean,
+        allowSplitters?: boolean,
         /** Controls the ability of the users to drop outside windows in the workspace */
         allowDrop?: boolean, // (enterprise only)
         /**Controls the users ability to drop windows in left zone of the workspace */
@@ -331,8 +331,6 @@ export namespace Glue42Workspaces {
         allowExtract?: boolean,
         /** Controls the visibility of the close button location in the workspaces tab */
         showCloseButton?: boolean,
-        /** Controls the visibility of the add window buttons located in groups */
-        showWindowAddButtons?: boolean,
         /** Controls the visibility of the save workspace button located in the workspace tab */
         showSaveButton?: boolean
     }

@@ -1,5 +1,6 @@
 import { Base } from "./base/base";
 import { Glue42Workspaces } from "../../workspaces.d";
+import { columnLockConfigDecoder } from "../shared/decoders";
 
 interface PrivateData {
     base: Base;
@@ -92,7 +93,20 @@ export class Column implements Glue42Workspaces.Column {
         return getBase(this).close(this);
     }
 
-    public lock(config?: Glue42Workspaces.ColumnLockConfig): Promise<void> {
-        return getBase(this).lockContainer(this, config);
+    public lock(config?: Glue42Workspaces.ColumnLockConfig | ((config: Glue42Workspaces.ColumnLockConfig) => Glue42Workspaces.ColumnLockConfig)): Promise<void> {
+        let lockConfigResult = undefined;
+
+        if (typeof config === "function") {
+            const currentLockConfig = {
+                allowDrop: this.allowDrop,
+            };
+
+            lockConfigResult = config(currentLockConfig);
+
+        } else {
+            lockConfigResult = config;
+        }
+        const verifiedConfig = lockConfigResult === undefined ? undefined : columnLockConfigDecoder.runWithException(lockConfigResult);
+        return getBase(this).lockContainer(this, verifiedConfig);
     }
 }

@@ -56,11 +56,10 @@ describe("lock() Should", () => {
     };
 
     let workspace;
-    before(()=> coreReady);
-
+    before(() => coreReady);
     beforeEach(async () => {
         workspace = await glue.workspaces.createWorkspace(basicConfig);
-        await Promise.all(workspace.getAllWindows().map(w=>w.forceLoad()));
+        await Promise.all(workspace.getAllWindows().map(w => w.forceLoad()));
     });
 
     afterEach(async () => {
@@ -101,6 +100,30 @@ describe("lock() Should", () => {
 
                 await workspace.refreshReference();
                 expect(window[propertyUnderTest]).to.eql(value);
+            });
+
+            it(`set ${propertyUnderTest} to ${value} when invoked with a function which returns an object with ${propertyUnderTest}:${value}`, async () => {
+                const window = workspace.getAllWindows()[0];
+
+                await window.lock(() => ({
+                    [`${propertyUnderTest}`]: value
+                }));
+
+                await workspace.refreshReference();
+                expect(window[propertyUnderTest]).to.eql(value);
+            });
+
+            it(`invoke the builder function with an object with ${propertyUnderTest} to ${value} when invoked with a function`, async () => {
+                const window = workspace.getAllWindows()[0];
+
+                await window.lock({
+                    [`${propertyUnderTest}`]: value
+                });
+
+                await workspace.refreshReference();
+                await window.lock((builder) => {
+                    expect(builder[propertyUnderTest]).to.eql(value);
+                });
             });
         });
     });

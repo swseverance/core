@@ -616,7 +616,7 @@ export class LayoutController {
         const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
         const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
 
-        wrapper.lockSplitters = false;
+        wrapper.allowSplitters = true;
     }
 
     public disableSplitters(workspaceId: string) {
@@ -624,7 +624,7 @@ export class LayoutController {
         const workspaceContentItem = store.getWorkspaceContentItem(workspaceId);
         const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
 
-        wrapper.lockSplitters = true;
+        wrapper.allowSplitters = false;
     }
 
     public enableWorkspaceExtract(workspaceId: string) {

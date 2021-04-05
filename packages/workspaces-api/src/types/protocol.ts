@@ -25,7 +25,7 @@ export interface WorkspaceConfigResult {
     positionIndex: number;
     layoutName: string | undefined;
     isHibernated: boolean;
-    lockSplitters: boolean;
+    allowSplitters: boolean;
     allowDrop: boolean;
     allowDropLeft: boolean;
     allowDropTop: boolean;
@@ -33,7 +33,6 @@ export interface WorkspaceConfigResult {
     allowDropBottom: boolean;
     allowExtract: boolean;
     showCloseButton: boolean;
-    showWindowAddButtons: boolean;
     showSaveButton: boolean;
 }
 
@@ -288,10 +287,9 @@ export interface LockWorkspaceConfig {
         allowDropRight?: boolean,
         allowDropBottom?: boolean,
         allowExtract?: boolean,
-        lockSplitters?: boolean,
+        allowSplitters?: boolean,
         showCloseButton?: boolean,
         showSaveButton?: boolean,
-        showWindowAddButtons?: boolean
     }
 }
 // #endregion

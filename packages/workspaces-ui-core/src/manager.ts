@@ -469,12 +469,18 @@ export class WorkspacesManager {
                 allowDropRight: false,
                 allowDropBottom: false,
                 allowExtract: false,
-                lockSplitters: true,
+                allowSplitters: false,
                 showCloseButton: false,
-                showSaveButton: false,
-                showWindowAddButtons: false
+                showSaveButton: false
             };
         }
+
+        Object.keys(lockConfig.config).forEach((key) => {
+            const config = lockConfig.config as any;
+            if (config[key] === undefined) {
+                config[key] = true;
+            }
+        });
 
         if (typeof lockConfig.config.allowDrop !== "undefined") {
             lockConfig.config.allowDropLeft = lockConfig.config.allowDropLeft ?? lockConfig.config.allowDrop;
@@ -483,7 +489,7 @@ export class WorkspacesManager {
             lockConfig.config.allowDropBottom = lockConfig.config.allowDropBottom ?? lockConfig.config.allowDrop;
         }
 
-        const { allowDrop, allowExtract, lockSplitters, showCloseButton, showSaveButton, showWindowAddButtons } = lockConfig.config;
+        const { allowDrop, allowExtract, allowSplitters, showCloseButton, showSaveButton } = lockConfig.config;
         const { workspaceId } = lockConfig;
 
         if (allowDrop === false) {
@@ -498,7 +504,7 @@ export class WorkspacesManager {
             this._controller.enableWorkspaceExtract(workspaceId);
         }
 
-        if (lockSplitters === true) {
+        if (allowSplitters === false) {
             this._controller.disableSplitters(workspaceId);
         } else {
             this._controller.enableSplitters(workspaceId);
@@ -514,12 +520,6 @@ export class WorkspacesManager {
             this._controller.disableWorkspaceSaveButton(workspaceId);
         } else {
             this._controller.enableWorkspaceSaveButton(workspaceId);
-        }
-
-        if (showWindowAddButtons === false) {
-            this._controller.disableWindowAddButtons(workspaceId);
-        } else {
-            this._controller.enableWindowAddButtons(workspaceId);
         }
     }
 
@@ -542,6 +542,13 @@ export class WorkspacesManager {
             };
         }
 
+        Object.keys(lockConfig.config).forEach((key) => {
+            const config = lockConfig.config as any;
+            if (config[key] === undefined) {
+                config[key] = true;
+            }
+        });
+
         switch (lockConfig.type) {
             case "column":
                 this.handleColumnLockRequested(lockConfig);
@@ -562,6 +569,13 @@ export class WorkspacesManager {
                 showCloseButton: false,
             };
         }
+
+        Object.keys(lockConfig.config).forEach((key) => {
+            const config = lockConfig.config as any;
+            if (config[key] === undefined) {
+                config[key] = true;
+            }
+        });
 
         const { allowExtract, showCloseButton } = lockConfig.config;
         const { windowPlacementId } = lockConfig;

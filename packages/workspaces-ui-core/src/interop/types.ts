@@ -237,7 +237,7 @@ export interface MoveWindowToArguments {
 export interface LockWorkspaceArguments {
     workspaceId: string;
     config?: {
-        lockSplitters?: boolean;
+        allowSplitters?: boolean;
         allowDrop?: boolean;
         allowDropLeft?: boolean;
         allowDropTop?: boolean;
@@ -245,7 +245,6 @@ export interface LockWorkspaceArguments {
         allowDropBottom?: boolean;
         allowExtract?: boolean;
         showCloseButton?: boolean;
-        showWindowAddButtons?: boolean;
         showSaveButton?: boolean;
     };
 }

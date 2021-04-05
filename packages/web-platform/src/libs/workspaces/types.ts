@@ -318,9 +318,8 @@ export interface LockWorkspaceConfig {
         allowDropRight?: boolean,
         allowDropBottom?: boolean,
         allowExtract?: boolean,
-        lockSplitters?: boolean,
+        allowSplitters?: boolean,
         showCloseButton?: boolean,
         showSaveButton?: boolean,
-        showWindowAddButtons?: boolean
     }
 }
