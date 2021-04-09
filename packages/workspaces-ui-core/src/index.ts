@@ -31,7 +31,7 @@ if (!isInIframe) {
     GlueWeb(config).then((glue) => {
         window.glue = glue;
         facade.subscribeForWorkspaceEvents();
-        return manager.init(window.glue, glue.agm.instance.windowId);
+        return manager.init(window.glue, glue.agm.instance.windowId,facade);
     }).then(({ cleanUp }) => {
         done = cleanUp;
         return facade.init(window.glue, window.glue.agm.instance.windowId);

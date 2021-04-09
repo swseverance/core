@@ -257,9 +257,35 @@ export namespace Glue42WebPlatform {
             idleWorkspaces?: IdleWorkspacesRule;
         }
 
+        export interface LoadingConfig {
+            /**
+             * Default restore strategy when opening Workspaces.
+             */
+            defaultStrategy?: "direct" | "delayed" | "lazy";
+            delayed?: {
+                /**
+                 * Valid only in `delayed` mode. Initial period after which to start loading applications in batches. Defaults to 1000.
+                 */
+                initialOffsetInterval?: number;
+                /**
+                 * Valid only in `delayed` mode. Interval in minutes at which to load the application batches. Defaults to 5000.
+                 */
+                interval?: number;
+                /**
+                 * Valid only in `delayed` mode. Number of applications in a batch to be loaded at each interval. Defaults to 1.
+                 */
+                batch?: number;
+            }
+            /**
+             * Visual indicator `Zzz` on tabs of apps which are not loaded yet. Useful for developing and testing purposes.
+             */
+            showDelayedIndicator?: boolean;
+        }
+
         export interface Config {
             src: string;
             hibernation?: HibernationConfig;
+            loadingStrategy?: LoadingConfig;
             isFrame?: boolean;
             frameCache?: boolean;
         }

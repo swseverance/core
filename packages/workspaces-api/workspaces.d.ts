@@ -116,6 +116,7 @@ export namespace Glue42Workspaces {
         /** A setting used to declare that the workspace must be in a new frame and also provide options for that new frame */
         newFrame?: NewFrameConfig | boolean;
 
+        loadingStrategy?: LoadingStrategy;
         /** Used for replacing the specified workspace instead of creating a new one */
         reuseWorkspaceId?: string;
     }
@@ -156,8 +157,8 @@ export namespace Glue42Workspaces {
         saveLayout?: boolean;
     }
 
-    /** The restore strategy used to open new workspaces from existing layouts. */
-    export type RestoreType = "direct" | "delayed" | "lazy";
+    /** The loading strategy used to open new workspaces */
+    export type LoadingStrategy = "direct" | "delayed" | "lazy";
 
     /** An object which represent a workspace element. This is an element can be a box or a workspace window. */
     export type WorkspaceElement = WorkspaceBox | WorkspaceWindow;
@@ -193,6 +194,8 @@ export namespace Glue42Workspaces {
 
         /** Used for replacing the specified workspace instead of creating a new one */
         reuseWorkspaceId?: string;
+
+        loadStrategy?: LoadingStrategy;
     }
 
     /** An object describing the possible options when defining a new workspace */

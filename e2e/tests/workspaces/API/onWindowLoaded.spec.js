@@ -34,7 +34,7 @@ describe('onWindowLoaded ', () => {
         }
 
         const frames = await glue.workspaces.getAllFrames();
-        await Promise.all(frames.map((frame) => frame.close()));
+         await Promise.all(frames.map((frame) => frame.close()));
 
         unSubFuncs.forEach((unSub) => {
             if (typeof unSub === "function") {

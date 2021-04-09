@@ -196,6 +196,7 @@ export class GlueFacade {
 
         } catch (error) {
             errorCallback(error.message);
+            console.warn(error);
         }
     };
 
@@ -433,12 +434,12 @@ export class GlueFacade {
         const hasEventMethod = this._glue.agm.methods().some(m => m.name === this._workspacesEventMethod);
 
         if (hasEventMethod) {
-
             const methodPayload = {
                 action,
                 type,
                 payload
             };
+
             this._glue.agm.invoke(this._workspacesEventMethod, methodPayload).catch(() => {
                 // console.warn(`Could not push data to ${this._workspacesEventMethod} because ${e.message}`);
             });

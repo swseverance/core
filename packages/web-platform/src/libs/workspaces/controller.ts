@@ -13,6 +13,9 @@ import { IoC } from "../../shared/ioc";
 import { WindowMoveResizeConfig } from "../windows/types";
 import { StateController } from "../../controllers/state";
 import { WorkspaceHibernationWatcher } from "./hibernationWatcher";
+import { workspacesConfigDecoder } from "../../shared/decoders";
+import deepMerge from "deepmerge";
+import { defaultLoadingConfig } from "./defaultConfig";
 
 export class WorkspacesController implements LibController {
     private started = false;
@@ -49,7 +52,8 @@ export class WorkspacesController implements LibController {
         addContainer: { name: "addContainer", dataDecoder: addContainerConfigDecoder, resultDecoder: addItemResultDecoder, execute: this.addContainer.bind(this) },
         bundleWorkspace: { name: "bundleWorkspace", dataDecoder: bundleConfigDecoder, resultDecoder: voidResultDecoder, execute: this.bundleWorkspace.bind(this) },
         hibernateWorkspace: { name: "hibernateWorkspace", dataDecoder: workspaceSelectorDecoder, resultDecoder: voidResultDecoder, execute: this.hibernateWorkspace.bind(this) },
-        resumeWorkspace: { name: "resumeWorkspace", dataDecoder: workspaceSelectorDecoder, resultDecoder: voidResultDecoder, execute: this.resumeWorkspace.bind(this) }
+        resumeWorkspace: { name: "resumeWorkspace", dataDecoder: workspaceSelectorDecoder, resultDecoder: voidResultDecoder, execute: this.resumeWorkspace.bind(this) },
+        getWorkspacesConfig: { name: "getWorkspacesConfig", resultDecoder: workspacesConfigDecoder, execute: this.getWorkspacesConfiguration.bind(this) }
     }
 
     constructor(
@@ -66,7 +70,7 @@ export class WorkspacesController implements LibController {
             return;
         }
 
-        this.settings = config.workspaces;
+        this.settings = this.applyDefaults(config.workspaces);
 
         if (this.settings.hibernation) {
             this.hibernationWatcher.start(this, this.settings.hibernation);
@@ -189,6 +193,12 @@ export class WorkspacesController implements LibController {
         await this.glueController.callFrame<WorkspaceSelector, void>(this.operations.hibernateWorkspace, config, frame.windowId);
 
         this.logger?.trace(`[${commandId}] frame ${frame.windowId} gave a success signal, responding to caller`);
+    }
+
+    public async getWorkspacesConfiguration(config: unknown, commandId: string): Promise<Glue42WebPlatform.Workspaces.Config> {
+        this.logger?.trace(`[${commandId}] handling getWorkspacesConfiguration request`);
+
+        return this.settings;
     }
 
     private async handleFrameHello(config: FrameHello, commandId: string): Promise<void> {
@@ -568,7 +578,6 @@ export class WorkspacesController implements LibController {
 
         const frame = await this.framesController.getFrameInstance({ frameId: config.itemId });
 
-
         const moveConfig: WindowMoveResizeConfig = {
             windowId: config.itemId,
             top: config.top,
@@ -579,5 +588,18 @@ export class WorkspacesController implements LibController {
         await this.glueController.callWindow<WindowMoveResizeConfig, void>(this.ioc.windowsController.moveResizeOperation, moveConfig, frame.windowId);
 
         this.logger?.trace(`[${commandId}] frame with id ${frame.windowId} was successfully moved, responding to caller`);
+    }
+
+    private applyDefaults(config: Glue42WebPlatform.Workspaces.Config): Glue42WebPlatform.Workspaces.Config {
+        const providedHibernationConfig = config?.hibernation || {};
+        const providedLoadingConfig = config?.loadingStrategy || {};
+
+        const loadingConfig = deepMerge<Glue42WebPlatform.Workspaces.LoadingConfig>(defaultLoadingConfig, providedLoadingConfig as Glue42WebPlatform.Workspaces.LoadingConfig);
+
+        return {
+            ...config,
+            loadingStrategy: loadingConfig,
+            hibernation: providedHibernationConfig
+        }
     }
 }

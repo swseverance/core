@@ -104,7 +104,7 @@ export const newFrameConfigDecoder: Decoder<Glue42Workspaces.NewFrameConfig> = o
     }))
 });
 
-export const restoreTypeDecoder: Decoder<Glue42Workspaces.RestoreType> = oneOf<"direct" | "delayed" | "lazy">(
+export const loadingStrategyDecoder: Decoder<Glue42Workspaces.LoadingStrategy> = oneOf<"direct" | "delayed" | "lazy">(
     constant("direct"),
     constant("delayed"),
     constant("lazy")
@@ -113,7 +113,7 @@ export const restoreTypeDecoder: Decoder<Glue42Workspaces.RestoreType> = oneOf<"
 export const restoreWorkspaceConfigDecoder: Decoder<Glue42Workspaces.RestoreWorkspaceConfig> = optional(object({
     app: optional(nonEmptyStringDecoder),
     context: optional(anyJson()),
-    restoreType: optional(restoreTypeDecoder),
+    loadingStrategy: optional(loadingStrategyDecoder),
     title: optional(nonEmptyStringDecoder),
     reuseWorkspaceId: optional(nonEmptyStringDecoder),
     frameId: optional(nonEmptyStringDecoder),
@@ -143,7 +143,8 @@ export const workspaceDefinitionDecoder: Decoder<Glue42Workspaces.WorkspaceDefin
         position: optional(nonNegativeNumberDecoder),
         isFocused: optional(boolean()),
         noTabHeader: optional(boolean()),
-        reuseWorkspaceId: optional(nonEmptyStringDecoder)
+        reuseWorkspaceId: optional(nonEmptyStringDecoder),
+        loadingStrategy: optional(loadingStrategyDecoder)
     })),
     frame: optional(object({
         reuseFrameId: optional(nonEmptyStringDecoder),
@@ -230,7 +231,7 @@ export const workspaceConfigResultDecoder: Decoder<WorkspaceConfigResult> = obje
     positionIndex: nonNegativeNumberDecoder,
     name: nonEmptyStringDecoder,
     layoutName: optional(nonEmptyStringDecoder),
-    isHibernated: boolean(),
+    isHibernated: optional(boolean()), // to support backwards comptability with older versions of GD
     isSelected: boolean(),
 });
 

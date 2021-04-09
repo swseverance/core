@@ -13,7 +13,7 @@ export default [
             commonjs(),
             resolve({
                 mainFields: ["main", "module", "browser"],
-                
+
             }),
             external(),
             terser({

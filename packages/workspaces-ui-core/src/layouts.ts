@@ -82,7 +82,7 @@ export class LayoutsManager {
         const workspacesFrame = storage.get(storage.LAST_SESSION_KEY) || [];
         const rendererFriendlyFrameConfig = workspacesFrame.map((wc: WorkspaceItem) => {
             this.addWorkspaceIds(wc);
-            this.addWindowIds(wc);
+            // this.addWindowIds(wc);
             return this._configConverter.convertToRendererConfig(wc);
         });
         return rendererFriendlyFrameConfig;
@@ -104,7 +104,7 @@ export class LayoutsManager {
         const rendererFriendlyConfig = this._configConverter.convertToRendererConfig(savedWorkspace);
 
         this.addWorkspaceIds(rendererFriendlyConfig);
-        this.addWindowIds(rendererFriendlyConfig);
+        // this.addWindowIds(rendererFriendlyConfig);
 
         return {
             config: rendererFriendlyConfig as GoldenLayout.Config,
@@ -211,10 +211,10 @@ export class LayoutsManager {
             return undefined;
         }
         const workspaceConfig = this.resolver.getWorkspaceConfig(workspace.id);
-
         if ((workspaceConfig.workspacesOptions as any).layoutName) {
             delete (workspaceConfig.workspacesOptions as any).layoutName;
         }
+
         this.removeWorkspaceIds(workspaceConfig);
         await this.applyWindowLayoutState(workspaceConfig);
 

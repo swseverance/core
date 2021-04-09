@@ -82,6 +82,8 @@ describe("convertToRendererConfig() Should", () => {
                     }
                 ] as object[],
                 type,
+                width: undefined,
+                height: undefined,
                 workspacesOptions: {}
             };
 
@@ -106,6 +108,8 @@ describe("convertToRendererConfig() Should", () => {
             const expectedResult = {
                 type,
                 workspacesOptions: {},
+                width: undefined,
+                height: undefined,
                 content: [
                     {
                         type: "stack",
@@ -228,11 +232,15 @@ describe("convertToRendererConfig() Should", () => {
             };
             const expectedResult = {
                 type,
+                width: undefined,
+                height: undefined,
                 workspacesOptions: {},
                 content: [
                     {
                         type: type === "row" ? "column" : "row",
                         workspacesOptions: {},
+                        width: undefined,
+                        height: undefined,
                         content: [
                             emptyWindowPlaceholder
                         ]
@@ -240,6 +248,8 @@ describe("convertToRendererConfig() Should", () => {
                     {
                         type: type === "row" ? "column" : "row",
                         workspacesOptions: {},
+                        width: undefined,
+                        height: undefined,
                         content: [
                             emptyWindowPlaceholder
                         ]
@@ -247,6 +257,8 @@ describe("convertToRendererConfig() Should", () => {
                     {
                         type: type === "row" ? "column" : "row",
                         workspacesOptions: {},
+                        width: undefined,
+                        height: undefined,
                         content: [
                             emptyWindowPlaceholder
                         ]
@@ -284,6 +296,9 @@ describe("convertToRendererConfig() Should", () => {
             const emptyWindowPlaceholder = {
                 type: "stack",
                 workspacesOptions: {},
+                activeItemIndex: undefined,
+                width: undefined,
+                height: undefined,
                 content: [
                     {
                         componentName: "emptyVisibleWindow",
@@ -298,9 +313,10 @@ describe("convertToRendererConfig() Should", () => {
             };
 
             const expectedResult = {
-
                 type,
                 workspacesOptions: {},
+                width: undefined,
+                height: undefined,
                 content: [
                     emptyWindowPlaceholder,
                     emptyWindowPlaceholder,
@@ -323,6 +339,9 @@ describe("convertToRendererConfig() Should", () => {
         const expectedResult = {
             type: "stack",
             workspacesOptions: {},
+            activeItemIndex: undefined,
+            width: undefined,
+            height: undefined,
             content: [
                 {
                     componentName: "emptyVisibleWindow",
@@ -354,6 +373,9 @@ describe("convertToRendererConfig() Should", () => {
         const expectedResult: object = {
             type: "stack",
             workspacesOptions: {},
+            activeItemIndex: undefined,
+            width: undefined,
+            height: undefined,
             content: [
                 {
                     componentName: `app${mockId}`,
@@ -442,6 +464,8 @@ describe("convertToRendererConfig() Should", () => {
             content: [
                 {
                     type: "row",
+                    width: undefined,
+                    height: undefined,
                     workspacesOptions: {},
                     content: [
                         emptyWindowPlaceholder
@@ -490,6 +514,8 @@ describe("convertToRendererConfig() Should", () => {
                 {
                     type: "column",
                     workspacesOptions: {},
+                    width: undefined,
+                    height: undefined,
                     content: [
                         emptyWindowPlaceholder
                     ]
@@ -515,6 +541,9 @@ describe("convertToRendererConfig() Should", () => {
         const emptyWindowPlaceholder = {
             type: "stack",
             workspacesOptions: {},
+            activeItemIndex: undefined,
+            width: undefined,
+            height: undefined,
             content: [
                 {
                     componentName: "emptyVisibleWindow",
@@ -578,11 +607,18 @@ describe("convertToRendererConfig() Should", () => {
             content: [
                 {
                     type: "row",
+                    width: undefined,
+                    height: undefined,
                     content: [
                         {
                             type: "column",
+                            width: undefined,
+                            height: undefined,
                             content: [{
                                 type: "stack",
+                                activeItemIndex: undefined,
+                                width: undefined,
+                                height: undefined,
                                 content: [
                                     {
                                         componentName: `app${mockId}`,
@@ -606,10 +642,17 @@ describe("convertToRendererConfig() Should", () => {
                         },
                         {
                             type: "column",
+                            width: undefined,
+                            height: undefined,
                             content: [{
                                 type: "row",
+                                width: undefined,
+                                height: undefined,
                                 content: [{
                                     type: "stack",
+                                    activeItemIndex: undefined,
+                                    width: undefined,
+                                    height: undefined,
                                     content: [
                                         {
                                             componentName: `app${mockId}`,

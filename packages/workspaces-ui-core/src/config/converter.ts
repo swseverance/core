@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { WorkspaceItem, ParentItem, AnyItem, APIWIndowSettings } from "../types/internal";
 import GoldenLayout, { StackConfig, ColumnConfig, RowConfig, Config } from "@glue42/golden-layout";
-import { EmptyVisibleWindowName } from "../constants";
+import { EmptyVisibleWindowName } from "../utils/constants";
 import { idAsString } from "../utils";
 import { WorkspacesConfigurationFactory } from "./factory";
 
@@ -53,6 +53,10 @@ export class ConfigConverter {
             if (glConfig.content.length === 0) {
                 glConfig.content.push(this.getGroupWithEmptyVisibleWindow());
             }
+
+            glConfig.width = this.convertSizeToRendererConfigSafely(config.config?.width as any);
+            glConfig.height = this.convertSizeToRendererConfigSafely(config.config?.height as any);
+
             return glConfig;
         } else if (config.type === "group") {
             glConfig.type = "stack";
@@ -60,6 +64,11 @@ export class ConfigConverter {
             if (glConfig.content.length === 0) {
                 glConfig.content.push(this._configFactory.createEmptyVisibleWindowConfig());
             }
+
+            glConfig.activeItemIndex = config.config?.activeTabIndex;
+            glConfig.width = this.convertSizeToRendererConfigSafely(config.config?.width as any);
+            glConfig.height = this.convertSizeToRendererConfigSafely(config.config?.height as any);
+
             return glConfig;
         } else if (config.type === "window") {
             let appName = config.config?.appName || (config as any).appName;
@@ -118,12 +127,22 @@ export class ConfigConverter {
 
             return resultWindow;
         }
-        return {
+        const configAsAny = config as any;
+        const containerResult =  {
             id: idAsString(config.id),
             type: config.type === "stack" ? "group" : config.type,
             children: this.flat(config.content.map((c) => this.convertToApiConfigCore(c))),
-            config: {}
+            config: {
+                positionIndex: configAsAny.workspacesConfig?.positionIndex,
+                frameId: configAsAny.workspacesConfig?.frameId,
+                workspaceId: configAsAny.workspacesConfig?.workspaceId,
+                activeTabIndex: configAsAny.activeItemIndex,
+                width: configAsAny.width,
+                height: configAsAny.height
+            }
         };
+
+        return containerResult;
     }
 
     private flat = <T>(arr: T[]) => arr.reduce((acc, i) => [...acc, ...(Array.isArray(i) ? i : [i])], []);
@@ -144,5 +163,12 @@ export class ConfigConverter {
 
     private getGroupWithEmptyVisibleWindow(): GoldenLayout.ItemConfig {
         return this.wrap([this._configFactory.createEmptyVisibleWindowConfig()], "stack");
+    }
+
+    private convertSizeToRendererConfigSafely(size: number) {
+        // If the size is positive golden layout can work with it
+        // however if the size is below or equal to zero it has been set manually to an invalid value
+        // so it should be discarded -> undefined width/height will be transformed to default
+        return size > 0 ? size : undefined;
     }
 }

@@ -129,11 +129,15 @@ export class LayoutEventEmitter {
         return this._registry.add("eject-requested", callback);
     }
 
+    public onComponentSelectedInWorkspace(callback: (component: GoldenLayout.Component, workspaceId: string) => void) {
+        return this._registry.add("workspace-global-selection-changed", callback);
+    }
+
     public raiseEvent(name: "stack-maximized" | "stack-restored", data: { stack: GoldenLayout.ContentItem }): Promise<void> | Array<Promise<void>>;
     public raiseEvent(name: "workspace-save-requested" | "workspace-container-resized", data: { workspaceId: string }): Promise<void> | Array<Promise<void>>;
     public raiseEvent(name: "workspace-selection-changed", data: { workspace: Workspace; toBack: Window[] }): Promise<void> | Array<Promise<void>>;
     public raiseEvent(name: "content-item-created", data: { workspaceId: string; item: GoldenLayout.ContentItem }): Promise<void> | Array<Promise<void>>;
-    public raiseEvent(name: "content-component-created", data: { component: GoldenLayout.ContentItem; workspaceId: string }): Promise<void> | Array<Promise<void>>;
+    public raiseEvent(name: "content-component-created" | "workspace-global-selection-changed", data: { component: GoldenLayout.ContentItem; workspaceId: string }): Promise<void> | Array<Promise<void>>;
     public raiseEvent(name: "content-layout-state-changed", data: { layoutId: string }): Promise<void> | Array<Promise<void>>;
     public raiseEvent(name: "add-button-clicked", data: { args: { laneId: string; workspaceId: string; bounds: Bounds; parentType?: string } }): Promise<void> | Array<Promise<void>>;
     public raiseEvent(name: "workspace-tab-close-requested" | "workspace-added", data: { workspace: Workspace }): Promise<void> | Array<Promise<void>>;

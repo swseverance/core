@@ -39,6 +39,8 @@ describe("resume() Should", () => {
 
     let workspace = undefined;
 
+    before(() => coreReady);
+
     beforeEach(async () => {
         gtf.clearWindowActiveHooks();
         workspace = await glue.workspaces.createWorkspace(basicConfig);
