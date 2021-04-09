@@ -137,7 +137,7 @@ export class WorkspaceWrapper {
 
     public get allowDrop(): boolean {
         let result;
-        if (this.workspace.layout) {
+        if (this.workspace?.layout) {
             result = (this.workspace.layout.config.workspacesOptions as any).allowDrop;
         } else {
             result = (this.workspaceContentItem.config.workspacesConfig as any).allowDrop;
@@ -157,7 +157,7 @@ export class WorkspaceWrapper {
 
     public get allowDropLeft(): boolean {
         let result;
-        if (this.workspace.layout) {
+        if (this.workspace?.layout) {
             result = (this.workspace.layout.config.workspacesOptions as any).allowDropLeft;
         } else {
             result = (this.workspaceContentItem.config.workspacesConfig as any).allowDropLeft;
@@ -176,7 +176,7 @@ export class WorkspaceWrapper {
 
     public get allowDropTop(): boolean {
         let result;
-        if (this.workspace.layout) {
+        if (this.workspace?.layout) {
             result = (this.workspace.layout.config.workspacesOptions as any).allowDropTop;
         } else {
             result = (this.workspaceContentItem.config.workspacesConfig as any).allowDropTop;
@@ -194,7 +194,7 @@ export class WorkspaceWrapper {
 
     public get allowDropRight(): boolean {
         let result;
-        if (this.workspace.layout) {
+        if (this.workspace?.layout) {
             result = (this.workspace.layout.config.workspacesOptions as any).allowDropRight;
         } else {
             result = (this.workspaceContentItem.config.workspacesConfig as any).allowDropRight;
@@ -213,7 +213,7 @@ export class WorkspaceWrapper {
 
     public get allowDropBottom(): boolean {
         let result;
-        if (this.workspace.layout) {
+        if (this.workspace?.layout) {
             result = (this.workspace.layout.config.workspacesOptions as any).allowDropBottom;
         } else {
             result = (this.workspaceContentItem.config.workspacesConfig as any).allowDropBottom;
@@ -231,7 +231,7 @@ export class WorkspaceWrapper {
 
     public get allowExtract(): boolean {
         let result;
-        if (this.workspace.layout) {
+        if (this.workspace?.layout) {
             result = (this.workspace.layout.config.workspacesOptions as any).allowExtract;
         } else {
             result = (this.workspaceContentItem.config.workspacesConfig as any).allowExtract;
@@ -251,7 +251,7 @@ export class WorkspaceWrapper {
 
     public get allowSplitters(): boolean {
         let result;
-        if (this.workspace.layout) {
+        if (this.workspace?.layout) {
             result = (this.workspace.layout.config.workspacesOptions as any).allowSplitters;
         } else {
             result = (this.workspaceContentItem.config.workspacesConfig as any).allowSplitters;
@@ -269,7 +269,7 @@ export class WorkspaceWrapper {
 
     public get showSaveButton(): boolean {
         let result;
-        if (this.workspace.layout) {
+        if (this.workspace?.layout) {
             result = (this.workspace.layout.config.workspacesOptions as any).showSaveButton;
         } else {
             result = (this.workspaceContentItem.config.workspacesConfig as any).showSaveButton;
@@ -287,7 +287,7 @@ export class WorkspaceWrapper {
 
     public get showCloseButton(): boolean {
         let result;
-        if (this.workspace.layout) {
+        if (this.workspace?.layout) {
             result = (this.workspace.layout.config.workspacesOptions as any).showCloseButton;
         } else {
             result = (this.workspaceContentItem.config.workspacesConfig as any).showCloseButton;
@@ -305,7 +305,7 @@ export class WorkspaceWrapper {
 
     public get showAddWindowButtons(): boolean {
         let result;
-        if (this.workspace.layout) {
+        if (this.workspace?.layout) {
             result = (this.workspace.layout.config.workspacesOptions as any).showAddWindowButtons;
         } else {
             result = (this.workspaceContentItem.config.workspacesConfig as any).showAddWindowButtons;

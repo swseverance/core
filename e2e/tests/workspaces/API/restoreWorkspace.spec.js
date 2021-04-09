@@ -1,4 +1,4 @@
-describe('restoreWorkspace() Should', function () {
+describe.only('restoreWorkspace() Should', function () {
 
     const basicConfig = {
         children: [
@@ -637,6 +637,288 @@ describe('restoreWorkspace() Should', function () {
             });
 
             return promise;
+        });
+    });
+
+    describe('locking Should', () => {
+        const lockingConfig = {
+            children: [
+                {
+                    type: "row",
+                    children: [
+                        {
+                            type: "column",
+                            children: [
+                                {
+                                    type: "row",
+                                    children: [
+                                        {
+                                            type: "group",
+                                            children: [
+                                                {
+                                                    type: "window",
+                                                    appName: "noGlueApp"
+                                                },
+                                                {
+                                                    type: "window",
+                                                    appName: "noGlueApp"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            type: "column",
+                            children: [
+                                {
+                                    type: "row",
+                                    children: [
+                                        {
+                                            type: "group",
+                                            children: [
+                                                {
+                                                    type: "window",
+                                                    appName: "noGlueApp"
+                                                },
+                                                {
+                                                    type: "window",
+                                                    appName: "noGlueApp"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        const lockedLayoutName = "layout.integration.tests.locked";
+
+        it("restore the workspace with all constraints when the workspace was saved in a locked state", async () => {
+            let workspace;
+
+            workspace = await glue.workspaces.createWorkspace(lockingConfig);
+            await workspace.lock();
+            await workspace.saveLayout(lockedLayoutName, { saveContext: false });
+
+            const wsps = await glue.workspaces.getAllWorkspaces();
+            await Promise.all(wsps.map((wsp) => wsp.close()));
+
+            const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
+
+            expect(restoredWorkspace.allowDrop).to.be.false;
+            expect(restoredWorkspace.allowExtract).to.be.false;
+            expect(restoredWorkspace.showSaveButton).to.be.false;
+            expect(restoredWorkspace.showCloseButton).to.be.false;
+            expect(restoredWorkspace.allowSplitters).to.be.false;
+        });
+
+        it("restore the workspace with containers with constraints when a group was saved in a locked state", async () => {
+            let workspace;
+
+            workspace = await glue.workspaces.createWorkspace(lockingConfig);
+            const groups = workspace.getAllGroups();
+
+            await Promise.all(groups.map((group) => group.lock()));
+            await workspace.saveLayout(lockedLayoutName, { saveContext: false });
+
+            const wsps = await glue.workspaces.getAllWorkspaces();
+            await Promise.all(wsps.map((wsp) => wsp.close()));
+
+            const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
+
+            restoredWorkspace.getAllGroups().forEach((g) => {
+                expect(g.allowDrop).to.be.false;
+                expect(g.allowExtract).to.be.false;
+                expect(g.showMaximizeButton).to.be.false;
+                expect(g.showEjectButton).to.be.false;
+                expect(g.showAddWindowButton).to.be.false;
+            });
+        });
+
+        it("restore the workspace with containers with constraints when a row was saved in a locked state", async () => {
+            let workspace;
+
+            workspace = await glue.workspaces.createWorkspace(lockingConfig);
+            const rows = workspace.getAllRows();
+
+            await Promise.all(rows.map((row) => row.lock()));
+            await workspace.saveLayout(lockedLayoutName, { saveContext: false });
+
+            const wsps = await glue.workspaces.getAllWorkspaces();
+            await Promise.all(wsps.map((wsp) => wsp.close()));
+
+            const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
+
+            restoredWorkspace.getAllRows().forEach((g) => {
+                expect(g.allowDrop).to.be.false;
+            });
+        });
+
+        it("restore the workspace with containers with constraints when a column was saved in a locked state", async () => {
+            let workspace;
+
+            workspace = await glue.workspaces.createWorkspace(lockingConfig);
+            const columns = workspace.getAllColumns();
+
+            await Promise.all(columns.map((column) => column.lock()));
+            await workspace.saveLayout(lockedLayoutName, { saveContext: false });
+
+            const wsps = await glue.workspaces.getAllWorkspaces();
+            await Promise.all(wsps.map((wsp) => wsp.close()));
+
+            const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
+
+            restoredWorkspace.getAllColumns().forEach((c) => {
+                expect(c.allowDrop).to.be.false;
+            });
+        });
+
+        it("restore the workspace with windows with constraints when the windows were saved in a locked state", async () => {
+            let workspace;
+
+            workspace = await glue.workspaces.createWorkspace(lockingConfig);
+            const windows = workspace.getAllWindows();
+
+            await Promise.all(windows.map((window) => window.lock()));
+            await workspace.saveLayout(lockedLayoutName, { saveContext: false });
+
+            const wsps = await glue.workspaces.getAllWorkspaces();
+            await Promise.all(wsps.map((wsp) => wsp.close()));
+
+            const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
+
+            restoredWorkspace.getAllWindows().forEach((w) => {
+                expect(w.allowExtract).to.be.false;
+                expect(w.showCloseButton).to.be.false;
+            });
+        });
+
+        it("restore the workspace with the correct container overrides when the workspace was locked and the groups were overriding the lock", async () => {
+            let workspace;
+
+            workspace = await glue.workspaces.createWorkspace(lockingConfig);
+            const groups = workspace.getAllGroups();
+
+            await workspace.lock();
+            await Promise.all(groups.map((group) => group.lock({})));
+            await workspace.saveLayout(lockedLayoutName, { saveContext: false });
+
+            const wsps = await glue.workspaces.getAllWorkspaces();
+            await Promise.all(wsps.map((wsp) => wsp.close()));
+
+            const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
+
+            expect(workspace.allowDrop).to.be.false;
+            expect(workspace.allowExtract).to.be.false;
+
+            restoredWorkspace.getAllGroups().forEach((g) => {
+                expect(g.allowDrop).to.be.true;
+                expect(g.showMaximizeButton).to.be.true;
+                expect(g.showEjectButton).to.be.true;
+                expect(g.allowExtract).to.be.true;
+                expect(g.showAddWindowButton).to.be.true;
+            });
+        });
+
+        it("restore the workspace with the correct container overrides when the workspace was locked and the columns were overriding the lock", async () => {
+            let workspace;
+
+            workspace = await glue.workspaces.createWorkspace(lockingConfig);
+            const columns = workspace.getAllColumns();
+
+            await workspace.lock();
+            await Promise.all(columns.map((column) => column.lock({})));
+            await workspace.saveLayout(lockedLayoutName, { saveContext: false });
+
+            const wsps = await glue.workspaces.getAllWorkspaces();
+            await Promise.all(wsps.map((wsp) => wsp.close()));
+
+            const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
+
+            expect(workspace.allowDrop).to.be.false;
+            expect(workspace.allowExtract).to.be.false;
+
+            restoredWorkspace.getAllColumns().forEach((c) => {
+                expect(c.allowDrop).to.be.true;
+            });
+        });
+
+        it("restore the workspace with the correct container overrides when the workspace was locked and the rows were overriding the lock", async () => {
+            let workspace;
+
+            workspace = await glue.workspaces.createWorkspace(lockingConfig);
+            const rows = workspace.getAllRows();
+
+            await workspace.lock();
+            await Promise.all(rows.map((row) => row.lock({})));
+            await workspace.saveLayout(lockedLayoutName, { saveContext: false });
+
+            const wsps = await glue.workspaces.getAllWorkspaces();
+            await Promise.all(wsps.map((wsp) => wsp.close()));
+
+            const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
+
+            expect(workspace.allowDrop).to.be.false;
+            expect(workspace.allowExtract).to.be.false;
+
+            restoredWorkspace.getAllRows().forEach((g) => {
+                expect(g.allowDrop).to.be.true;
+            });
+        });
+
+        it("restore the workspace with the correct window overrides when the workspace was locked and some of the windows were overriding the lock", async () => {
+            let workspace;
+
+            workspace = await glue.workspaces.createWorkspace(lockingConfig);
+            const windows = workspace.getAllWindows();
+
+            await workspace.lock();
+            await Promise.all(windows.map((win) => win.lock({})));
+            await workspace.saveLayout(lockedLayoutName, { saveContext: false });
+
+            const wsps = await glue.workspaces.getAllWorkspaces();
+            await Promise.all(wsps.map((wsp) => wsp.close()));
+
+            const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
+
+            expect(workspace.allowDrop).to.be.false;
+            expect(workspace.allowExtract).to.be.false;
+
+            restoredWorkspace.getAllWindows().forEach((w) => {
+                expect(w.allowExtract).to.be.true;
+                expect(w.showCloseButton).to.be.true;
+            });
+        });
+
+        it("restore the workspace with the correct window overrides when the parent group was locked and some of the windows were overriding the lock", async () => {
+            let workspace;
+
+            workspace = await glue.workspaces.createWorkspace(lockingConfig);
+            const windows = workspace.getAllWindows();
+
+            await Promise.all(workspace.getAllGroups().map(g => g.lock()));
+            await Promise.all(windows.map((win) => win.lock({})));
+            await workspace.saveLayout(lockedLayoutName, { saveContext: false });
+
+            const wsps = await glue.workspaces.getAllWorkspaces();
+            await Promise.all(wsps.map((wsp) => wsp.close()));
+
+            const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
+
+            restoredWorkspace.getAllGroups(g => {
+                expect(g.allowExtract).to.be.false;
+            });
+
+            restoredWorkspace.getAllWindows().forEach((w) => {
+                expect(w.allowExtract).to.be.true;
+                expect(w.showCloseButton).to.be.true;
+            });
         });
     });
 });

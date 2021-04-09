@@ -37,6 +37,7 @@ export class WorkspacesConfigurationFactory {
 
     public createGDWindowConfig(args: { windowId: string; id?: string; appName?: string; url?: string; title?: string; context?: object, allowExtract: boolean, showCloseButton: boolean }): GoldenLayout.ComponentConfig {
         const baseConfiguration = this.createWindowConfigurationCore(args.id);
+        console.log("Constructing window with", args);
         const workspacesConfig = {
             allowExtract: args.allowExtract,
             showCloseButton: args.showCloseButton

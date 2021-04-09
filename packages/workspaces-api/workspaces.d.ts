@@ -96,6 +96,10 @@ export namespace Glue42Workspaces {
             url?: string;
             /** The title of the window */
             title?: string;
+            /** Controls the visibility of the close button*/
+            showCloseButton?: boolean;
+            /** Controls whether the window can be dragged*/
+            allowExtract?: boolean;
         };
     }
 

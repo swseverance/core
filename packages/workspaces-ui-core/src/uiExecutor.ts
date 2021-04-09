@@ -1,3 +1,4 @@
+import GoldenLayout from "@glue42/golden-layout";
 import store from "./state/store";
 import { idAsString } from "./utils";
 
@@ -102,20 +103,35 @@ export class WorkspacesUIExecutor {
         $(".lm_item_container .lm_content .lm_item_container .lm_content").addClass("transparent-color");
     }
 
-    public showWindowCloseButton(windowId: string) {
-        const windowContentItem = store.getWindowContentItem(windowId);
+    public showWindowCloseButton(windowId: string | GoldenLayout.Component) {
+        let windowContentItem;
+        if (typeof windowId === "string") {
+            windowContentItem = store.getWindowContentItem(windowId);
+        } else {
+            windowContentItem = windowId;
+        }
 
         windowContentItem.tab.closeElement.show();
     }
 
-    public hideWindowCloseButton(windowId: string) {
-        const windowContentItem = store.getWindowContentItem(windowId);
+    public hideWindowCloseButton(windowId: string | GoldenLayout.Component) {
+        let windowContentItem;
+        if (typeof windowId === "string") {
+            windowContentItem = store.getWindowContentItem(windowId);
+        } else {
+            windowContentItem = windowId;
+        }
 
         windowContentItem.tab.closeElement.hide();
     }
 
-    public showMaximizeButton(itemId: string) {
-        const containerContentItem = store.getContainer(itemId);
+    public showMaximizeButton(itemId: string | GoldenLayout.Stack) {
+        let containerContentItem;
+        if (typeof itemId === "string") {
+            containerContentItem = store.getContainer(itemId);
+        } else {
+            containerContentItem = itemId;
+        }
 
         if (containerContentItem.type !== "stack") {
             throw new Error(`Cannot show maximize button of ${containerContentItem.type} ${containerContentItem.config.id}`);
@@ -129,8 +145,13 @@ export class WorkspacesUIExecutor {
         maximiseButton.show();
     }
 
-    public hideMaximizeButton(itemId: string) {
-        const containerContentItem = store.getContainer(itemId);
+    public hideMaximizeButton(itemId: string | GoldenLayout.Stack) {
+        let containerContentItem;
+        if (typeof itemId === "string") {
+            containerContentItem = store.getContainer(itemId);
+        } else {
+            containerContentItem = itemId;
+        }
 
         if (containerContentItem.type !== "stack") {
             throw new Error(`Cannot hide maximize button of ${containerContentItem.type} ${containerContentItem.config.id}`);
@@ -144,8 +165,13 @@ export class WorkspacesUIExecutor {
         maximiseButton.hide();
     }
 
-    public showEjectButton(itemId: string) {
-        const containerContentItem = store.getContainer(itemId);
+    public showEjectButton(itemId: string | GoldenLayout.Stack) {
+        let containerContentItem;
+        if (typeof itemId === "string") {
+            containerContentItem = store.getContainer(itemId);
+        } else {
+            containerContentItem = itemId;
+        }
 
         if (containerContentItem.type !== "stack") {
             throw new Error(`Cannot show eject button of ${containerContentItem.type} ${containerContentItem.config.id}`);
@@ -158,8 +184,13 @@ export class WorkspacesUIExecutor {
         ejectButton.show();
     }
 
-    public hideEjectButton(itemId: string) {
-        const containerContentItem = store.getContainer(itemId);
+    public hideEjectButton(itemId: string | GoldenLayout.Stack) {
+        let containerContentItem;
+        if (typeof itemId === "string") {
+            containerContentItem = store.getContainer(itemId);
+        } else {
+            containerContentItem = itemId;
+        }
 
         if (containerContentItem.type !== "stack") {
             throw new Error(`Cannot hide eject button of ${containerContentItem.type} ${containerContentItem.config.id}`);
@@ -172,8 +203,13 @@ export class WorkspacesUIExecutor {
         ejectButton.hide();
     }
 
-    public showAddWindowButton(itemId: string) {
-        const containerContentItem = store.getContainer(itemId);
+    public showAddWindowButton(itemId: string | GoldenLayout.Stack) {
+        let containerContentItem;
+        if (typeof itemId === "string") {
+            containerContentItem = store.getContainer(itemId);
+        } else {
+            containerContentItem = itemId;
+        }
 
         if (containerContentItem.type !== "stack") {
             throw new Error(`Cannot show add window button of ${containerContentItem.type} ${containerContentItem.config.id}`);
@@ -191,8 +227,13 @@ export class WorkspacesUIExecutor {
         button.show();
     }
 
-    public hideAddWindowButton(itemId: string) {
-        const containerContentItem = store.getContainer(itemId);
+    public hideAddWindowButton(itemId: string | GoldenLayout.Stack) {
+        let containerContentItem;
+        if (typeof itemId === "string") {
+            containerContentItem = store.getContainer(itemId);
+        } else {
+            containerContentItem = itemId;
+        }
 
         if (containerContentItem.type !== "stack") {
             throw new Error(`Cannot hide add window button of ${containerContentItem.type} ${containerContentItem.config.id}`);

@@ -25,15 +25,15 @@ export interface WorkspaceConfigResult {
     positionIndex: number;
     layoutName: string | undefined;
     isHibernated: boolean;
-    allowSplitters: boolean;
-    allowDrop: boolean;
-    allowDropLeft: boolean;
-    allowDropTop: boolean;
-    allowDropRight: boolean;
-    allowDropBottom: boolean;
-    allowExtract: boolean;
-    showCloseButton: boolean;
-    showSaveButton: boolean;
+    allowSplitters?: boolean;
+    allowDrop?: boolean;
+    allowDropLeft?: boolean;
+    allowDropTop?: boolean;
+    allowDropRight?: boolean;
+    allowDropBottom?: boolean;
+    allowExtract?: boolean;
+    showCloseButton?: boolean;
+    showSaveButton?: boolean;
 }
 
 export interface BaseChildSnapshotConfig {

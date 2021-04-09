@@ -101,6 +101,7 @@ export class LayoutsManager {
     public async getWorkspaceByName(name: string): Promise<SavedConfigWithData> {
         const savedWorkspaceLayout = await this._glue.layouts.get(name, this._layoutsType);
         const savedWorkspace: WorkspaceItem = savedWorkspaceLayout.components[0].state as WorkspaceItem;
+        console.log("SAVED WORKSPACE THING", savedWorkspace);
         const rendererFriendlyConfig = this._configConverter.convertToRendererConfig(savedWorkspace);
 
         this.addWorkspaceIds(rendererFriendlyConfig);

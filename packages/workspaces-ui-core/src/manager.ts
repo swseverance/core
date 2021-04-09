@@ -126,6 +126,7 @@ export class WorkspacesManager {
 
     public async openWorkspace(name: string, options?: RestoreWorkspaceConfig): Promise<string> {
         const savedConfigWithData = await this._layoutsManager.getWorkspaceByName(name);
+        console.log("Found layout", savedConfigWithData);
         const savedConfig = savedConfigWithData.config;
 
         savedConfig.workspacesOptions.context = savedConfigWithData.layoutData.context;
@@ -590,6 +591,12 @@ export class WorkspacesManager {
             this._controller.disableWindowCloseButton(windowPlacementId);
         } else {
             this._controller.enableWindowCloseButton(windowPlacementId, showCloseButton);
+        }
+
+        const workspace = store.getByWindowId(windowPlacementId);
+
+        if (workspace?.layout) {
+            workspace.layout.updateSize();
         }
     }
 
@@ -1236,7 +1243,7 @@ export class WorkspacesManager {
 
         const workspace = store.getByContainerId(data.itemId);
         if (workspace?.layout) {
-            this.reportLayoutStructure(workspace.layout);
+            workspace.layout.updateSize();
         }
     }
 

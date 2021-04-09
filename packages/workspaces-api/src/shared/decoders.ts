@@ -279,15 +279,15 @@ export const workspaceConfigResultDecoder: Decoder<WorkspaceConfigResult> = obje
     layoutName: optional(nonEmptyStringDecoder),
     isHibernated: boolean(),
     isSelected: boolean(),
-    allowDrop: boolean(),
-    allowExtract: boolean(),
-    allowSplitters: boolean(),
-    showCloseButton: boolean(),
-    showSaveButton: boolean(),
-    allowDropLeft: boolean(),
-    allowDropTop: boolean(),
-    allowDropRight: boolean(),
-    allowDropBottom: boolean()
+    allowDrop: optional(boolean()),
+    allowExtract: optional(boolean()),
+    allowSplitters: optional(boolean()),
+    showCloseButton: optional(boolean()),
+    showSaveButton: optional(boolean()),
+    allowDropLeft: optional(boolean()),
+    allowDropTop: optional(boolean()),
+    allowDropRight: optional(boolean()),
+    allowDropBottom: optional(boolean())
 });
 
 // todo: remove number positionIndex when fixed
@@ -308,8 +308,8 @@ export const swimlaneWindowSnapshotConfigDecoder: Decoder<SwimlaneWindowSnapshot
         isFocused: boolean(),
         title: optional(string()),
         appName: optional(nonEmptyStringDecoder),
-        allowExtract: boolean(),
-        showCloseButton: boolean()
+        allowExtract: optional(boolean()),
+        showCloseButton: optional(boolean())
     })
 ) as any;
 
@@ -348,7 +348,9 @@ export const windowLayoutItemDecoder: Decoder<Glue42Workspaces.WindowLayoutItem>
     config: object({
         appName: nonEmptyStringDecoder,
         url: optional(nonEmptyStringDecoder),
-        title: optional(string())
+        title: optional(string()),
+        allowExtract: optional(boolean()),
+        showCloseButton: optional(boolean())
     })
 });
 

@@ -90,7 +90,9 @@ export const windowLayoutItemDecoder: Decoder<Glue42Workspaces.WindowLayoutItem>
     config: object({
         appName: nonEmptyStringDecoder,
         url: optional(nonEmptyStringDecoder),
-        title: optional(string())
+        title: optional(string()),
+        showCloseButton: optional(boolean()),
+        allowExtract: optional(boolean())
     })
 });
 

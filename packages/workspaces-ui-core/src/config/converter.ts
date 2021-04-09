@@ -78,7 +78,7 @@ export class ConfigConverter {
             glConfig.workspacesConfig.allowExtract = config.config?.allowExtract;
             glConfig.workspacesConfig.showMaximizeButton = config.config?.showMaximizeButton;
             glConfig.workspacesConfig.showEjectButton = config.config?.showEjectButton;
-            glConfig.workspacesConfig.showWindowAddButton = config.config?.showWindowAddButton;
+            glConfig.workspacesConfig.showAddWindowButton = config.config?.showAddWindowButton;
             glConfig.activeItemIndex = config.config?.activeTabIndex;
             glConfig.width = this.convertSizeToRendererConfigSafely(config.config?.width as any);
             glConfig.height = this.convertSizeToRendererConfigSafely(config.config?.height as any);
@@ -91,7 +91,7 @@ export class ConfigConverter {
             if (!appName && windowId) {
                 appName = this._configFactory.getAppNameFromWindowId(windowId);
             }
-
+            console.log("Window in converter", config);
             const resultWindow = this._configFactory.createGDWindowConfig({
                 windowId,
                 id: config.id,
@@ -99,8 +99,8 @@ export class ConfigConverter {
                 url: config.config?.url || (config as any).url,
                 title: config.config?.title || (config as any).title,
                 context: config.config?.context || (config as any).context,
-                allowExtract: config?.config?.allowExtract !== undefined ? config?.config?.allowExtract : (config as any).allowExtract,
-                showCloseButton: config?.config?.showCloseButton !== undefined ? config?.config?.showCloseButton : (config as any).showCloseButton,
+                allowExtract: config?.config?.allowExtract ?? (config as any).allowExtract,
+                showCloseButton: config?.config?.showCloseButton ?? (config as any).showCloseButton,
             });
 
             if (parent.type !== "group") {

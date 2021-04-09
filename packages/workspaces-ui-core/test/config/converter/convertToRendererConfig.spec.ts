@@ -341,7 +341,7 @@ describe("convertToRendererConfig() Should", () => {
                     allowExtract: undefined,
                     showEjectButton: undefined,
                     showMaximizeButton: undefined,
-                    showWindowAddButton: undefined,
+                    showAddWindowButton: undefined,
                 },
             };
 
@@ -394,7 +394,7 @@ describe("convertToRendererConfig() Should", () => {
                 allowExtract: undefined,
                 showEjectButton: undefined,
                 showMaximizeButton: undefined,
-                showWindowAddButton: undefined,
+                showAddWindowButton: undefined,
             }
         };
 
@@ -480,7 +480,7 @@ describe("convertToRendererConfig() Should", () => {
                 allowExtract: undefined,
                 showEjectButton: undefined,
                 showMaximizeButton: undefined,
-                showWindowAddButton: undefined,
+                showAddWindowButton: undefined,
             },
         };
 
@@ -625,7 +625,7 @@ describe("convertToRendererConfig() Should", () => {
                 allowExtract: undefined,
                 showEjectButton: undefined,
                 showMaximizeButton: undefined,
-                showWindowAddButton: undefined,
+                showAddWindowButton: undefined,
             },
         };
 
@@ -716,7 +716,7 @@ describe("convertToRendererConfig() Should", () => {
                                     allowExtract: undefined,
                                     showEjectButton: undefined,
                                     showMaximizeButton: undefined,
-                                    showWindowAddButton: undefined,
+                                    showAddWindowButton: undefined,
                                 },
                                 workspacesOptions: {},
                             }],
@@ -763,7 +763,7 @@ describe("convertToRendererConfig() Should", () => {
                                         allowExtract: undefined,
                                         showEjectButton: undefined,
                                         showMaximizeButton: undefined,
-                                        showWindowAddButton: undefined,
+                                        showAddWindowButton: undefined,
                                     },
                                     workspacesOptions: {},
                                 }],

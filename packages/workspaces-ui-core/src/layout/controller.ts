@@ -963,6 +963,7 @@ export class LayoutController {
         });
 
         layout.on("stackCreated", (stack: GoldenLayout.Stack) => {
+            const wrapper = new WorkspaceContainerWrapper(stack, this._frameId);
             const button = document.createElement("li");
             button.classList.add("lm_add_button");
 
@@ -984,6 +985,20 @@ export class LayoutController {
 
             maximizeButton.addClass("workspace_content");
 
+            if (wrapper.showMaximizeButton === false) {
+                uiExecutor.hideMaximizeButton(stack);
+            }
+
+            const ejectButton = (stack as any)
+                .element
+                .children(".lm_header")
+                .children(".lm_controls")
+                .children(".lm_popout")[0];
+
+            if (wrapper.showEjectButton === false) {
+                uiExecutor.hideEjectButton(stack);
+            }
+
             stack.on("maximized", () => {
                 maximizeButton.addClass("lm_restore");
                 maximizeButton.attr("title", this._stackRestoreLabel);
@@ -998,6 +1013,14 @@ export class LayoutController {
 
             if (!this._options.disableCustomButtons) {
                 stack.header.controlsContainer.prepend($(button));
+            }
+
+            if ((layout.config.workspacesOptions as any).showAddWindowButtons === false) {
+                uiExecutor.hideAddWindowButton(stack);
+            }
+
+            if (wrapper.showAddWindowButton === false) {
+                uiExecutor.hideAddWindowButton(stack);
             }
 
             stack.on("activeContentItemChanged", () => {
@@ -1067,6 +1090,15 @@ export class LayoutController {
                 const hibernationIcon = document.createElement("div");
                 hibernationIcon.classList.add("lm_saveButton", "lm_hibernationIcon");
                 tab.element[0].prepend(hibernationIcon);
+            }
+
+            if (!tab.contentItem.isComponent) {
+                return;
+            }
+
+            const wrapper = new WorkspaceWindowWrapper(tab.contentItem, this._frameId);
+            if (wrapper.showCloseButton === false) {
+                uiExecutor.hideWindowCloseButton(tab.contentItem);
             }
         });
 
@@ -1215,6 +1247,17 @@ export class LayoutController {
                 }
 
                 this.refreshTabSizeClass(tab);
+
+                const workspace = store.getById(tab.contentItem.config.id);
+                const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, store.getWorkspaceContentItem(idAsString(tab.contentItem.config.id)), this._frameId);
+
+                if (wrapper.showSaveButton === false) {
+                    uiExecutor.hideWorkspaceSaveButton(idAsString(tab.contentItem.config.id));
+                }
+
+                if (wrapper.showCloseButton === false) {
+                    uiExecutor.hideWorkspaceCloseButton(idAsString(tab.contentItem.config.id));
+                }
             });
 
             store.workspaceLayout.on("tabCloseRequested", (tab: GoldenLayout.Tab) => {
