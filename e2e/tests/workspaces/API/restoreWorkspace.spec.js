@@ -1,4 +1,4 @@
-describe.only('restoreWorkspace() Should', function () {
+describe('restoreWorkspace() Should', function () {
 
     const basicConfig = {
         children: [

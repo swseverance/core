@@ -91,7 +91,6 @@ export class ConfigConverter {
             if (!appName && windowId) {
                 appName = this._configFactory.getAppNameFromWindowId(windowId);
             }
-            console.log("Window in converter", config);
             const resultWindow = this._configFactory.createGDWindowConfig({
                 windowId,
                 id: config.id,

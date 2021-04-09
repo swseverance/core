@@ -569,7 +569,7 @@ export class WorkspacesController implements LibController {
     }
 
     private async lockWorkspace(config: LockWorkspaceConfig, commandId: string): Promise<void> {
-        this.logger?.trace(`[${commandId}] handling resumeWorkspace request with config ${JSON.stringify(config)}`);
+        this.logger?.trace(`[${commandId}] handling lockWorkspace request with config ${JSON.stringify(config)}`);
 
         const frame = await this.framesController.getFrameInstance({ itemId: config.workspaceId });
 
@@ -581,7 +581,7 @@ export class WorkspacesController implements LibController {
     }
 
     private async lockContainer(config: LockContainerConfig, commandId: string): Promise<void> {
-        this.logger?.trace(`[${commandId}] handling resumeWorkspace request with config ${JSON.stringify(config)}`);
+        this.logger?.trace(`[${commandId}] handling lockContainer request with config ${JSON.stringify(config)}`);
 
         const frame = await this.framesController.getFrameInstance({ itemId: config.itemId });
 
@@ -593,7 +593,7 @@ export class WorkspacesController implements LibController {
     }
 
     private async lockWindow(config: LockWindowConfig, commandId: string):Promise<void>{
-        this.logger?.trace(`[${commandId}] handling resumeWorkspace request with config ${JSON.stringify(config)}`);
+        this.logger?.trace(`[${commandId}] handling lockWindow request with config ${JSON.stringify(config)}`);
 
         const frame = await this.framesController.getFrameInstance({ itemId: config.windowPlacementId });
 

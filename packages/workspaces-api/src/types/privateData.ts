@@ -30,12 +30,6 @@ export interface SwimlaneItemConfig {
     workspace: Workspace;
 }
 
-// export interface ParentPrivateData extends SwimlaneItemConfig {
-//     config: ParentSnapshotConfig;
-//     type: SubParent;
-//     children: Child[];
-// }
-
 export interface GroupPrivateData extends SwimlaneItemConfig {
     config: GroupSnapshotConfig;
     type: "group";

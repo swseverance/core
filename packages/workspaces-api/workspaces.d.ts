@@ -306,8 +306,10 @@ export namespace Glue42Workspaces {
         /** The title of the window */
         title: string;
 
+        /** A flag showing whether the window can be dragged */
         allowExtract: boolean;
 
+          /** A flag showing whether the window close button is visible */
         showCloseButton: boolean;
     }
 

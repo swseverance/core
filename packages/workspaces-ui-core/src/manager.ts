@@ -126,7 +126,6 @@ export class WorkspacesManager {
 
     public async openWorkspace(name: string, options?: RestoreWorkspaceConfig): Promise<string> {
         const savedConfigWithData = await this._layoutsManager.getWorkspaceByName(name);
-        console.log("Found layout", savedConfigWithData);
         const savedConfig = savedConfigWithData.config;
 
         savedConfig.workspacesOptions.context = savedConfigWithData.layoutData.context;
@@ -390,11 +389,9 @@ export class WorkspacesManager {
     }
 
     public getFrameSummary(itemId: string) {
-        console.log("getting summary", itemId);
         const workspace = store.getByContainerId(itemId) || store.getByWindowId(itemId) || store.getById(itemId);
         const isFrameId = this._frameId === itemId;
 
-        console.log("FOUND WORKSPACE", workspace);
         return {
             id: (workspace || isFrameId) ? this._frameId : "none"
         };
