@@ -603,41 +603,6 @@ describe.only('restoreWorkspace() Should', function () {
                 return promise;
             });
         });
-
-        it.skip(`not start any new windows when the loadingStrategy is delayed and the frame is in parallel with its creation`, async () => {
-            let resolve;
-            let reject;
-            const promise = new Promise((res, rej) => {
-                resolve = res;
-                reject = rej;
-            });
-
-            let frameClosed = false;
-            const allFrames = await glue.workspaces.getAllFrames();
-
-            await Promise.all(allFrames.map(f => f.close()));
-
-            const frame = (await glue.workspaces.createWorkspace({ children: [] })).frame;
-
-            let unsub = await glue.windows.onWindowAdded((w) => {
-                if (frameClosed) {
-                    reject("Should not be invoked after the frame has been stopped" + " " + w.id);
-                }
-            });
-
-            gtf.addWindowHook(unsub);
-
-            glue.workspaces.restoreWorkspace(layoutName, { loadingStrategy: "delayed" });
-            frame.close().then(() => {
-                frameClosed = true;
-            });
-
-            gtf.wait(5000).then(() => {
-                resolve();
-            });
-
-            return promise;
-        });
     });
 
     describe('locking Should', () => {

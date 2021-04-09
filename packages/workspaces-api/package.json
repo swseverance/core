@@ -1,6 +1,6 @@
 {
     "name": "@glue42/workspaces-api",
-    "version": "1.4.7",
+    "version": "1.5.0",
     "description": "Glue42 Core workspaces API",
     "main": "dist/workspaces.umd.js",
     "module": "dist/workspaces.es.js",

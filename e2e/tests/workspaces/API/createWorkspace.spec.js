@@ -791,40 +791,8 @@ describe('createWorkspace() ', function () {
                     resolve();
                 });
 
-                return promise;
+                await promise;
             });
-        });
-
-        it(`not start any new windows when the loadingStrategy is delayed and the frame is in parallel with its creation`, async () => {
-            let resolve;
-            let reject;
-            const promise = new Promise((res, rej) => {
-                resolve = res;
-                reject = rej;
-            });
-
-            let frameClosed = false;
-            const frame = (await glue.workspaces.createWorkspace({ children: [] })).frame;
-            const directConfig = Object.assign(config, { config: { loadingStrategy: "delayed" } });
-
-            let unsub = await glue.windows.onWindowAdded(() => {
-                if (frameClosed) {
-                    reject("Should not be invoked after the frame has been stopped");
-                }
-            });
-
-            gtf.addWindowHook(unsub);
-
-            glue.workspaces.createWorkspace(directConfig);
-            frame.close().then(() => {
-                frameClosed = true;
-            });
-
-            gtf.wait(5000).then(() => {
-                resolve();
-            });
-
-            return promise;
         });
     });
     // SAVE CONFIG

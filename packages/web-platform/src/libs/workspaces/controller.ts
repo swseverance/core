@@ -15,7 +15,7 @@ import { StateController } from "../../controllers/state";
 import { WorkspaceHibernationWatcher } from "./hibernationWatcher";
 import { workspacesConfigDecoder } from "../../shared/decoders";
 import deepMerge from "deepmerge";
-import { defaultHibernationConfig, defaultLoadingConfig } from "./defaultConfig";
+import { defaultLoadingConfig } from "./defaultConfig";
 
 export class WorkspacesController implements LibController {
     private started = false;
@@ -633,13 +633,12 @@ export class WorkspacesController implements LibController {
         const providedHibernationConfig = config?.hibernation || {};
         const providedLoadingConfig = config?.loadingStrategy || {};
 
-        const hibernationConfig = deepMerge<Glue42WebPlatform.Workspaces.HibernationConfig>(defaultHibernationConfig, providedHibernationConfig as Glue42WebPlatform.Workspaces.HibernationConfig);
         const loadingConfig = deepMerge<Glue42WebPlatform.Workspaces.LoadingConfig>(defaultLoadingConfig, providedLoadingConfig as Glue42WebPlatform.Workspaces.LoadingConfig);
 
         return {
             ...config,
             loadingStrategy: loadingConfig,
-            hibernation: hibernationConfig
+            hibernation: providedHibernationConfig
         }
     }
 }

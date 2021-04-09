@@ -704,7 +704,6 @@ export class WorkspacesManager {
         }
     }
 
-
     private async reinitializeWorkspace(id: string, config: GoldenLayout.Config) {
         await this._controller.reinitializeWorkspace(id, config);
 
@@ -1063,7 +1062,7 @@ export class WorkspacesManager {
         }
     }
 
-    private async closeWorkspaceCore(workspace: Workspace) {
+    private closeWorkspaceCore(workspace: Workspace) {
         const workspaceSummary = this.stateResolver.getWorkspaceSummary(workspace.id);
         const windowSummaries = workspace.windows.map((w) => {
             if (store.getWindowContentItem(w.id)) {
@@ -1097,7 +1096,7 @@ export class WorkspacesManager {
         });
     }
 
-    private async closeHibernatedWorkspaceCore(workspace: Workspace) {
+    private closeHibernatedWorkspaceCore(workspace: Workspace) {
         const workspaceSummary = this.stateResolver.getWorkspaceSummary(workspace.id);
         const snapshot = this.stateResolver.getSnapshot(workspace.id) as GoldenLayout.Config;
         const windowSummaries = this.stateResolver.extractWindowSummariesFromSnapshot(snapshot);
