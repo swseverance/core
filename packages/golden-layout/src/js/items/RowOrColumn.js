@@ -163,6 +163,27 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 	},
 
 	/**
+	 * Returns the min width of the row or column
+	 * @returns {number | undefined}
+	 */
+	getMinWidth() {
+		const elementMinWidth = this.config.workspacesOptions.minWidth || this.layoutManager.config.dimensions.minItemWidth;
+		return this.contentItems.reduce((minWidth, ci) => {
+			return Math.max(minWidth, ci.getMinWidth() || this.layoutManager.config.dimensions.minItemWidth);
+		}, elementMinWidth);
+	},
+	/**
+	 * Returns the min width of the row or column
+	 * @returns {number | undefined}
+	 */
+	getMinHeight() {
+		const elementMinHeight = this.config.workspacesOptions.minHeight || this.layoutManager.config.dimensions.minItemHeight;
+		return this.contentItems.reduce((minHeight, ci) => {
+			return Math.max(minHeight, ci.getMinHeight() || this.layoutManager.config.dimensions.minItemHeight);
+		}, elementMinHeight);
+	},
+
+	/**
 	 * Invoked recursively by the layout manager. AbstractContentItem.init appends
 	 * the contentItem's DOM elements to the container, RowOrColumn init adds splitters
 	 * in between them
@@ -293,6 +314,7 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 		 */
 		if (Math.round(total) === 100) {
 			this._respectMinItemWidth();
+			this._respectMinItemHeight();
 			return;
 		}
 
@@ -304,6 +326,7 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 				itemsWithoutSetDimension[i].config[dimension] = (100 - total) / itemsWithoutSetDimension.length;
 			}
 			this._respectMinItemWidth();
+			this._respectMinItemHeight();
 			return;
 		}
 
@@ -328,6 +351,7 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 		}
 
 		this._respectMinItemWidth();
+		this._respectMinItemHeight();
 	},
 
 	/**
@@ -362,13 +386,16 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 			contentItem = this.contentItems[i];
 			itemSize = sizeData.itemSizes[i];
 
-			if (itemSize < minItemWidth) {
-				totalUnderMin += minItemWidth - itemSize;
-				entry = { width: minItemWidth };
+			const contentItemMinWidth = contentItem.getMinWidth();
+			const validContentItemMinWidth = (contentItemMinWidth === undefined) ? minItemWidth : contentItemMinWidth;
+
+			if (itemSize < validContentItemMinWidth) {
+				totalUnderMin += validContentItemMinWidth - itemSize;
+				entry = { width: validContentItemMinWidth };
 
 			}
 			else {
-				totalOverMin += itemSize - minItemWidth;
+				totalOverMin += itemSize - validContentItemMinWidth;
 				entry = { width: itemSize };
 				entriesOverMin.push(entry);
 			}
@@ -380,7 +407,8 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 		 * If there is nothing under min, or there is not enough over to make up the difference, do nothing.
 		 */
 		if (totalUnderMin === 0 || totalUnderMin > totalOverMin) {
-			return;
+			console.log("SUCCESS");
+			return true;
 		}
 
 		/**
@@ -408,6 +436,95 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 		for (i = 0; i < this.contentItems.length; i++) {
 			this.contentItems[i].config.width = (allEntries[i].width / sizeData.totalWidth) * 100;
 		}
+
+		console.log("FAAIL");
+		return false;
+	},
+	/**
+	  * Adjusts the column widths to respect the dimensions minItemWidth if set.
+	  * @returns {}
+	  */
+	_respectMinItemHeight: function () {
+		var minItemHeight = this.layoutManager.config.dimensions ? (this.layoutManager.config.dimensions.minItemHeight || 0) : 0,
+			sizeData = null,
+			entriesOverMin = [],
+			totalOverMin = 0,
+			totalUnderMin = 0,
+			remainingHeight = 0,
+			itemSize = 0,
+			contentItem = null,
+			reducePercent,
+			reducedHeight,
+			allEntries = [],
+			entry;
+
+		if (this._isRow || !minItemHeight || this.contentItems.length <= 1) {
+			return;
+		}
+
+		sizeData = this._calculateAbsoluteSizes();
+
+		/**
+		 * Figure out how much we are under the min item size total and how much room we have to use.
+		 */
+		for (var i = 0; i < this.contentItems.length; i++) {
+
+			contentItem = this.contentItems[i];
+			itemSize = sizeData.itemSizes[i];
+
+			const contentItemMinHeight = contentItem.getMinHeight();
+			const validContentItemMinHeight = (contentItemMinHeight === undefined) ? minItemHeight : contentItemMinHeight;
+
+			if (itemSize < validContentItemMinHeight) {
+				totalUnderMin += validContentItemMinHeight - itemSize;
+				entry = { height: validContentItemMinHeight };
+
+			}
+			else {
+				totalOverMin += itemSize - validContentItemMinHeight;
+				entry = { height: itemSize };
+				entriesOverMin.push(entry);
+			}
+
+			allEntries.push(entry);
+		}
+
+		/**
+		 * If there is nothing under min, or there is not enough over to make up the difference, do nothing.
+		 */
+		if (totalUnderMin === 0 || totalUnderMin > totalOverMin) {
+			console.log("SUCCESS");
+			return true;
+		}
+
+		/**
+		 * Evenly reduce all columns that are over the min item width to make up the difference.
+		 */
+		reducePercent = totalUnderMin / totalOverMin;
+		remainingHeight = totalUnderMin;
+		for (i = 0; i < entriesOverMin.length; i++) {
+			entry = entriesOverMin[i];
+			reducedHeight = Math.round((entry.height - minItemHeight) * reducePercent);
+			remainingHeight -= reducedHeight;
+			entry.height -= reducedHeight;
+		}
+
+		/**
+		 * Take anything remaining from the last item.
+		 */
+		if (remainingHeight !== 0) {
+			allEntries[allEntries.length - 1].height -= remainingHeight;
+		}
+
+		/**
+		 * Set every items size relative to 100 relative to its size to total
+		 */
+		for (i = 0; i < this.contentItems.length; i++) {
+			this.contentItems[i].config.height = (allEntries[i].height / sizeData.totalHeight) * 100;
+		}
+
+		console.log("FAAIL");
+		return false;
 	},
 
 	/**
@@ -458,8 +575,8 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 		var minWidth = 0, minHeight = 0;
 
 		for (var i = 0; i < arr.length; ++i) {
-			minWidth = Math.max(arr[i].minWidth || 0, minWidth);
-			minHeight = Math.max(arr[i].minHeight || 0, minHeight);
+			minWidth = Math.max(arr[i].getMinWidth() || 0, minWidth);
+			minHeight = Math.max(arr[i].getMinHeight() || 0, minHeight);
 		}
 
 		return { horizontal: minWidth, vertical: minHeight };
@@ -477,10 +594,10 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 		var items = this._getItemsForSplitter(splitter),
 			minSize = this.layoutManager.config.dimensions[this._isColumn ? 'minItemHeight' : 'minItemWidth'];
 
-		var beforeMinDim = this._getMinimumDimensions(items.before.config.content);
+		var beforeMinDim = this._getMinimumDimensions([...items.before.contentItems, items.before]);
 		var beforeMinSize = this._isColumn ? beforeMinDim.vertical : beforeMinDim.horizontal;
 
-		var afterMinDim = this._getMinimumDimensions(items.after.config.content);
+		var afterMinDim = this._getMinimumDimensions([...items.after.contentItems, items.after]);
 		var afterMinSize = this._isColumn ? afterMinDim.vertical : afterMinDim.horizontal;
 
 		this._splitterPosition = 0;
@@ -503,6 +620,10 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 			return;
 		}
 		var offset = this._isColumn ? offsetY : offsetX;
+		console.log("offset", offset);
+		console.log("minPos", this._splitterMinPosition);
+		console.log("maxPos", this._splitterMaxPosition);
+		console.log("_____");
 
 		if (offset > this._splitterMinPosition && offset < this._splitterMaxPosition) {
 			this._splitterPosition = offset;

@@ -39,6 +39,27 @@ lm.utils.copy( lm.items.Root.prototype, {
 			this.contentItems[ 0 ].element.height( height );
 		}
 	},
+
+	/**
+	 * Returns the min width of the row or column
+	 * @returns {number | undefined}
+	 */
+	getMinWidth() {
+		const elementMinWidth = this.config.workspacesOptions.minWidth || this.layoutManager.config.dimensions.minItemWidth;
+		return this.contentItems.reduce((minWidth, ci) => {
+			return Math.max(minWidth, ci.getMinWidth() || this.layoutManager.config.dimensions.minItemWidth);
+		}, elementMinWidth);
+	},
+	/**
+	 * Returns the min width of the row or column
+	 * @returns {number | undefined}
+	 */
+   getMinHeight() {
+	   const elementMinHeight = this.config.workspacesOptions.minHeight || this.layoutManager.config.dimensions.minItemHeight;
+	   return this.contentItems.reduce((minHeight, ci) => {
+		   return Math.max(minHeight, ci.getMinHeight() || this.layoutManager.config.dimensions.minItemHeight);
+	   }, elementMinHeight);
+   },
 	_$highlightDropZone: function( x, y, area ) {
 		this.layoutManager.tabDropPlaceholder.remove();
 		lm.items.AbstractContentItem.prototype._$highlightDropZone.apply( this, arguments );
