@@ -40,8 +40,6 @@ import {
     FrameStateConfig,
     FrameStateResult,
     WorkspaceSelector,
-    WindowSelector,
-    ItemSelector,
     LockWorkspaceConfig,
     LockWindowConfig,
     LockContainerConfig,
@@ -50,6 +48,7 @@ import {
 } from "../types/protocol";
 import { WorkspaceEventType, WorkspaceEventAction } from "../types/subscription";
 import { Glue42Workspaces } from "../../workspaces";
+import { ColumnLockConfig, GroupLockConfig, RowLockConfig, WorkspaceLockConfig, WorkspaceWindowLockConfig } from "../types/temp";
 
 export const nonEmptyStringDecoder: Decoder<string> = string().where((s) => s.length > 0, "Expected a non-empty string");
 export const nonNegativeNumberDecoder: Decoder<number> = number().where((num) => num >= 0, "Expected a non-negative number");
@@ -567,7 +566,7 @@ export const workspaceSelectorDecoder: Decoder<WorkspaceSelector> = object({
     workspaceId: nonEmptyStringDecoder,
 });
 
-export const workspaceLockConfigDecoder: Decoder<Glue42Workspaces.WorkspaceLockConfig> = object({
+export const workspaceLockConfigDecoder: Decoder<WorkspaceLockConfig> = object({
     allowDrop: optional(boolean()),
     allowDropLeft: optional(boolean()),
     allowDropTop: optional(boolean()),
@@ -584,7 +583,7 @@ export const lockWorkspaceDecoder: Decoder<LockWorkspaceConfig> = object({
     config: optional(workspaceLockConfigDecoder)
 });
 
-export const windowLockConfigDecoder: Decoder<Glue42Workspaces.WorkspaceWindowLockConfig> = object({
+export const windowLockConfigDecoder: Decoder<WorkspaceWindowLockConfig> = object({
     allowExtract: optional(boolean()),
     showCloseButton: optional(boolean())
 });
@@ -594,15 +593,15 @@ export const lockWindowDecoder: Decoder<LockWindowConfig> = object({
     config: optional(windowLockConfigDecoder)
 });
 
-export const rowLockConfigDecoder: Decoder<Glue42Workspaces.RowLockConfig> = object({
+export const rowLockConfigDecoder: Decoder<RowLockConfig> = object({
     allowDrop: optional(boolean()),
 });
 
-export const columnLockConfigDecoder: Decoder<Glue42Workspaces.ColumnLockConfig> = object({
+export const columnLockConfigDecoder: Decoder<ColumnLockConfig> = object({
     allowDrop: optional(boolean()),
 });
 
-export const groupLockConfigDecoder: Decoder<Glue42Workspaces.GroupLockConfig> = object({
+export const groupLockConfigDecoder: Decoder<GroupLockConfig> = object({
     allowExtract: optional(boolean()),
     allowDrop: optional(boolean()),
     showMaximizeButton: optional(boolean()),

@@ -83,7 +83,7 @@ export interface SubParentSnapshotResult {
     id: string;
     type: "row" | "column" | "group";
     children: ChildSnapshotResult[];
-    config: ParentSnapshotConfig
+    config: ParentSnapshotConfig;
 }
 export type ChildSnapshotResult = WindowSnapshotResult | SubParentSnapshotResult;
 
@@ -259,37 +259,37 @@ export interface WindowStreamData {
 }
 
 export interface LockWindowConfig {
-    windowPlacementId: string,
+    windowPlacementId: string;
     config?: {
-        allowExtract?: boolean,
-        showCloseButton?: boolean
-    }
+        allowExtract?: boolean;
+        showCloseButton?: boolean;
+    };
 }
 
 export interface LockContainerConfig {
-    itemId: string,
-    type: "row" | "column" | "group",
+    itemId: string;
+    type: "row" | "column" | "group";
     config?: {
-        allowExtract?: boolean,
-        allowDrop?: boolean,
-        showMaximizeButton?: boolean,
-        showEjectButton?: boolean,
-        showAddWindowButton?: boolean
-    }
+        allowExtract?: boolean;
+        allowDrop?: boolean;
+        showMaximizeButton?: boolean;
+        showEjectButton?: boolean;
+        showAddWindowButton?: boolean;
+    };
 }
 
 export interface LockWorkspaceConfig {
-    workspaceId: string,
+    workspaceId: string;
     config?: {
-        allowDrop?: boolean,
-        allowDropLeft?: boolean,
-        allowDropTop?: boolean,
-        allowDropRight?: boolean,
-        allowDropBottom?: boolean,
-        allowExtract?: boolean,
-        allowSplitters?: boolean,
-        showCloseButton?: boolean,
-        showSaveButton?: boolean,
-    }
+        allowDrop?: boolean;
+        allowDropLeft?: boolean;
+        allowDropTop?: boolean;
+        allowDropRight?: boolean;
+        allowDropBottom?: boolean;
+        allowExtract?: boolean;
+        allowSplitters?: boolean;
+        showCloseButton?: boolean;
+        showSaveButton?: boolean;
+    };
 }
 // #endregion

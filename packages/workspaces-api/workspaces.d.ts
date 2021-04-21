@@ -319,52 +319,6 @@ export namespace Glue42Workspaces {
         name: string;
     }
 
-    /** Provides fine grain control when locking a workspace */
-    export interface WorkspaceLockConfig {
-        /** Prevents the splitters for being draggable, so the windows cannot be resized */
-        allowSplitters?: boolean,
-        /** Controls the ability of the users to drop outside windows in the workspace */
-        allowDrop?: boolean, // (enterprise only)
-        /**Controls the users ability to drop windows in left zone of the workspace */
-        allowDropLeft?: boolean,
-        /**Controls the users ability to drop windows in top zone of the workspace */
-        allowDropTop?: boolean,
-        /**Controls the users ability to drop windows in right zone of the workspace */
-        allowDropRight?: boolean,
-        /**Controls the users ability to drop windows in bottom zone of the workspace */
-        allowDropBottom?: boolean,
-        /** Controls the ability of the users to extract (or rearrange) windows inside the workspace */
-        allowExtract?: boolean,
-        /** Controls the visibility of the close button location in the workspaces tab */
-        showCloseButton?: boolean,
-        /** Controls the visibility of the save workspace button located in the workspace tab */
-        showSaveButton?: boolean
-    }
-
-    /**Provides fine grain control when locking a window */
-    export interface WorkspaceWindowLockConfig {
-        /**  Blocks the users ability to extract the specified window */
-        allowExtract?: boolean;
-        /** Controls the visibility of the close button which appears is located in the specified tab */
-        showCloseButton?: boolean;
-    }
-
-    export interface GroupLockConfig {
-        allowExtract?: boolean;
-        allowDrop?: boolean;
-        showMaximizeButton?: boolean;
-        showEjectButton?: boolean;
-        showAddWindowButton?: boolean;
-    }
-
-    export interface RowLockConfig {
-        allowDrop?: boolean;
-    }
-
-    export interface ColumnLockConfig {
-        allowDrop?: boolean;
-    }
-
     /** An object describing a frame */
     export interface Frame extends FrameSummary {
         /**
@@ -789,15 +743,11 @@ export namespace Glue42Workspaces {
     /** An object describing a row type workspace box */
     export interface Row extends Box {
         type: "row";
-
-        lock(config?: Glue42Workspaces.RowLockConfig): Promise<void>;
     }
 
     /** An object describing a column type workspace box */
     export interface Column extends Box {
         type: "column";
-
-        lock(config?: Glue42Workspaces.ColumnLockConfig): Promise<void>;
     }
 
     /** An object describing a group type workspace box */
@@ -811,8 +761,6 @@ export namespace Glue42Workspaces {
         showAddWindowButton: boolean;
 
         allowExtract: boolean;
-
-        lock(config?: Glue42Workspaces.GroupLockConfig): Promise<void>;
     }
 
     /** An object describing a window part of an existing workspace */
@@ -873,8 +821,6 @@ export namespace Glue42Workspaces {
          * @param box An object describing the new box of the window.
          */
         moveTo(box: WorkspaceBox): Promise<void>;
-
-        lock(config: Glue42Workspaces.WorkspaceWindowLockConfig): Promise<void>;
 
         /**
          * Notifies when this window was removed from the workspace.

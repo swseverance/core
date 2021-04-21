@@ -1,6 +1,7 @@
 import { Base } from "./base/base";
 import { Glue42Workspaces } from "../../workspaces.d";
 import { groupLockConfigDecoder } from "../shared/decoders";
+import { GroupLockConfig } from "../types/temp";
 
 interface PrivateData {
     base: Base;
@@ -102,7 +103,7 @@ export class Group implements Glue42Workspaces.Group {
         return getBase(this).close(this);
     }
 
-    public lock(config?: Glue42Workspaces.GroupLockConfig | ((config: Glue42Workspaces.GroupLockConfig) => Glue42Workspaces.GroupLockConfig)): Promise<void> {
+    public lock(config?: GroupLockConfig | ((config: GroupLockConfig) => GroupLockConfig)): Promise<void> {
         let lockConfigResult = undefined;
 
         if (typeof config === "function") {
@@ -119,7 +120,7 @@ export class Group implements Glue42Workspaces.Group {
             lockConfigResult = config;
         }
         const verifiedConfig = lockConfigResult === undefined ? undefined : groupLockConfigDecoder.runWithException(lockConfigResult);
-        return getBase(this).lockContainer(this, lockConfigResult);
+        return getBase(this).lockContainer(this, verifiedConfig);
     }
 
 }

@@ -12,6 +12,7 @@ import { WorkspacesController } from "../types/controller";
 import { GDWindow } from "../types/glue";
 import { BaseController } from "./base";
 import { UnsubscribeFunction } from "callback-registry";
+import { WorkspaceLockConfig, WorkspaceWindowLockConfig } from "../types/temp";
 
 export class MainController implements WorkspacesController {
 
@@ -314,11 +315,11 @@ export class MainController implements WorkspacesController {
         return this.base.resumeWorkspace(workspaceId);
     }
 
-    public lockWorkspace(workspaceId: string, config?: Glue42Workspaces.WorkspaceLockConfig): Promise<void> {
+    public lockWorkspace(workspaceId: string, config?: WorkspaceLockConfig): Promise<void> {
         return this.base.lockWorkspace(workspaceId, config);
     }
 
-    public lockWindow(windowPlacementId: string, config?: Glue42Workspaces.WorkspaceWindowLockConfig): Promise<void> {
+    public lockWindow(windowPlacementId: string, config?: WorkspaceWindowLockConfig): Promise<void> {
         return this.base.lockWindow(windowPlacementId, config);
     }
 

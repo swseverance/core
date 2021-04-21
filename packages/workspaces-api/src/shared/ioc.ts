@@ -5,14 +5,14 @@ import { InteropTransport } from "../communication/interop-transport";
 import { BaseBuilder } from "../builders/baseBuilder";
 import { ParentBuilder } from "../builders/parentBuilder";
 import { WorkspaceBuilder } from "../builders/workspaceBuilder";
-import { ModelMaps, ModelTypes, FramePrivateData, WindowPrivateData, WorkspacePrivateData, ParentPrivateData, GroupPrivateData, RowPrivateData, ColumnPrivateData } from "../types/privateData";
+import { ModelMaps, ModelTypes, FramePrivateData, WindowPrivateData, WorkspacePrivateData, ParentPrivateData } from "../types/privateData";
 import { PrivateDataManager } from "./privateDataManager";
 import { FrameCreateConfig, ModelCreateConfig, WindowCreateConfig, WorkspaceIoCCreateConfig, ParentCreateConfig } from "../types/ioc";
 import { Frame } from "../models/frame";
 import { Window } from "../models/window";
 import { Workspace } from "../models/workspace";
-import { ChildSnapshotResult, SwimlaneWindowSnapshotConfig, ParentSnapshotConfig, ColumnSnapshotConfig } from "../types/protocol";
-import { Child } from "../types/builders";
+import { ChildSnapshotResult } from "../types/protocol";
+import { AllParentTypes, Child } from "../types/builders";
 import { Row } from "../models/row";
 import { Column } from "../models/column";
 import { Group } from "../models/group";
@@ -184,32 +184,33 @@ export class IoC {
         }
     }
 
-    private buildChildren(children: ChildSnapshotResult[], frame: Frame, workspace: Workspace, parent: Workspace | Row | Column | Group): Child[] {
+    private buildChildren(children: ChildSnapshotResult[], frame: Frame, workspace: Glue42Workspaces.Workspace, parent: AllParentTypes): Child[] {
         return children.map<Child>((child) => {
             switch (child.type) {
                 case "window": return this.getModel<"window">("window", {
                     id: child.id,
-                    config: child.config as SwimlaneWindowSnapshotConfig,
+                    config: child.config,
                     frame, workspace, parent
-                });
+                } as WindowCreateConfig);
                 case "column": return this.getModel<"column">(child.type, {
                     id: child.id,
-                    config: child.config as ParentSnapshotConfig,
+                    config: child.config,
                     children: child.children,
                     frame, workspace, parent
-                });
+                } as ParentCreateConfig);
                 case "row": return this.getModel<"row">(child.type, {
                     id: child.id,
-                    config: child.config as ParentSnapshotConfig,
+                    config: child.config,
                     children: child.children,
                     frame, workspace, parent
-                });
+                } as ParentCreateConfig);
                 case "group": return this.getModel<"group">(child.type, {
                     id: child.id,
-                    config: child.config as ParentSnapshotConfig,
+                    config: child.config,
                     children: child.children,
                     frame, workspace, parent
-                });
+                } as ParentCreateConfig);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 default: throw new Error(`Unsupported child type: ${(child as any).type}`);
             }
         });

@@ -1,12 +1,13 @@
 import { checkThrowCallback, nonEmptyStringDecoder, windowLockConfigDecoder } from "../shared//decoders";
 import { SubscriptionConfig } from "../types/subscription";
 import { PrivateDataManager } from "../shared/privateDataManager";
-import { Row } from "./row";
-import { Column } from "./column";
-import { Group } from "./group";
 import { WindowPrivateData } from "../types/privateData";
 import { Glue42Workspaces } from "../../workspaces";
 import { GDWindow } from "../types/glue";
+import { Row } from "./row";
+import { Column } from "./column";
+import { Group } from "./group";
+import { WorkspaceWindowLockConfig } from "../types/temp";
 
 interface PrivateData {
     manager: PrivateDataManager;
@@ -80,7 +81,7 @@ export class Window implements Glue42Workspaces.WorkspaceWindow {
         return getData(this).frame;
     }
 
-    public get parent(): Glue42Workspaces.Workspace | Glue42Workspaces.Workspace | Row | Column | Group {
+    public get parent(): Glue42Workspaces.Workspace | Glue42Workspaces.Row | Glue42Workspaces.Column | Glue42Workspaces.Group {
         return getData(this).parent;
     }
 
@@ -179,7 +180,7 @@ export class Window implements Glue42Workspaces.WorkspaceWindow {
         return controller.getGDWindow(myId);
     }
 
-    public async moveTo(parent: Row | Column | Group): Promise<void> {
+    public async moveTo(parent: Glue42Workspaces.Row | Glue42Workspaces.Column | Glue42Workspaces.Group): Promise<void> {
         if (!(parent instanceof Row || parent instanceof Column || parent instanceof Group)) {
             throw new Error("Cannot add to the provided parent, because the provided parent is not an instance of Row, Column or Group");
         }
@@ -198,7 +199,7 @@ export class Window implements Glue42Workspaces.WorkspaceWindow {
         await this.workspace.refreshReference();
     }
 
-    public async lock(config?: Glue42Workspaces.WorkspaceWindowLockConfig | ((config: Glue42Workspaces.WorkspaceWindowLockConfig) => Glue42Workspaces.WorkspaceWindowLockConfig)): Promise<void> {
+    public async lock(config?: WorkspaceWindowLockConfig | ((config: WorkspaceWindowLockConfig) => WorkspaceWindowLockConfig)): Promise<void> {
         let lockConfigResult = undefined;
 
         if (typeof config === "function") {
