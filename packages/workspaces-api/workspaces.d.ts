@@ -230,6 +230,8 @@ export namespace Glue42Workspaces {
 
         /** An array of all the box's children which will also be opened. */
         children?: Array<WorkspaceWindowDefinition | BoxDefinition>;
+
+        config?: any;
     }
 
     /** An object describing the possible options when opening a window inside a workspace. */
@@ -309,8 +311,16 @@ export namespace Glue42Workspaces {
         /** A flag showing whether the window can be dragged */
         allowExtract: boolean;
 
-          /** A flag showing whether the window close button is visible */
+        /** A flag showing whether the window close button is visible */
         showCloseButton: boolean;
+
+        minWidth: number;
+
+        maxWidth: number;
+
+        minHeight: number;
+
+        maxHeight: number;
     }
 
     /** An object describing a workspace layout without the underlying structure */
@@ -363,6 +373,37 @@ export namespace Glue42Workspaces {
 
     export interface ColumnLockConfig {
         allowDrop?: boolean;
+    }
+
+    export interface Constraints {
+        minWidth: number;
+        maxWidth: number;
+        minHeight: number;
+        maxHeight: number;
+    }
+
+    export interface WindowDefinitionConfig{
+        minWidth?: number;
+        maxWidth?: number;
+        minHeight?: number;
+        maxHeight?: number;
+    }
+
+    export interface GroupDefinitionConfig{
+        minWidth?: number;
+        maxWidth?: number;
+        minHeight?: number;
+        maxHeight?: number;
+    }
+
+    export interface RowDefinitionConfig{
+        minHeight?: number;
+        maxHeight?: number;
+    }
+
+    export interface ColumnDefinitionConfig{
+        minWidth?: number;
+        maxWidth?: number;
     }
 
     /** An object describing a frame */
@@ -739,6 +780,14 @@ export namespace Glue42Workspaces {
         workspace: Workspace;
 
         allowDrop: boolean;
+
+        minWidth: number;
+
+        maxWidth: number;
+
+        minHeight: number;
+
+        maxHeight: number;
 
         /**
          * Opens a new window inside this box and loads it's content.

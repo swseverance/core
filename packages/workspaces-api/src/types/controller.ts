@@ -57,4 +57,5 @@ export interface WorkspacesController {
     lockWorkspace(workspaceId: string, config?: Glue42Workspaces.WorkspaceLockConfig): Promise<void>;
     lockWindow(windowPlacementId: string, config?: Glue42Workspaces.WorkspaceWindowLockConfig): Promise<void>;
     lockContainer(itemId: string, type: SubParentTypes["type"], config?: ContainerLockConfig): Promise<void>;
+    getFrameConstraints(frameId: string): Promise<Glue42Workspaces.Constraints>;
 }

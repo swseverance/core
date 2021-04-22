@@ -355,6 +355,11 @@ declare module '@glue42/golden-layout' {
              * Indicates that the element is created just for wrapping purposes and should not be exposed to the Workspaces API
              */
             wrapper?: boolean;
+
+            minWidth?: number;
+            minHeight?: number;
+            maxWidth?: number;
+            maxHeight?: number;
         }
 
         interface BaseItemConfig {
@@ -668,6 +673,11 @@ declare module '@glue42/golden-layout' {
              * @param componentName a componentName as specified in the itemConfig
              */
             getComponentsByName(componentName: string): any;
+
+            getMinWidth(): number;
+            getMaxWidth(): number;
+            getMinHeight(): number;
+            getMaxHeight(): number;
         }
 
         export interface Stack extends BaseContentItem {

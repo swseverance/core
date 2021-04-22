@@ -34,12 +34,20 @@ export interface WorkspaceConfigResult {
     allowExtract?: boolean;
     showCloseButton?: boolean;
     showSaveButton?: boolean;
+    minWidth?: number;
+    maxWidth?: number;
+    minHeight?: number;
+    maxHeight?: number;
 }
 
 export interface BaseChildSnapshotConfig {
     frameId: string;
     workspaceId: string;
     positionIndex: number;
+    minWidth?: number;
+    maxWidth?: number;
+    minHeight?: number;
+    maxHeight?: number;
 }
 
 export type ParentSnapshotConfig = RowSnapshotConfig | ColumnSnapshotConfig | GroupSnapshotConfig;

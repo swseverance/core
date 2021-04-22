@@ -97,19 +97,45 @@ export const deleteLayoutConfigDecoder: Decoder<DeleteLayoutConfig> = object({
     name: nonEmptyStringDecoder
 });
 
+export const windowDefinitionConfigDecoder: Decoder<Glue42Workspaces.WindowDefinitionConfig> = object({
+    minWidth: optional(number()),
+    maxWidth: optional(number()),
+    minHeight: optional(number()),
+    maxHeight: optional(number()),
+});
+
+export const groupDefinitionConfigDecoder: Decoder<Glue42Workspaces.GroupDefinitionConfig> = object({
+    minWidth: optional(number()),
+    maxWidth: optional(number()),
+    minHeight: optional(number()),
+    maxHeight: optional(number()),
+});
+
+export const rowDefinitionConfigDecoder: Decoder<Glue42Workspaces.RowDefinitionConfig> = object({
+    minHeight: optional(number()),
+    maxHeight: optional(number())
+});
+
+export const columnDefinitionConfigDecoder: Decoder<Glue42Workspaces.ColumnDefinitionConfig> = object({
+    minWidth: optional(number()),
+    maxWidth: optional(number()),
+});
+
 
 export const swimlaneWindowDefinitionDecoder: Decoder<Glue42Workspaces.WorkspaceWindowDefinition> = object({
     type: optional(constant("window")),
     appName: optional(nonEmptyStringDecoder),
     windowId: optional(nonEmptyStringDecoder),
-    context: optional(anyJson())
+    context: optional(anyJson()),
+    config: optional(windowDefinitionConfigDecoder)
 });
 
 export const strictSwimlaneWindowDefinitionDecoder: Decoder<Glue42Workspaces.WorkspaceWindowDefinition> = object({
     type: constant("window"),
     appName: optional(nonEmptyStringDecoder),
     windowId: optional(nonEmptyStringDecoder),
-    context: optional(anyJson())
+    context: optional(anyJson()),
+    config: optional(windowDefinitionConfigDecoder)
 });
 
 export const parentDefinitionDecoder: Decoder<Glue42Workspaces.BoxDefinition> = optional(object({
@@ -121,7 +147,8 @@ export const parentDefinitionDecoder: Decoder<Glue42Workspaces.BoxDefinition> = 
                 parentDefinitionDecoder
             )
         ))
-    )
+    ),
+    config: anyJson()
 }));
 
 export const strictParentDefinitionDecoder: Decoder<Glue42Workspaces.BoxDefinition> = object({
@@ -133,7 +160,8 @@ export const strictParentDefinitionDecoder: Decoder<Glue42Workspaces.BoxDefiniti
                 strictParentDefinitionDecoder
             )
         ))
-    )
+    ),
+    config: optional(anyJson())
 });
 
 export const stateDecoder: Decoder<"maximized" | "normal"> = oneOf<"maximized" | "normal">(
@@ -287,14 +315,22 @@ export const workspaceConfigResultDecoder: Decoder<WorkspaceConfigResult> = obje
     allowDropLeft: optional(boolean()),
     allowDropTop: optional(boolean()),
     allowDropRight: optional(boolean()),
-    allowDropBottom: optional(boolean())
+    allowDropBottom: optional(boolean()),
+    minWidth: optional(number()),
+    maxWidth: optional(number()),
+    minHeight: optional(number()),
+    maxHeight: optional(number()),
 });
 
 // todo: remove number positionIndex when fixed
 export const baseChildSnapshotConfigDecoder: Decoder<BaseChildSnapshotConfig> = object({
     frameId: nonEmptyStringDecoder,
     workspaceId: nonEmptyStringDecoder,
-    positionIndex: number()
+    positionIndex: number(),
+    minWidth: optional(number()),
+    maxWidth: optional(number()),
+    minHeight: optional(number()),
+    maxHeight: optional(number())
 });
 
 export const parentSnapshotConfigDecoder: Decoder<ParentSnapshotConfig> = anyJson();
@@ -309,7 +345,11 @@ export const swimlaneWindowSnapshotConfigDecoder: Decoder<SwimlaneWindowSnapshot
         title: optional(string()),
         appName: optional(nonEmptyStringDecoder),
         allowExtract: optional(boolean()),
-        showCloseButton: optional(boolean())
+        showCloseButton: optional(boolean()),
+        minWidth: optional(number()),
+        minHeigth: optional(number()),
+        maxWidth: optional(number()),
+        maxHeight: optional(number())
     })
 ) as any;
 
@@ -350,7 +390,11 @@ export const windowLayoutItemDecoder: Decoder<Glue42Workspaces.WindowLayoutItem>
         url: optional(nonEmptyStringDecoder),
         title: optional(string()),
         allowExtract: optional(boolean()),
-        showCloseButton: optional(boolean())
+        showCloseButton: optional(boolean()),
+        minWidth: optional(number()),
+        minHeigth: optional(number()),
+        maxWidth: optional(number()),
+        maxHeight: optional(number())
     })
 });
 

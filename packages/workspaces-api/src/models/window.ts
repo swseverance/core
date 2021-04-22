@@ -72,6 +72,22 @@ export class Window implements Glue42Workspaces.WorkspaceWindow {
         return getData(this).config.showCloseButton;
     }
 
+    public get minWidth(): number {
+        return getData(this).config.minWidth;
+    }
+
+    public get minHeight(): number {
+        return getData(this).config.minHeight;
+    }
+
+    public get maxWidth(): number {
+        return getData(this).config.maxWidth;
+    }
+
+    public get maxHeight(): number {
+        return getData(this).config.maxHeight;
+    }
+
     public get workspace(): Glue42Workspaces.Workspace {
         return getData(this).workspace;
     }

@@ -167,20 +167,67 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 	 * @returns {number | undefined}
 	 */
 	getMinWidth() {
-		const elementMinWidth = this.config.workspacesOptions.minWidth || this.layoutManager.config.dimensions.minItemWidth;
-		return this.contentItems.reduce((minWidth, ci) => {
-			return Math.max(minWidth, ci.getMinWidth() || this.layoutManager.config.dimensions.minItemWidth);
-		}, elementMinWidth);
+		const elementMinWidth = this.config.workspacesConfig.minWidth || this.layoutManager.config.dimensions.minItemWidth;
+		const contentsMinWidth = this.contentItems.reduce((minWidth, ci) => {
+			if (this.config.type === "row") {
+				minWidth += ci.getMinWidth() || this.layoutManager.config.dimensions.minItemWidth;
+			} else if (this.config.type === "column") {
+				minWidth = Math.max(ci.getMinWidth() || this.layoutManager.config.dimensions.minItemWidth, minWidth);
+			}
+			return minWidth;
+		}, 0);
+		return Math.max(elementMinWidth, contentsMinWidth);
+	},
+	/**
+	 * Returns the min width of the row or column
+	 * @returns {number | undefined}
+	 */
+	getMaxWidth() {
+		const elementMaxWidth = this.config.workspacesConfig.maxWidth || this.layoutManager.config.dimensions.maxItemWidth;
+		const contentsMaxWidth = this.contentItems.reduce((maxWidth, ci) => {
+			if (this.config.type === "row") {
+				maxWidth += ci.getMaxWidth() || this.layoutManager.config.dimensions.maxItemWidth;
+			} else if (this.config.type === "column") {
+				maxWidth = Math.min(ci.getMaxWidth() || this.layoutManager.config.dimensions.maxItemWidth, maxWidth || elementMaxWidth);
+			}
+			return maxWidth;
+		}, 0);
+
+		return Math.min(elementMaxWidth, contentsMaxWidth);
 	},
 	/**
 	 * Returns the min width of the row or column
 	 * @returns {number | undefined}
 	 */
 	getMinHeight() {
-		const elementMinHeight = this.config.workspacesOptions.minHeight || this.layoutManager.config.dimensions.minItemHeight;
-		return this.contentItems.reduce((minHeight, ci) => {
-			return Math.max(minHeight, ci.getMinHeight() || this.layoutManager.config.dimensions.minItemHeight);
-		}, elementMinHeight);
+		const elementMinHeight = this.config.workspacesConfig.minHeight || this.layoutManager.config.dimensions.minItemHeight;
+		const contentsMinHeight = this.contentItems.reduce((minHeight, ci) => {
+			if (this.config.type === "row") {
+				minHeight = Math.max(ci.getMinHeight() || this.layoutManager.config.dimensions.minItemHeight, minHeight);
+			} else if (this.config.type === "column") {
+				minHeight += ci.getMinHeight() || this.layoutManager.config.dimensions.minItemHeight;
+			}
+			return minHeight;
+		}, 0);
+
+		return Math.max(elementMinHeight, contentsMinHeight);
+	},
+	/**
+	 * Returns the min width of the row or column
+	 * @returns {number | undefined}
+	 */
+	getMaxHeight() {
+		const elementMaxHeight = this.config.workspacesConfig.maxHeight || this.layoutManager.config.dimensions.maxItemHeight;
+		const contentsMaxHeight = this.contentItems.reduce((maxHeight, ci) => {
+			if (this.config.type === "row") {
+				maxHeight = Math.min(ci.getMaxHeight() || this.layoutManager.config.dimensions.maxItemHeight, maxHeight || elementMaxHeight);
+			} else if (this.config.type === "column") {
+				maxHeight += ci.getMaxHeight() || this.layoutManager.config.dimensions.maxItemHeight;
+			}
+			return maxHeight;
+		}, 0);
+
+		return Math.min(elementMaxHeight, contentsMaxHeight);
 	},
 
 	/**
@@ -359,16 +406,25 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 	 * @returns {}
 	 */
 	_respectMinItemWidth: function () {
+		const newError = new Error();
 		var minItemWidth = this.layoutManager.config.dimensions ? (this.layoutManager.config.dimensions.minItemWidth || 0) : 0,
+			maxItemWidth = this.layoutManager.config.dimensions ? (this.layoutManager.config.dimensions.minItemWidth || 32767) : 32767,
 			sizeData = null,
 			entriesOverMin = [],
+			entriesUnderMax = [],
 			totalOverMin = 0,
 			totalUnderMin = 0,
+			totalOverMax = 0,
+			totalUnderMax = 0,
 			remainingWidth = 0,
+			remainingWidthToReduce = 0,
+			remainingWidthToEnlarge = 0,
 			itemSize = 0,
 			contentItem = null,
 			reducePercent,
+			enlargePercent,
 			reducedWidth,
+			enlargedWidth,
 			allEntries = [],
 			entry;
 
@@ -377,57 +433,103 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 		}
 
 		sizeData = this._calculateAbsoluteSizes();
+		maxItemWidth = Math.min(maxItemWidth, sizeData.totalWidth);
 
 		/**
 		 * Figure out how much we are under the min item size total and how much room we have to use.
 		 */
 		for (var i = 0; i < this.contentItems.length; i++) {
-
 			contentItem = this.contentItems[i];
 			itemSize = sizeData.itemSizes[i];
 
+			const contentItemMaxWidth = contentItem.getMaxWidth();
 			const contentItemMinWidth = contentItem.getMinWidth();
+			const validContentItemMaxWidth = Math.min((contentItemMaxWidth === undefined) ? maxItemWidth : contentItemMaxWidth, sizeData.totalWidth)
 			const validContentItemMinWidth = (contentItemMinWidth === undefined) ? minItemWidth : contentItemMinWidth;
 
 			if (itemSize < validContentItemMinWidth) {
 				totalUnderMin += validContentItemMinWidth - itemSize;
-				entry = { width: validContentItemMinWidth };
+				entry = {
+					maxWidth: validContentItemMaxWidth,
+					minWidth: validContentItemMinWidth,
+					width: validContentItemMinWidth
+				};
 
-			}
-			else {
-				totalOverMin += itemSize - validContentItemMinWidth;
-				entry = { width: itemSize };
+			} else {
+				totalOverMin += Math.min(itemSize, validContentItemMaxWidth) - validContentItemMinWidth;
+				entry = {
+					maxWidth: validContentItemMaxWidth,
+					minWidth: validContentItemMinWidth,
+					width: itemSize
+				};
 				entriesOverMin.push(entry);
+			}
+
+			if (itemSize > validContentItemMaxWidth) {
+				totalOverMax += itemSize - validContentItemMaxWidth;
+				entry.width = validContentItemMaxWidth;
+			} else {
+				totalUnderMax += validContentItemMaxWidth - Math.max(itemSize, validContentItemMinWidth);
+				entriesUnderMax.push(entry);
 			}
 
 			allEntries.push(entry);
 		}
 
+		const isMinWidthImpossible = totalUnderMin === 0 || totalUnderMin > totalOverMin;
+		const isMaxWidthImpossible = totalOverMax === 0 || totalOverMax > totalUnderMax;
 		/**
 		 * If there is nothing under min, or there is not enough over to make up the difference, do nothing.
 		 */
-		if (totalUnderMin === 0 || totalUnderMin > totalOverMin) {
-			console.log("SUCCESS");
+		if (isMinWidthImpossible && isMaxWidthImpossible) {
 			return true;
 		}
 
-		/**
-		 * Evenly reduce all columns that are over the min item width to make up the difference.
-		 */
-		reducePercent = totalUnderMin / totalOverMin;
-		remainingWidth = totalUnderMin;
-		for (i = 0; i < entriesOverMin.length; i++) {
-			entry = entriesOverMin[i];
-			reducedWidth = Math.round((entry.width - minItemWidth) * reducePercent);
-			remainingWidth -= reducedWidth;
-			entry.width -= reducedWidth;
+		if (!isMinWidthImpossible) {
+			/**
+					 * Evenly reduce all columns that are over the min item width to make up the difference.
+					 */
+			reducePercent = totalUnderMin / totalOverMin;
+			remainingWidthToReduce = totalUnderMin;
+			for (i = 0; i < entriesOverMin.length; i++) {
+				entry = entriesOverMin[i];
+				reducedWidth = Math.round((entry.width - entry.minWidth) * reducePercent);
+				remainingWidthToReduce -= reducedWidth;
+				entry.width -= reducedWidth;
+			}
 		}
 
-		/**
-		 * Take anything remaining from the last item.
-		 */
-		if (remainingWidth !== 0) {
-			allEntries[allEntries.length - 1].width -= remainingWidth;
+		if (!isMaxWidthImpossible) {
+			/**
+			 * Evenly enlarge all that are over the max item width to make up the difference.
+			 */
+			enlargePercent = totalOverMax / totalUnderMax;
+			remainingWidthToEnlarge = totalOverMax;
+			for (i = 0; i < entriesUnderMax.length; i++) {
+				entry = entriesUnderMax[i];
+				enlargedWidth = Math.round((entry.maxWidth - entry.width) * enlargePercent);
+				remainingWidthToEnlarge -= enlargedWidth;
+				entry.width += enlargedWidth;
+			}
+		}
+
+
+		if (!isMinWidthImpossible) {
+			/**
+					 * Take anything remaining from the last item.
+					 */
+			if (remainingWidthToReduce !== 0) {
+				allEntries[allEntries.length - 1].width -= remainingWidthToReduce;
+			}
+		}
+
+		if (!isMaxWidthImpossible) {
+			/**
+			  * Take anything remaining from the last item.
+			  */
+			if (remainingWidthToEnlarge !== 0) {
+				allEntries[allEntries.length - 1].width += remainingWidthToEnlarge;
+			}
 		}
 
 		/**
@@ -437,7 +539,6 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 			this.contentItems[i].config.width = (allEntries[i].width / sizeData.totalWidth) * 100;
 		}
 
-		console.log("FAAIL");
 		return false;
 	},
 	/**
@@ -446,15 +547,23 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 	  */
 	_respectMinItemHeight: function () {
 		var minItemHeight = this.layoutManager.config.dimensions ? (this.layoutManager.config.dimensions.minItemHeight || 0) : 0,
+			maxItemHeight = this.layoutManager.config.dimensions ? (this.layoutManager.config.dimensions.maxItemHeight || 32767) : 32767,
 			sizeData = null,
 			entriesOverMin = [],
+			entriesUnderMax = [],
 			totalOverMin = 0,
 			totalUnderMin = 0,
+			totalOverMax = 0,
+			totalUnderMax = 0,
 			remainingHeight = 0,
+			remainingHeightToReduce = 0,
+			remainingHeightToEnlarge = 0,
 			itemSize = 0,
 			contentItem = null,
 			reducePercent,
+			enlargePercent,
 			reducedHeight,
+			enlargedHeight,
 			allEntries = [],
 			entry;
 
@@ -463,6 +572,7 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 		}
 
 		sizeData = this._calculateAbsoluteSizes();
+		maxItemHeight = Math.min(sizeData.totalHeight, maxItemHeight);
 
 		/**
 		 * Figure out how much we are under the min item size total and how much room we have to use.
@@ -472,48 +582,92 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 			contentItem = this.contentItems[i];
 			itemSize = sizeData.itemSizes[i];
 
+			const contentItemMaxHeight = contentItem.getMaxHeight();
 			const contentItemMinHeight = contentItem.getMinHeight();
+			const validContentItemMaxHeight = Math.min((contentItemMaxHeight === undefined) ? maxItemHeight : contentItemMaxHeight, sizeData.totalHeight);
 			const validContentItemMinHeight = (contentItemMinHeight === undefined) ? minItemHeight : contentItemMinHeight;
 
 			if (itemSize < validContentItemMinHeight) {
 				totalUnderMin += validContentItemMinHeight - itemSize;
-				entry = { height: validContentItemMinHeight };
-
-			}
-			else {
-				totalOverMin += itemSize - validContentItemMinHeight;
-				entry = { height: itemSize };
+				entry = {
+					validContentItemMaxHeight,
+					validContentItemMinHeight,
+					height: validContentItemMinHeight
+				};
+			} else {
+				totalOverMin += Math.min(itemSize, validContentItemMaxHeight) - validContentItemMinHeight;
+				entry = {
+					validContentItemMaxHeight,
+					validContentItemMinHeight,
+					height: itemSize
+				};
 				entriesOverMin.push(entry);
+			}
+
+			if (itemSize > validContentItemMaxHeight) {
+				totalOverMax += itemSize - validContentItemMaxHeight;
+				entry.height = validContentItemMaxHeight;
+			} else {
+				totalUnderMax += validContentItemMaxHeight - Math.max(itemSize, validContentItemMinHeight);
+				entriesUnderMax.push(entry);
 			}
 
 			allEntries.push(entry);
 		}
 
+		const isMinHeightImpossible = totalUnderMin === 0 || totalUnderMin > totalOverMin;
+		const isMaxHeightImpossible = totalOverMax === 0 || totalOverMax > totalUnderMax;
 		/**
 		 * If there is nothing under min, or there is not enough over to make up the difference, do nothing.
 		 */
-		if (totalUnderMin === 0 || totalUnderMin > totalOverMin) {
-			console.log("SUCCESS");
+		if (isMinHeightImpossible && isMaxHeightImpossible) {
 			return true;
 		}
 
-		/**
-		 * Evenly reduce all columns that are over the min item width to make up the difference.
-		 */
-		reducePercent = totalUnderMin / totalOverMin;
-		remainingHeight = totalUnderMin;
-		for (i = 0; i < entriesOverMin.length; i++) {
-			entry = entriesOverMin[i];
-			reducedHeight = Math.round((entry.height - minItemHeight) * reducePercent);
-			remainingHeight -= reducedHeight;
-			entry.height -= reducedHeight;
+		if (!isMinHeightImpossible) {
+			/**
+			 * Evenly reduce all columns that are over the min item width to make up the difference.
+			 */
+			reducePercent = totalUnderMin / totalOverMin;
+			remainingHeight = totalUnderMin;
+			for (i = 0; i < entriesOverMin.length; i++) {
+				entry = entriesOverMin[i];
+				remainingHeightToReduce = Math.round((entry.height - minItemHeight) * reducePercent);
+				remainingHeight -= remainingHeightToReduce;
+				entry.height -= remainingHeightToReduce;
+			}
 		}
 
-		/**
-		 * Take anything remaining from the last item.
-		 */
-		if (remainingHeight !== 0) {
-			allEntries[allEntries.length - 1].height -= remainingHeight;
+		if (!isMaxHeightImpossible) {
+			/**
+			 * Evenly enlarge all that are over the max item width to make up the difference.
+			 */
+			enlargePercent = totalOverMax / totalUnderMax;
+			remainingHeightToEnlarge = totalOverMax;
+			for (i = 0; i < entriesUnderMax.length; i++) {
+				entry = entriesUnderMax[i];
+				enlargedHeight = Math.round((entry.maxHeight - entry.height) * enlargePercent);
+				remainingHeightToEnlarge -= enlargeHeight;
+				entry.height += enlargedHeight;
+			}
+		}
+
+		if (!isMinHeightImpossible) {
+			/**
+			 * Take anything remaining from the last item.
+			 */
+			if (remainingHeight !== 0) {
+				allEntries[allEntries.length - 1].height -= remainingHeight;
+			}
+		}
+
+		if (!isMaxHeightImpossible) {
+			/**
+			  * Take anything remaining from the last item.
+			  */
+			if (remainingHeightToEnlarge !== 0) {
+				allEntries[allEntries.length - 1].height += remainingHeightToEnlarge;
+			}
 		}
 
 		/**
@@ -523,7 +677,6 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 			this.contentItems[i].config.height = (allEntries[i].height / sizeData.totalHeight) * 100;
 		}
 
-		console.log("FAAIL");
 		return false;
 	},
 
@@ -581,6 +734,21 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 
 		return { horizontal: minWidth, vertical: minHeight };
 	},
+	/**
+	 * Gets the minimum dimensions for the given item configuration array
+	 * @param item
+	 * @private
+	 */
+	_getMaximumDimensions: function (arr) {
+		var maxWidth = 32767, maxHeight = 32767;
+
+		for (var i = 0; i < arr.length; ++i) {
+			maxWidth = Math.min(arr[i].getMaxWidth() || 0, maxWidth);
+			maxHeight = Math.min(arr[i].getMaxHeight() || 0, maxHeight);
+		}
+
+		return { horizontal: maxWidth, vertical: maxHeight };
+	},
 
 	/**
 	 * Invoked when a splitter's dragListener fires dragStart. Calculates the splitters
@@ -592,17 +760,28 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 	 */
 	_onSplitterDragStart: function (splitter) {
 		var items = this._getItemsForSplitter(splitter),
-			minSize = this.layoutManager.config.dimensions[this._isColumn ? 'minItemHeight' : 'minItemWidth'];
+			minSize = this.layoutManager.config.dimensions[this._isColumn ? 'minItemHeight' : 'minItemWidth'],
+			maxSize = this.layoutManager.config.dimensions[this.isColumn ? 'maxItemHeight' : 'maxItemWidth'];
 
 		var beforeMinDim = this._getMinimumDimensions([...items.before.contentItems, items.before]);
+		var beforeMaxDim = this._getMaximumDimensions([...items.before.contentItems, items.before]);
 		var beforeMinSize = this._isColumn ? beforeMinDim.vertical : beforeMinDim.horizontal;
+		var beforeMaxSize = this.isColumn ? beforeMaxDim.vertical : beforeMaxDim.horizontal;
 
 		var afterMinDim = this._getMinimumDimensions([...items.after.contentItems, items.after]);
+		var afterMaxDim = this._getMaximumDimensions([...items.after.contentItems, items.after]);
 		var afterMinSize = this._isColumn ? afterMinDim.vertical : afterMinDim.horizontal;
+		var afterMaxSize = this.isColumn ? afterMaxDim.vertical : afterMaxDim.horizontal;
+
+		var splitterMinPositionFromBeforeElement = -1 * (items.before.element[this._dimension]() - (beforeMinSize || minSize));
+		var splitterMinPositionFromAfterElement = -1 * ((afterMaxSize || maxSize) - items.after.element[this._dimension]());
+
+		var splitterMaxPositionFromBeforeElement = (beforeMaxSize || maxSize) - items.before.element[this._dimension]();
+		var splitterMaxPositionFromAfterElement = items.after.element[this._dimension]() - (afterMinSize || minSize);
 
 		this._splitterPosition = 0;
-		this._splitterMinPosition = -1 * (items.before.element[this._dimension]() - (beforeMinSize || minSize));
-		this._splitterMaxPosition = items.after.element[this._dimension]() - (afterMinSize || minSize);
+		this._splitterMinPosition = Math.max(splitterMinPositionFromBeforeElement, splitterMinPositionFromAfterElement);
+		this._splitterMaxPosition = Math.min(splitterMaxPositionFromBeforeElement, splitterMaxPositionFromAfterElement);
 	},
 
 	/**
@@ -620,10 +799,6 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 			return;
 		}
 		var offset = this._isColumn ? offsetY : offsetX;
-		console.log("offset", offset);
-		console.log("minPos", this._splitterMinPosition);
-		console.log("maxPos", this._splitterMaxPosition);
-		console.log("_____");
 
 		if (offset > this._splitterMinPosition && offset < this._splitterMaxPosition) {
 			this._splitterPosition = offset;

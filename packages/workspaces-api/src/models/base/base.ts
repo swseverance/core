@@ -216,6 +216,30 @@ export class Base {
         return privateData.config.showAddWindowButton;
     }
 
+    public getMinWidth(model: SubParentTypes) {
+        const privateData = getData(this, model);
+       
+        return privateData.config.minWidth;
+    }
+
+    public getMaxWidth(model: SubParentTypes) {
+        const privateData = getData(this, model);
+       
+        return privateData.config.maxWidth;
+    }
+
+    public getMinHeight(model: SubParentTypes) {
+        const privateData = getData(this, model);
+       
+        return privateData.config.minHeight;
+    }
+
+    public getMaxHeight(model: SubParentTypes) {
+        const privateData = getData(this, model);
+       
+        return privateData.config.maxHeight;
+    }
+
     private transformDefinition(type: "group" | "row" | "column", definition?: Glue42Workspaces.BoxDefinition | ParentBuilder): Glue42Workspaces.BoxDefinition {
         let parentDefinition: Glue42Workspaces.BoxDefinition;
 

@@ -100,6 +100,22 @@ export class Workspace implements Glue42Workspaces.Workspace {
         return getData(this).config.showSaveButton;
     }
 
+    public get minWidth(): number {
+        return getData(this).config.minWidth;
+    }
+
+    public get minHeight(): number {
+        return getData(this).config.minHeight;
+    }
+
+    public get maxWidth(): number {
+        return getData(this).config.maxWidth;
+    }
+
+    public get maxHeight(): number {
+        return getData(this).config.maxHeight;
+    }
+
     public async removeChild(predicate: (child: Glue42Workspaces.WorkspaceElement) => boolean): Promise<void> {
         checkThrowCallback(predicate);
         const child = this.children.find(predicate);

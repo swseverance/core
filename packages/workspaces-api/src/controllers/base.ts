@@ -270,7 +270,7 @@ export class BaseController {
                 });
             } else {
                 let createConfig: WindowCreateConfig | ParentCreateConfig;
-                
+
                 if (newChildSnapshot.type === "window") {
                     createConfig = {
                         id: newChildSnapshot.id,

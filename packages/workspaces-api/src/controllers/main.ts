@@ -273,6 +273,8 @@ export class MainController implements WorkspacesController {
         return await this.base.moveWindowTo(itemId, newParentId);
     }
 
+    public async getSnapshot(itemId: string, type: "workspace"): Promise<WorkspaceSnapshotResult>
+    public async getSnapshot(itemId: string, type: "frame"): Promise<FrameSnapshotResult>
     public async getSnapshot(itemId: string, type: "workspace" | "frame"): Promise<WorkspaceSnapshotResult | FrameSnapshotResult> {
         return await this.base.getSnapshot(itemId, type);
     }
@@ -324,6 +326,17 @@ export class MainController implements WorkspacesController {
 
     public lockContainer(itemId: string, type: SubParentTypes["type"], config?: ContainerLockConfig): Promise<void> {
         return this.base.lockContainer(itemId, type, config);
+    }
+
+    public async getFrameConstraints(frameId: string): Promise<Glue42Workspaces.Constraints> {
+        const frameSnapshot = await this.getSnapshot(frameId, "frame");
+
+        return {
+            minWidth: frameSnapshot.config.minWidth,
+            maxWidth: frameSnapshot.config.maxWidth,
+            minHeight: frameSnapshot.config.minHeight,
+            maxHeight: frameSnapshot.config.maxHeight,
+        }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

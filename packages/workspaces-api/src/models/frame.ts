@@ -91,6 +91,12 @@ export class Frame implements Glue42Workspaces.Frame {
         return controller.getWorkspaces((wsp) => wsp.frameId === this.id);
     }
 
+    public async constraints(): Promise<Glue42Workspaces.Constraints> {
+        const controller = getData(this).controller;
+        const myId = getData(this).summary.id
+
+        return controller.getFrameConstraints(myId);
+    }
     public async restoreWorkspace(name: string, options?: Glue42Workspaces.RestoreWorkspaceConfig): Promise<Glue42Workspaces.Workspace> {
         nonEmptyStringDecoder.runWithException(name);
         const validatedOptions = restoreWorkspaceConfigDecoder.runWithException(options);

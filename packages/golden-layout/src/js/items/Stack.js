@@ -58,8 +58,8 @@ lm.utils.copy(lm.items.Stack.prototype, {
 	 * Returns the min width of the row or column
 	 * @returns {number | undefined}
 	 */
-	 getMinWidth() {
-		const elementMinWidth = this.config.workspacesOptions.minWidth || this.layoutManager.config.dimensions.minItemWidth;
+	getMinWidth() {
+		const elementMinWidth = this.config.workspacesConfig.minWidth || this.layoutManager.config.dimensions.minItemWidth;
 		return this.contentItems.reduce((minWidth, ci) => {
 			return Math.max(minWidth, ci.getMinWidth() || this.layoutManager.config.dimensions.minItemWidth);
 		}, elementMinWidth);
@@ -68,11 +68,41 @@ lm.utils.copy(lm.items.Stack.prototype, {
 	 * Returns the min width of the row or column
 	 * @returns {number | undefined}
 	 */
-	 getMinHeight() {
-		const elementMinHeight = this.config.workspacesOptions.minHeight || this.layoutManager.config.dimensions.minItemHeight;
+	getMaxWidth() {
+		const elementMaxWidth = this.config.workspacesConfig.maxWidth || this.layoutManager.config.dimensions.maxItemWidth;
+		const result = this.contentItems.reduce((maxWidth, ci) => {
+			const childMaxWidth = ci.getMaxWidth();
+			console.log("Child maxWidth", childMaxWidth, ci.config.workspacesConfig, this.config.id);
+			console.log("Current maxWidth", maxWidth, this.config.id);
+			return Math.min(maxWidth, childMaxWidth || this.layoutManager.config.dimensions.maxItemWidth);
+		}, elementMaxWidth);
+
+		console.log("Stack id", this.config.id);
+		console.log("Stack children", this.contentItems);
+		console.log("Stack max width", elementMaxWidth);
+		console.log("Stack result max width", result);
+
+		return result;
+	},
+	/**
+	 * Returns the min width of the row or column
+	 * @returns {number | undefined}
+	 */
+	getMinHeight() {
+		const elementMinHeight = this.config.workspacesConfig.minHeight || this.layoutManager.config.dimensions.minItemHeight;
 		return this.contentItems.reduce((minHeight, ci) => {
 			return Math.max(minHeight, ci.getMinHeight() || this.layoutManager.config.dimensions.minItemHeight);
 		}, elementMinHeight);
+	},
+	/**
+	 * Returns the min width of the row or column
+	 * @returns {number | undefined}
+	 */
+	getMaxHeight() {
+		const elementMaxHeight = this.config.workspacesConfig.maxHeight || this.layoutManager.config.dimensions.maxItemHeight;
+		return this.contentItems.reduce((maxHeight, ci) => {
+			return Math.min(maxHeight, ci.getMaxHeight() || this.layoutManager.config.dimensions.maxItemHeight);
+		}, elementMaxHeight);
 	},
 	_$init: function () {
 		var i, initialItem;

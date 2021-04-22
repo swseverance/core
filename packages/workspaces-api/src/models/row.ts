@@ -54,6 +54,22 @@ export class Row implements Glue42Workspaces.Row {
         return getBase(this).getAllowDrop(this);
     }
 
+    public get minWidth(): number {
+        return getBase(this).getMinWidth(this);
+    }
+
+    public get minHeight(): number {
+        return getBase(this).getMinHeight(this);
+    }
+
+    public get maxWidth(): number {
+        return getBase(this).getMaxWidth(this);
+    }
+
+    public get maxHeight(): number {
+        return getBase(this).getMaxHeight(this);
+    }
+
     public addWindow(definition: Glue42Workspaces.WorkspaceWindowDefinition): Promise<Glue42Workspaces.WorkspaceWindow> {
         return getBase(this).addWindow(this, definition, "row");
     }
