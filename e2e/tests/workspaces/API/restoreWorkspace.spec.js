@@ -676,7 +676,7 @@ describe('restoreWorkspace() Should', function () {
 
             const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
 
-            expect(restoredWorkspace.allowDrop).to.be.false;
+            expect(restoredWorkspace.allowDrop).to.be.true;
             expect(restoredWorkspace.allowExtract).to.be.false;
             expect(restoredWorkspace.showSaveButton).to.be.false;
             expect(restoredWorkspace.showCloseButton).to.be.false;
@@ -779,7 +779,7 @@ describe('restoreWorkspace() Should', function () {
 
             const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
 
-            expect(workspace.allowDrop).to.be.false;
+            expect(workspace.allowDrop).to.be.true;
             expect(workspace.allowExtract).to.be.false;
 
             restoredWorkspace.getAllGroups().forEach((g) => {
@@ -806,7 +806,7 @@ describe('restoreWorkspace() Should', function () {
 
             const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
 
-            expect(workspace.allowDrop).to.be.false;
+            expect(workspace.allowDrop).to.be.true;
             expect(workspace.allowExtract).to.be.false;
 
             restoredWorkspace.getAllColumns().forEach((c) => {
@@ -829,7 +829,7 @@ describe('restoreWorkspace() Should', function () {
 
             const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
 
-            expect(workspace.allowDrop).to.be.false;
+            expect(workspace.allowDrop).to.be.true;
             expect(workspace.allowExtract).to.be.false;
 
             restoredWorkspace.getAllRows().forEach((g) => {
@@ -852,7 +852,7 @@ describe('restoreWorkspace() Should', function () {
 
             const restoredWorkspace = await glue.workspaces.restoreWorkspace(lockedLayoutName);
 
-            expect(workspace.allowDrop).to.be.false;
+            expect(workspace.allowDrop).to.be.true;
             expect(workspace.allowExtract).to.be.false;
 
             restoredWorkspace.getAllWindows().forEach((w) => {

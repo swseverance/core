@@ -550,7 +550,6 @@ export class LayoutController {
         const workspace = store.getById(workspaceId);
         const wrapper = new WorkspaceWrapper(this._stateResolver, workspace, workspaceContentItem, this._frameId);
 
-        wrapper.allowDrop = false;
         wrapper.allowDropLeft = workspaceDropOptions.allowDropLeft;
         wrapper.allowDropTop = workspaceDropOptions.allowDropTop;
         wrapper.allowDropRight = workspaceDropOptions.allowDropRight;

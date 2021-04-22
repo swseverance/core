@@ -52,20 +52,20 @@ describe("lock() Should", () => {
         await workspace.lock();
     });
 
-    it("set allowDrop constraint when invoked without arguments", async () => {
+    it("not set allowDrop constraint when invoked without arguments", async () => {
         await workspace.lock();
 
-        expect(workspace.allowDrop).to.be.false;
+        expect(workspace.allowDrop).to.be.true;
     });
 
-    it("set allowDrop constraint to children when invoked without arguments", async () => {
+    it("not set allowDrop constraint to children when invoked without arguments", async () => {
         await workspace.lock();
         await workspace.refreshReference();
 
         const allBoxes = workspace.getAllBoxes();
 
         allBoxes.forEach(b => {
-            expect(b.allowDrop).to.be.false;
+            expect(b.allowDrop).to.be.true;
         });
     });
 
@@ -127,7 +127,7 @@ describe("lock() Should", () => {
         const allWindows = workspace.getAllWindows();
 
         allGroups.forEach(g => {
-            expect(g.allowDrop).to.be.false;
+            expect(g.allowDrop).to.be.true;
         });
 
         allWindows.forEach(w => {
@@ -135,7 +135,7 @@ describe("lock() Should", () => {
         });
     });
 
-    it("set allowDrop constraint when invoked with all other constraints removed and allowDrop false", async () => {
+    it("not set allowDrop constraint when invoked with all other constraints removed and allowDrop false", async () => {
         await workspace.lock({
             allowSplitters: true,
             allowExtract: true,
@@ -144,7 +144,7 @@ describe("lock() Should", () => {
             allowDrop: false
         });
 
-        expect(workspace.allowDrop).to.be.false;
+        expect(workspace.allowDrop).to.be.true;
     });
 
     it("set allowSplitters constraint when invoked with all other constraints removed and allowSplitters false", async () => {
@@ -259,7 +259,7 @@ describe("lock() Should", () => {
         expect(workspace.showSaveButton).to.be.true;
     });
 
-    it("set allowDrop constraint when invoked with a function and all other constraints removed and allowDrop false", async () => {
+    it("not set the allowDrop constraint when invoked with a function and all other constraints removed and allowDrop false", async () => {
         await workspace.lock(() => ({
             allowSplitters: true,
             allowExtract: true,
@@ -268,7 +268,7 @@ describe("lock() Should", () => {
             allowDrop: false
         }));
 
-        expect(workspace.allowDrop).to.be.false;
+        expect(workspace.allowDrop).to.be.true;
     });
 
     it("set allowSplitters constraint when invoked with a function and all other constraints removed and allowSplitters false", async () => {
@@ -416,7 +416,7 @@ describe("lock() Should", () => {
 
         await emptyWorkspace.refreshReference();
 
-        expect(emptyWorkspace.allowDrop).to.be.false;
+        expect(emptyWorkspace.allowDrop).to.be.true;
         expect(emptyWorkspace.allowExtract).to.be.false;
         expect(emptyWorkspace.showCloseButton).to.be.false;
         expect(emptyWorkspace.showSaveButton).to.be.false;
