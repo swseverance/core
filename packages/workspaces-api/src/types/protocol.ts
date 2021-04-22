@@ -266,9 +266,25 @@ export interface LockWindowConfig {
     };
 }
 
-export interface LockContainerConfig {
+export interface LockRowConfig {
     itemId: string;
-    type: "row" | "column" | "group";
+    type: "row";
+    config?: {
+        allowDrop?: boolean;
+    };
+}
+
+export interface LockColumnConfig {
+    itemId: string;
+    type: "column";
+    config?: {
+        allowDrop?: boolean;
+    };
+}
+
+export interface LockGroupConfig {
+    itemId: string;
+    type: "group";
     config?: {
         allowExtract?: boolean;
         allowDrop?: boolean;
@@ -277,6 +293,8 @@ export interface LockContainerConfig {
         showAddWindowButton?: boolean;
     };
 }
+
+export type LockContainerConfig = LockGroupConfig | LockColumnConfig | LockRowConfig;
 
 export interface LockWorkspaceConfig {
     workspaceId: string;

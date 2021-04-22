@@ -592,7 +592,7 @@ export class WorkspacesController implements LibController {
         this.logger?.trace(`[${commandId}] frame ${frame.windowId} gave a success signal, responding to caller`);
     }
 
-    private async lockWindow(config: LockWindowConfig, commandId: string):Promise<void>{
+    private async lockWindow(config: LockWindowConfig, commandId: string): Promise<void> {
         this.logger?.trace(`[${commandId}] handling lockWindow request with config ${JSON.stringify(config)}`);
 
         const frame = await this.framesController.getFrameInstance({ itemId: config.windowPlacementId });
@@ -639,6 +639,6 @@ export class WorkspacesController implements LibController {
             ...config,
             loadingStrategy: loadingConfig,
             hibernation: providedHibernationConfig
-        }
+        };
     }
 }

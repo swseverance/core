@@ -44,7 +44,10 @@ import {
     LockWindowConfig,
     LockContainerConfig,
     SubParentSnapshotResult,
-    WindowSnapshotResult
+    WindowSnapshotResult,
+    LockRowConfig,
+    LockColumnConfig,
+    LockGroupConfig
 } from "../types/protocol";
 import { WorkspaceEventType, WorkspaceEventAction } from "../types/subscription";
 import { Glue42Workspaces } from "../../workspaces";
@@ -609,8 +612,23 @@ export const groupLockConfigDecoder: Decoder<GroupLockConfig> = object({
     showAddWindowButton: optional(boolean()),
 });
 
-export const lockContainerDecoder: Decoder<LockContainerConfig> = object({
+export const lockRowDecoder: Decoder<LockRowConfig> = object({
     itemId: nonEmptyStringDecoder,
-    type: oneOf(constant("row"), constant("column"), constant("group")),
-    config: optional(oneOf(rowLockConfigDecoder, columnLockConfigDecoder, groupLockConfigDecoder))
+    type: constant("row"),
+    config: optional(rowLockConfigDecoder)
 });
+
+export const lockColumnDecoder: Decoder<LockColumnConfig> = object({
+    itemId: nonEmptyStringDecoder,
+    type: constant("column"),
+    config: optional(columnLockConfigDecoder)
+});
+
+export const lockGroupDecoder: Decoder<LockGroupConfig> = object({
+    itemId: nonEmptyStringDecoder,
+    type: constant("group"),
+    config: optional(groupLockConfigDecoder)
+});
+
+
+export const lockContainerDecoder: Decoder<LockContainerConfig> = oneOf<LockGroupConfig | LockColumnConfig | LockRowConfig>(lockRowDecoder, lockColumnDecoder, lockGroupDecoder);

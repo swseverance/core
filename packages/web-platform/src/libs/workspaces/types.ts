@@ -290,36 +290,54 @@ export interface WindowStreamData {
 export type WorkspaceConfigWithReuseWorkspaceId = Glue42Workspaces.WorkspaceConfig & { reuseWorkspaceId: string };
 
 export interface LockWindowConfig {
-    windowPlacementId: string,
+    windowPlacementId: string;
     config?: {
-        allowExtract?: boolean,
-        showCloseButton?: boolean
-    }
+        allowExtract?: boolean;
+        showCloseButton?: boolean;
+    };
 }
 
-export interface LockContainerConfig {
-    itemId: string,
-    type: "row" | "column" | "group",
+export interface LockRowConfig {
+    itemId: string;
+    type: "row";
     config?: {
-        allowExtract?: boolean,
-        allowDrop?: boolean,
-        showMaximizeButton?: boolean,
-        showEjectButton?: boolean,
-        showAddWindowButton?: boolean
-    }
+        allowDrop?: boolean;
+    };
 }
+
+export interface LockColumnConfig {
+    itemId: string;
+    type: "column";
+    config?: {
+        allowDrop?: boolean;
+    };
+}
+
+export interface LockGroupConfig {
+    itemId: string;
+    type: "group";
+    config?: {
+        allowExtract?: boolean;
+        allowDrop?: boolean;
+        showMaximizeButton?: boolean;
+        showEjectButton?: boolean;
+        showAddWindowButton?: boolean;
+    };
+}
+
+export type LockContainerConfig = LockColumnConfig | LockRowConfig | LockGroupConfig;
 
 export interface LockWorkspaceConfig {
-    workspaceId: string,
+    workspaceId: string;
     config?: {
-        allowDrop?: boolean,
-        allowDropLeft?: boolean,
-        allowDropTop?: boolean,
-        allowDropRight?: boolean,
-        allowDropBottom?: boolean,
-        allowExtract?: boolean,
-        allowSplitters?: boolean,
-        showCloseButton?: boolean,
-        showSaveButton?: boolean,
-    }
+        allowDrop?: boolean;
+        allowDropLeft?: boolean;
+        allowDropTop?: boolean;
+        allowDropRight?: boolean;
+        allowDropBottom?: boolean;
+        allowExtract?: boolean;
+        allowSplitters?: boolean;
+        showCloseButton?: boolean;
+        showSaveButton?: boolean;
+    };
 }
