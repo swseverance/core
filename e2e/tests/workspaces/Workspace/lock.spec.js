@@ -103,7 +103,7 @@ describe("lock() Should", () => {
         }
 
         [true, false].forEach((value) => {
-            it.only(`set ${propertyUnderTest} constraint when invoked with ${propertyUnderTest}: ${value}`, async () => {
+            it(`set ${propertyUnderTest} constraint when invoked with ${propertyUnderTest}: ${value}`, async () => {
                 await workspace.lock({ [`${propertyUnderTest}`]: value });
 
                 expect(workspace[propertyUnderTest]).to.be.eql(value);
