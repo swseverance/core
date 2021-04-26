@@ -18,6 +18,9 @@ export interface WorkspaceLockConfig {
     showCloseButton?: boolean;
     /** Controls the visibility of the save workspace button located in the workspace tab */
     showSaveButton?: boolean;
+    showAllEjectButtons?: boolean;
+    showAllAddWindowButtons?: boolean;
+    showAllWindowCloseButtons?: boolean;
 }
 
 /**Provides fine grain control when locking a window */
