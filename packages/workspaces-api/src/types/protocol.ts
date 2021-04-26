@@ -34,6 +34,9 @@ export interface WorkspaceConfigResult {
     allowExtract?: boolean;
     showCloseButton?: boolean;
     showSaveButton?: boolean;
+    showWindowCloseButtons?: boolean;
+    showAddWindowButtons?: boolean;
+    showEjectButtons?: boolean;
 }
 
 export interface BaseChildSnapshotConfig {

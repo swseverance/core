@@ -7,21 +7,7 @@ export class WorkspacesUIExecutor {
     public static readonly SaveWorkspaceButtonLabel = "save";
     private readonly hibernatedWorkspaceIconLabel = "hibernated";
 
-    public hideWindowAddButtons(workspaceId: string) {
-        const addButtonsInWorkspace = document.querySelectorAll(`#nestHere${workspaceId} .lm_add_button`);
-
-        addButtonsInWorkspace.forEach((e) => $(e).hide());
-    }
-
-    public showWindowAddButtons(workspaceId: string) {
-        const workspace = store.getById(workspaceId);
-        const allGroupsInWorkspace = workspace.layout.root.getItemsByType("stack");
-        allGroupsInWorkspace.forEach((g) => {
-            this.showAddWindowButton(idAsString(g.config.id));
-        });
-    }
-
-    public showWorkspaceSaveButton(workspaceId: string) {
+    public showWorkspaceSaveButton(workspaceId: string): void {
         const workspaceTab = store.getWorkspaceTabElement(workspaceId);
 
         if (workspaceTab.element.hasClass(WorkspacesUIExecutor.HibernationIconClass)) {
@@ -31,7 +17,7 @@ export class WorkspacesUIExecutor {
         workspaceTab.element.children(".lm_saveButton").show();
     }
 
-    public hideWorkspaceSaveButton(workspaceId: string) {
+    public hideWorkspaceSaveButton(workspaceId: string): void {
         const workspaceTab = store.getWorkspaceTabElement(workspaceId);
 
         if (workspaceTab.element.hasClass(WorkspacesUIExecutor.HibernationIconClass)) {
@@ -40,7 +26,7 @@ export class WorkspacesUIExecutor {
         workspaceTab.element.children(".lm_saveButton").hide();
     }
 
-    public showHibernationIcon(workspaceId: string) {
+    public showHibernationIcon(workspaceId: string): void {
         const tab = store.getWorkspaceTabElement(workspaceId);
 
         if (!tab) {
@@ -57,7 +43,7 @@ export class WorkspacesUIExecutor {
         saveButton.attr("title", this.hibernatedWorkspaceIconLabel);
     }
 
-    public showSaveIcon(workspaceId: string) {
+    public showSaveIcon(workspaceId: string): void {
         const tab = store.getWorkspaceTabElement(workspaceId);
         const workspace = store.getById(workspaceId);
 
@@ -75,7 +61,7 @@ export class WorkspacesUIExecutor {
         }
     }
 
-    public showWorkspaceCloseButton(workspaceId: string) {
+    public showWorkspaceCloseButton(workspaceId: string): void {
         const tab = store.getWorkspaceTabElement(workspaceId);
 
         if (!tab) {
@@ -87,7 +73,7 @@ export class WorkspacesUIExecutor {
         closeButton.show();
     }
 
-    public hideWorkspaceCloseButton(workspaceId: string) {
+    public hideWorkspaceCloseButton(workspaceId: string): void {
         const tab = store.getWorkspaceTabElement(workspaceId);
 
         if (!tab) {
@@ -99,11 +85,11 @@ export class WorkspacesUIExecutor {
         closeButton.hide();
     }
 
-    public makeContentInvisible() {
+    public makeContentInvisible(): void {
         $(".lm_item_container .lm_content .lm_item_container .lm_content").addClass("transparent-color");
     }
 
-    public showWindowCloseButton(windowId: string | GoldenLayout.Component) {
+    public showWindowCloseButton(windowId: string | GoldenLayout.Component): void {
         let windowContentItem;
         if (typeof windowId === "string") {
             windowContentItem = store.getWindowContentItem(windowId);
@@ -114,7 +100,7 @@ export class WorkspacesUIExecutor {
         windowContentItem.tab.closeElement.show();
     }
 
-    public hideWindowCloseButton(windowId: string | GoldenLayout.Component) {
+    public hideWindowCloseButton(windowId: string | GoldenLayout.Component): void {
         let windowContentItem;
         if (typeof windowId === "string") {
             windowContentItem = store.getWindowContentItem(windowId);
@@ -125,7 +111,7 @@ export class WorkspacesUIExecutor {
         windowContentItem.tab.closeElement.hide();
     }
 
-    public showMaximizeButton(itemId: string | GoldenLayout.Stack) {
+    public showMaximizeButton(itemId: string | GoldenLayout.Stack): void {
         let containerContentItem;
         if (typeof itemId === "string") {
             containerContentItem = store.getContainer(itemId);
@@ -145,7 +131,7 @@ export class WorkspacesUIExecutor {
         maximiseButton.show();
     }
 
-    public hideMaximizeButton(itemId: string | GoldenLayout.Stack) {
+    public hideMaximizeButton(itemId: string | GoldenLayout.Stack): void {
         let containerContentItem;
         if (typeof itemId === "string") {
             containerContentItem = store.getContainer(itemId);
@@ -165,7 +151,7 @@ export class WorkspacesUIExecutor {
         maximiseButton.hide();
     }
 
-    public showEjectButton(itemId: string | GoldenLayout.Stack) {
+    public showEjectButton(itemId: string | GoldenLayout.Stack): void {
         let containerContentItem;
         if (typeof itemId === "string") {
             containerContentItem = store.getContainer(itemId);
@@ -184,7 +170,7 @@ export class WorkspacesUIExecutor {
         ejectButton.show();
     }
 
-    public hideEjectButton(itemId: string | GoldenLayout.Stack) {
+    public hideEjectButton(itemId: string | GoldenLayout.Stack): void {
         let containerContentItem;
         if (typeof itemId === "string") {
             containerContentItem = store.getContainer(itemId);
@@ -203,7 +189,7 @@ export class WorkspacesUIExecutor {
         ejectButton.hide();
     }
 
-    public showAddWindowButton(itemId: string | GoldenLayout.Stack) {
+    public showAddWindowButton(itemId: string | GoldenLayout.Stack): void {
         let containerContentItem;
         if (typeof itemId === "string") {
             containerContentItem = store.getContainer(itemId);
@@ -227,7 +213,7 @@ export class WorkspacesUIExecutor {
         button.show();
     }
 
-    public hideAddWindowButton(itemId: string | GoldenLayout.Stack) {
+    public hideAddWindowButton(itemId: string | GoldenLayout.Stack): void {
         let containerContentItem;
         if (typeof itemId === "string") {
             containerContentItem = store.getContainer(itemId);
@@ -244,6 +230,84 @@ export class WorkspacesUIExecutor {
         }
 
         button.hide();
+    }
+
+    public showWindowCloseButtons(workspaceId: string): void {
+        const workspace = store.getById(workspaceId);
+        if (!workspace?.layout) {
+            return;
+        }
+
+        const allComponentItems = workspace.layout.root.getItemsByType("component");
+
+        allComponentItems.forEach((componentItem) => {
+            this.showWindowCloseButton(idAsString(componentItem.config.id));
+        });
+    }
+
+    public hideWindowCloseButtons(workspaceId: string): void {
+        const workspace = store.getById(workspaceId);
+        if (!workspace?.layout) {
+            return;
+        }
+
+        const allComponentItems = workspace.layout.root.getItemsByType("component");
+
+        allComponentItems.forEach((componentItem) => {
+            this.hideWindowCloseButton(idAsString(componentItem.config.id));
+        });
+    }
+
+    public showEjectButtons(workspaceId: string): void {
+        const workspace = store.getById(workspaceId);
+        if (!workspace?.layout) {
+            return;
+        }
+
+        const allComponentItems = workspace.layout.root.getItemsByType("stack");
+
+        allComponentItems.forEach((stackItem) => {
+            this.showEjectButton(idAsString(stackItem.config.id));
+        });
+    }
+
+    public hideEjectButtons(workspaceId: string): void {
+        const workspace = store.getById(workspaceId);
+        if (!workspace?.layout) {
+            return;
+        }
+
+        const allComponentItems = workspace.layout.root.getItemsByType("stack");
+
+        allComponentItems.forEach((stackItem) => {
+            this.hideEjectButton(idAsString(stackItem.config.id));
+        });
+    }
+
+    public showAddWindowButtons(workspaceId: string): void {
+        const workspace = store.getById(workspaceId);
+        if (!workspace?.layout) {
+            return;
+        }
+
+        const allComponentItems = workspace.layout.root.getItemsByType("stack");
+
+        allComponentItems.forEach((stackItem) => {
+            this.showAddWindowButton(idAsString(stackItem.config.id));
+        });
+    }
+
+    public hideAddWindowButtons(workspaceId: string): void {
+        const workspace = store.getById(workspaceId);
+        if (!workspace?.layout) {
+            return;
+        }
+
+        const allComponentItems = workspace.layout.root.getItemsByType("stack");
+
+        allComponentItems.forEach((stackItem) => {
+            this.hideAddWindowButton(idAsString(stackItem.config.id));
+        });
     }
 }
 

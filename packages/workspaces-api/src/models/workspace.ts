@@ -97,6 +97,18 @@ export class Workspace implements Glue42Workspaces.Workspace {
         return getData(this).config.showSaveButton;
     }
 
+    public get showWindowCloseButtons(): boolean {
+        return getData(this).config.showWindowCloseButtons;
+    }
+
+    public get showEjectButtons(): boolean {
+        return getData(this).config.showEjectButtons;
+    }
+
+    public get showAddWindowButtons(): boolean {
+        return getData(this).config.showAddWindowButtons;
+    }
+
     public async removeChild(predicate: (child: Glue42Workspaces.WorkspaceElement) => boolean): Promise<void> {
         checkThrowCallback(predicate);
         const child = this.children.find(predicate);
@@ -339,7 +351,10 @@ export class Workspace implements Glue42Workspaces.Workspace {
                 allowExtract: this.allowExtract,
                 allowSplitters: this.allowSplitters,
                 showCloseButton: this.showCloseButton,
-                showSaveButton: this.showSaveButton
+                showSaveButton: this.showSaveButton,
+                showAddWindowButtons: this.showAddWindowButtons,
+                showEjectButtons: this.showEjectButtons,
+                showWindowCloseButtons: this.showWindowCloseButtons
             };
 
             lockConfigResult = config(currentLockConfig);

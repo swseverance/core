@@ -339,5 +339,8 @@ export interface LockWorkspaceConfig {
         allowSplitters?: boolean;
         showCloseButton?: boolean;
         showSaveButton?: boolean;
+        showAddWindowButtons?: boolean;
+        showWindowCloseButtons?: boolean;
+        showEjectButtons?: boolean;
     };
 }

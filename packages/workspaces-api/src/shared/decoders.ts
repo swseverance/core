@@ -289,7 +289,10 @@ export const workspaceConfigResultDecoder: Decoder<WorkspaceConfigResult> = obje
     allowDropLeft: optional(boolean()),
     allowDropTop: optional(boolean()),
     allowDropRight: optional(boolean()),
-    allowDropBottom: optional(boolean())
+    allowDropBottom: optional(boolean()),
+    showAddWindowButtons: optional(boolean()),
+    showEjectButtons: optional(boolean()),
+    showWindowCloseButtons: optional(boolean()),
 });
 
 // todo: remove number positionIndex when fixed
@@ -579,6 +582,9 @@ export const workspaceLockConfigDecoder: Decoder<WorkspaceLockConfig> = object({
     allowSplitters: optional(boolean()),
     showCloseButton: optional(boolean()),
     showSaveButton: optional(boolean()),
+    showWindowCloseButtons: optional(boolean()),
+    showAddWindowButtons: optional(boolean()),
+    showEjectButtons: optional(boolean()),
 });
 
 export const lockWorkspaceDecoder: Decoder<LockWorkspaceConfig> = object({
