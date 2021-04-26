@@ -582,8 +582,6 @@ describe("lock() Should", () => {
         expect(emptyWorkspace.showWindowCloseButtons).to.be.true;
         expect(emptyWorkspace.showEjectButtons).to.be.true;
         expect(emptyWorkspace.showAddWindowButtons).to.be.true;
-        expect(emptyWorkspace.showEjectButtons).to.be.true;
-        expect(emptyWorkspace.showWindowCloseButtons).to.be.true;
     });
 
     it("set all showEjectButton in all groups to false when locked without arguments", async () => {
