@@ -1,6 +1,7 @@
 import { Base } from "./base/base";
 import { Glue42Workspaces } from "../../workspaces.d";
 import { columnLockConfigDecoder } from "../shared/decoders";
+import { ColumnLockConfig } from "../types/temp";
 
 interface PrivateData {
     base: Base;
@@ -109,7 +110,7 @@ export class Column implements Glue42Workspaces.Column {
         return getBase(this).close(this);
     }
 
-    public lock(config?: Glue42Workspaces.ColumnLockConfig | ((config: Glue42Workspaces.ColumnLockConfig) => Glue42Workspaces.ColumnLockConfig)): Promise<void> {
+    public lock(config?: ColumnLockConfig | ((config: ColumnLockConfig) => ColumnLockConfig)): Promise<void> {
         let lockConfigResult = undefined;
 
         if (typeof config === "function") {

@@ -285,7 +285,7 @@ export const loadingConfigDecoder: Decoder<Glue42WebPlatform.Workspaces.LoadingC
     })),
     defaultStrategy: optional(oneOf(constant("direct"), constant("delayed"), constant("lazy"))),
     showDelayedIndicator: optional(boolean())
-})
+});
 
 export const workspacesConfigDecoder: Decoder<Glue42WebPlatform.Workspaces.Config> = object({
     src: nonEmptyStringDecoder,

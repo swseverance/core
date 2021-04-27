@@ -21,7 +21,7 @@ const getData = (base: Base, model: AllParentTypes): WorkspacePrivateData | Pare
         return manager.getWorkspaceData(model);
     }
 
-    return data.get(base).manager.getParentData(model);
+    return data.get(base).manager.getParentData(model as SubParentTypes);
 };
 
 const getWindowFromPlacementId = (base: Base, placemenId: string): Window => {

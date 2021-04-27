@@ -132,7 +132,7 @@ describe("resume() Should", () => {
         await workspace.resume();
         await workspace.refreshReference();
 
-        expect(workspace.allowDrop).to.be.false;
+        expect(workspace.allowDrop).to.be.true;
         expect(workspace.allowExtract).to.be.false;
         expect(workspace.allowDropLeft).to.be.false;
         expect(workspace.allowDropTop).to.be.false;
@@ -152,7 +152,7 @@ describe("resume() Should", () => {
         await workspace.refreshReference();
 
         workspace.getAllGroups().forEach((group) => {
-            expect(group.allowDrop).to.be.false;
+            expect(group.allowDrop).to.be.true;
             expect(group.allowExtract).to.be.false;
         });
     });
@@ -166,7 +166,7 @@ describe("resume() Should", () => {
         await workspace.refreshReference();
 
         workspace.getAllRows().forEach((row) => {
-            expect(row.allowDrop).to.be.false;
+            expect(row.allowDrop).to.be.true;
         });
     });
 
@@ -179,7 +179,7 @@ describe("resume() Should", () => {
         await workspace.refreshReference();
 
         workspace.getAllColumns().forEach((column) => {
-            expect(column.allowDrop).to.be.false;
+            expect(column.allowDrop).to.be.true;
         });
     });
 

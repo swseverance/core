@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import GoldenLayout from "@glue42/golden-layout";
 import store from "./store";
 import { LayoutStateResolver } from "./resolver";
@@ -15,16 +16,16 @@ export class WorkspaceWrapper {
         private readonly frameId: string) {
     }
 
-    public get id() {
+    public get id(): string {
         return this.workspace.id;
     }
 
-    public get title() {
+    public get title(): string {
         const component = this.workspaceContentItem;
         return component.config.title || component.config.componentName;
     }
 
-    public get lastFocusedWindowId() {
+    public get lastFocusedWindowId(): string {
         if (!this.workspace?.layout) {
             return;
         }
@@ -37,7 +38,7 @@ export class WorkspaceWrapper {
 
             if (groupContentItem && groupContentItem.type !== "component" && groupContentItem.contentItems.length) {
                 const focusedItemInGroup = groupContentItem.contentItems[groupContentItem.contentItems.length - 1].config.id;
-                return focusedItemInGroup;
+                return idAsString(focusedItemInGroup);
             }
 
         } else {
@@ -47,18 +48,18 @@ export class WorkspaceWrapper {
         return this.workspace.windows.filter((w) => this.stateResolver.isWindowSelected(idAsString(w.id)))[0]?.id;
     }
 
-    public get isSelected() {
+    public get isSelected(): boolean {
         const workspaceLayoutStack = store.workspaceLayout.root.getItemsById(this.workspace.id)[0].parent;
         const activeContentItem = workspaceLayoutStack.getActiveContentItem();
 
         return idAsString(activeContentItem.config.id) === this.workspace.id;
     }
 
-    public get isHibernated() {
+    public get isHibernated(): boolean {
         return typeof this.workspace.hibernateConfig !== "undefined" && typeof this.workspace.hibernateConfig !== null;
     }
 
-    public get tabIndex() {
+    public get tabIndex(): number {
         const workspaceLayoutStack = store.workspaceLayout.root.getItemsById(this.workspace.id)[0].parent;
         const workspaceIndex = ((workspaceLayoutStack as any).header as GoldenLayout.Header)
             .tabs
@@ -88,6 +89,10 @@ export class WorkspaceWrapper {
         glConfig.workspacesOptions.showCloseButton = this.showCloseButton;
         glConfig.workspacesOptions.showSaveButton = this.showSaveButton;
         glConfig.workspacesOptions.allowSplitters = this.allowSplitters;
+        glConfig.workspacesOptions.showAddWindowButtons = this.showAddWindowButtons;
+        glConfig.workspacesOptions.showEjectButtons = this.showEjectButtons;
+        glConfig.workspacesOptions.showWindowCloseButtons = this.showWindowCloseButtons;
+
         glConfig.workspacesOptions.lastActive = workspace.lastActive;
 
         if (!glConfig.workspacesOptions.title) {
@@ -122,11 +127,14 @@ export class WorkspaceWrapper {
             allowExtract: this.allowExtract,
             allowSplitters: this.allowSplitters,
             showCloseButton: this.showCloseButton,
-            showSaveButton: this.showSaveButton
+            showSaveButton: this.showSaveButton,
+            showAddWindowButtons: this.showAddWindowButtons,
+            showEjectButtons: this.showEjectButtons,
+            showWindowCloseButtons: this.showWindowCloseButtons
         };
 
         if ((config.workspacesOptions as WorkspaceOptionsWithLayoutName).layoutName) {
-            summaryConfig.layoutName = (config.workspacesOptions as WorkspaceOptionsWithLayoutName).layoutName
+            summaryConfig.layoutName = (config.workspacesOptions as WorkspaceOptionsWithLayoutName).layoutName;
         }
 
         return {
@@ -319,9 +327,51 @@ export class WorkspaceWrapper {
             (this.workspace.layout.config.workspacesOptions as any).showAddWindowButtons = value;
         }
         (this.workspaceContentItem.config.workspacesConfig as any).showAddWindowButtons = value;
+
+        this.populateChildrenShowAddWindowButtons(value);
     }
 
-    private transformComponentsToWindowSummary(glConfig: GoldenLayout.ItemConfig) {
+    public get showEjectButtons(): boolean {
+        let result;
+        if (this.workspace?.layout) {
+            result = (this.workspace.layout.config.workspacesOptions as any).showEjectButtons;
+        } else {
+            result = (this.workspaceContentItem.config.workspacesConfig as any).showEjectButtons;
+        }
+
+        return result ?? true;
+    }
+
+    public set showEjectButtons(value: boolean) {
+        if (this.workspace?.layout) {
+            (this.workspace.layout.config.workspacesOptions as any).showEjectButtons = value;
+        }
+        (this.workspaceContentItem.config.workspacesConfig as any).showEjectButtons = value;
+
+        this.populateChildrenShowEjectButtons(value);
+    }
+
+    public get showWindowCloseButtons(): boolean {
+        let result;
+        if (this.workspace?.layout) {
+            result = (this.workspace.layout.config.workspacesOptions as any).showWindowCloseButtons;
+        } else {
+            result = (this.workspaceContentItem.config.workspacesConfig as any).showWindowCloseButtons;
+        }
+
+        return result ?? true;
+    }
+
+    public set showWindowCloseButtons(value: boolean) {
+        if (this.workspace?.layout) {
+            (this.workspace.layout.config.workspacesOptions as any).showWindowCloseButtons = value;
+        }
+        (this.workspaceContentItem.config.workspacesConfig as any).showWindowCloseButtons = value;
+
+        this.populateChildrenShowWindowCloseButtons(value);
+    }
+
+    private transformComponentsToWindowSummary(glConfig: GoldenLayout.ItemConfig): void {
         if (glConfig.type === "component" && glConfig.componentName === EmptyVisibleWindowName) {
             return;
         }
@@ -335,7 +385,7 @@ export class WorkspaceWrapper {
         glConfig.content?.map((c: any) => this.transformComponentsToWindowSummary(c));
     }
 
-    private transformParentsToContainerSummary(glConfig: any) {
+    private transformParentsToContainerSummary(glConfig: any): void {
         if (glConfig.type === "component") {
             return;
         }
@@ -350,7 +400,7 @@ export class WorkspaceWrapper {
         glConfig.content?.map((c: any) => this.transformParentsToContainerSummary(c));
     }
 
-    private populateChildrenAllowDrop(value?: boolean) {
+    private populateChildrenAllowDrop(value?: boolean): void {
         const { layout } = this.workspace;
 
         if (!layout) {
@@ -375,14 +425,14 @@ export class WorkspaceWrapper {
         });
     }
 
-    private populateChildrenAllowExtract(value?: boolean) {
+    private populateChildrenAllowExtract(value?: boolean): void {
         const { layout } = this.workspace;
 
         if (!layout) {
             return;
         }
 
-        const populateRecursive = (item: GoldenLayout.ContentItem) => {
+        const populateRecursive = (item: GoldenLayout.ContentItem): void => {
             if (item.type === "component") {
                 const windowWrapper = new WorkspaceWindowWrapper(item, this.frameId);
 
@@ -393,6 +443,85 @@ export class WorkspaceWrapper {
             if (item.type === "stack") {
                 const containerWrapper = new WorkspaceContainerWrapper(item, this.frameId, this.workspace.id);
                 containerWrapper.allowExtract = value;
+            }
+
+            item.contentItems.forEach((ci) => {
+                populateRecursive(ci);
+            });
+        };
+
+        layout.root.contentItems.forEach((ci) => {
+            populateRecursive(ci);
+        });
+    }
+
+    private populateChildrenShowAddWindowButtons(value?: boolean): void {
+        const { layout } = this.workspace;
+
+        if (!layout) {
+            return;
+        }
+
+        const populateRecursive = (item: GoldenLayout.ContentItem): void => {
+            if (item.type === "component") {
+                return;
+            }
+
+            if (item.type === "stack") {
+                const containerWrapper = new WorkspaceContainerWrapper(item, this.frameId, this.workspace.id);
+                containerWrapper.showAddWindowButton = value;
+            }
+
+            item.contentItems.forEach((ci) => {
+                populateRecursive(ci);
+            });
+        };
+
+        layout.root.contentItems.forEach((ci) => {
+            populateRecursive(ci);
+        });
+    }
+
+    private populateChildrenShowEjectButtons(value?: boolean): void {
+        const { layout } = this.workspace;
+
+        if (!layout) {
+            return;
+        }
+
+        const populateRecursive = (item: GoldenLayout.ContentItem): void => {
+            if (item.type === "component") {
+                return;
+            }
+
+            if (item.type === "stack") {
+                const containerWrapper = new WorkspaceContainerWrapper(item, this.frameId, this.workspace.id);
+                containerWrapper.showEjectButton = value;
+            }
+
+            item.contentItems.forEach((ci) => {
+                populateRecursive(ci);
+            });
+        };
+
+        layout.root.contentItems.forEach((ci) => {
+            populateRecursive(ci);
+        });
+    }
+
+    private populateChildrenShowWindowCloseButtons(value?: boolean): void {
+        const { layout } = this.workspace;
+
+        if (!layout) {
+            return;
+        }
+
+        const populateRecursive = (item: GoldenLayout.ContentItem): void => {
+            if (item.type === "component") {
+                const windowWrapper = new WorkspaceWindowWrapper(item, this.frameId);
+
+                windowWrapper.showCloseButton = value;
+                return;
             }
 
             item.contentItems.forEach((ci) => {

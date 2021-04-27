@@ -9,10 +9,11 @@ import { GDWindow, WindowsAPI, ContextsAPI, LayoutsAPI } from "../types/glue";
 import { Glue42Workspaces } from "../../workspaces";
 import { Frame } from "../models/frame";
 import { RefreshChildrenConfig } from "../types/privateData";
-import { Child, ContainerLockConfig, SubParentTypes } from "../types/builders";
+import { AllParentTypes, Child, ContainerLockConfig, SubParentTypes } from "../types/builders";
 import { PrivateDataManager } from "../shared/privateDataManager";
 import { Window } from "../models/window";
 import { UnsubscribeFunction } from "callback-registry";
+import { WorkspaceLockConfig, WorkspaceWindowLockConfig } from "../types/temp";
 
 export class BaseController {
 
@@ -253,7 +254,7 @@ export class BaseController {
 
     public refreshChildren(config: RefreshChildrenConfig): Child[] {
         const { parent, children, existingChildren, workspace } = config;
-        if (parent instanceof Window) {
+        if (parent instanceof Window || (parent as Glue42Workspaces.WorkspaceWindow).type === "window") {
             return;
         }
 
@@ -264,7 +265,7 @@ export class BaseController {
 
             if (childToAdd) {
                 this.privateDataManager.remapChild(childToAdd, {
-                    parent,
+                    parent: parent as AllParentTypes,
                     children: [],
                     config: newChildSnapshot.config
                 });
@@ -274,20 +275,20 @@ export class BaseController {
                 if (newChildSnapshot.type === "window") {
                     createConfig = {
                         id: newChildSnapshot.id,
-                        parent,
+                        parent: parent as AllParentTypes,
                         frame: workspace.frame,
                         workspace,
                         config: newChildSnapshot.config,
-                    };
+                    } as WindowCreateConfig;
                 } else {
                     createConfig = {
                         id: newChildSnapshot.id,
-                        parent,
+                        parent: parent as AllParentTypes,
                         frame: workspace.frame,
                         workspace,
                         config: newChildSnapshot.config,
                         children: []
-                    };
+                    } as ParentCreateConfig;
                 }
 
                 childToAdd = this.ioc.getModel<"child">(newChildSnapshot.type, createConfig);
@@ -307,7 +308,7 @@ export class BaseController {
         if (parent instanceof Workspace) {
             return newChildren;
         } else {
-            this.privateDataManager.remapChild(parent, { children: newChildren });
+            this.privateDataManager.remapChild(parent as SubParentTypes, { children: newChildren });
             return newChildren;
         }
     }
@@ -324,7 +325,7 @@ export class BaseController {
                 return false;
             }
 
-            foundChild = this.iterateFindChild(child.children, predicate);
+            foundChild = this.iterateFindChild((child as SubParentTypes).children, predicate);
 
             if (foundChild) {
                 return true;
@@ -342,7 +343,7 @@ export class BaseController {
                 return innerFound;
             }
 
-            innerFound.push(...this.iterateFilterChildren(child.children, predicate));
+            innerFound.push(...this.iterateFilterChildren((child as SubParentTypes).children, predicate));
 
             return innerFound;
         }, []);
@@ -384,11 +385,11 @@ export class BaseController {
         await this.bridge.send<void>(OPERATIONS.resumeWorkspace.name, { workspaceId });
     }
 
-    public async lockWorkspace(workspaceId: string, config?: Glue42Workspaces.WorkspaceLockConfig): Promise<void> {
+    public async lockWorkspace(workspaceId: string, config?: WorkspaceLockConfig): Promise<void> {
         await this.bridge.send<void>(OPERATIONS.lockWorkspace.name, { workspaceId, config });
     }
 
-    public async lockWindow(windowPlacementId: string, config?: Glue42Workspaces.WorkspaceWindowLockConfig): Promise<void> {
+    public async lockWindow(windowPlacementId: string, config?: WorkspaceWindowLockConfig): Promise<void> {
         await this.bridge.send<void>(OPERATIONS.lockWindow.name, { windowPlacementId, config });
     }
 

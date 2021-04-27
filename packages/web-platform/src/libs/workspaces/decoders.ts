@@ -3,7 +3,7 @@
 import { Glue42Workspaces } from "@glue42/workspaces-api";
 import { anyJson, array, boolean, constant, Decoder, intersection, lazy, number, object, oneOf, optional, string } from "decoder-validate";
 import { nonEmptyStringDecoder, nonNegativeNumberDecoder, windowLayoutItemDecoder } from "../../shared/decoders";
-import { AddContainerConfig, AddItemResult, AddWindowConfig, BaseChildSnapshotConfig, BundleConfig, ChildSnapshotResult, ContainerStreamData, ContainerSummaryResult, DeleteLayoutConfig, ExportedLayoutsResult, FrameHello, FrameSnapshotResult, FrameStateConfig, FrameStateResult, FrameStreamData, FrameSummariesResult, FrameSummaryResult, GetFrameSummaryConfig, IsWindowInSwimlaneResult, LayoutSummariesResult, LayoutSummary, LockContainerConfig, LockWindowConfig, LockWorkspaceConfig, MoveFrameConfig, MoveWindowConfig, OpenWorkspaceConfig, ParentSnapshotConfig, PingResult, ResizeItemConfig, SetItemTitleConfig, SimpleItemConfig, SimpleWindowOperationSuccessResult, SwimlaneWindowSnapshotConfig, WindowStreamData, WorkspaceConfigResult, WorkspaceCreateConfigProtocol, WorkspaceEventAction, WorkspaceEventType, WorkspaceSelector, WorkspacesLayoutImportConfig, WorkspaceSnapshotResult, WorkspacesOperationsTypes, WorkspaceStreamData, WorkspaceSummariesResult, WorkspaceSummaryResult, WorkspaceWindowData } from "./types";
+import { AddContainerConfig, AddItemResult, AddWindowConfig, BaseChildSnapshotConfig, BundleConfig, ChildSnapshotResult, ContainerStreamData, ContainerSummaryResult, DeleteLayoutConfig, ExportedLayoutsResult, FrameHello, FrameSnapshotResult, FrameStateConfig, FrameStateResult, FrameStreamData, FrameSummariesResult, FrameSummaryResult, GetFrameSummaryConfig, IsWindowInSwimlaneResult, LayoutSummariesResult, LayoutSummary, LockColumnConfig, LockContainerConfig, LockGroupConfig, LockRowConfig, LockWindowConfig, LockWorkspaceConfig, MoveFrameConfig, MoveWindowConfig, OpenWorkspaceConfig, ParentSnapshotConfig, PingResult, ResizeItemConfig, SetItemTitleConfig, SimpleItemConfig, SimpleWindowOperationSuccessResult, SwimlaneWindowSnapshotConfig, WindowStreamData, WorkspaceConfigResult, WorkspaceCreateConfigProtocol, WorkspaceEventAction, WorkspaceEventType, WorkspaceSelector, WorkspacesLayoutImportConfig, WorkspaceSnapshotResult, WorkspacesOperationsTypes, WorkspaceStreamData, WorkspaceSummariesResult, WorkspaceSummaryResult, WorkspaceWindowData } from "./types";
 
 export const workspacesOperationDecoder: Decoder<WorkspacesOperationsTypes> = oneOf<
     "isWindowInWorkspace" | "createWorkspace" | "getAllFramesSummaries" | "getFrameSummary" |
@@ -297,7 +297,10 @@ export const workspaceConfigResultDecoder: Decoder<WorkspaceConfigResult> = obje
     allowDropLeft: boolean(),
     allowDropTop: boolean(),
     allowDropRight: boolean(),
-    allowDropBottom: boolean()
+    allowDropBottom: boolean(),
+    showAddWindowButtons: boolean(),
+    showEjectButtons: boolean(),
+    showWindowCloseButtons: boolean()
 });
 
 // todo: remove number positionIndex when fixed
@@ -594,6 +597,9 @@ export const lockWorkspaceDecoder: Decoder<LockWorkspaceConfig> = object({
         allowSplitters: optional(boolean()),
         showCloseButton: optional(boolean()),
         showSaveButton: optional(boolean()),
+        showWindowCloseButtons: optional(boolean()),
+        showEjectButtons: optional(boolean()),
+        showAddWindowButtons: optional(boolean())
     }))
 });
 
@@ -605,9 +611,25 @@ export const lockWindowDecoder: Decoder<LockWindowConfig> = object({
     }))
 });
 
-export const lockContainerDecoder: Decoder<LockContainerConfig> = object({
+export const lockRowDecoder: Decoder<LockRowConfig> = object({
     itemId: nonEmptyStringDecoder,
-    type: oneOf(constant("row"), constant("column"), constant("group")),
+    type: constant("row"),
+    config: optional(object({
+        allowDrop: optional(boolean()),
+    }))
+});
+
+export const lockColumnDecoder: Decoder<LockColumnConfig> = object({
+    itemId: nonEmptyStringDecoder,
+    type: constant("column"),
+    config: optional(object({
+        allowDrop: optional(boolean()),
+    }))
+});
+
+export const lockGroupDecoder: Decoder<LockGroupConfig> = object({
+    itemId: nonEmptyStringDecoder,
+    type: constant("group"),
     config: optional(object({
         allowExtract: optional(boolean()),
         allowDrop: optional(boolean()),
@@ -616,3 +638,5 @@ export const lockContainerDecoder: Decoder<LockContainerConfig> = object({
         showAddWindowButton: optional(boolean()),
     }))
 });
+
+export const lockContainerDecoder: Decoder<LockContainerConfig> = oneOf<LockColumnConfig | LockGroupConfig | LockRowConfig>(lockColumnDecoder, lockGroupDecoder, lockRowDecoder);

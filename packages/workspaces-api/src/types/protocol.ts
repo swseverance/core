@@ -38,6 +38,9 @@ export interface WorkspaceConfigResult {
     maxWidth?: number;
     minHeight?: number;
     maxHeight?: number;
+    showWindowCloseButtons?: boolean;
+    showAddWindowButtons?: boolean;
+    showEjectButtons?: boolean;
 }
 
 export interface BaseChildSnapshotConfig {
@@ -91,7 +94,7 @@ export interface SubParentSnapshotResult {
     id: string;
     type: "row" | "column" | "group";
     children: ChildSnapshotResult[];
-    config: ParentSnapshotConfig
+    config: ParentSnapshotConfig;
 }
 export type ChildSnapshotResult = WindowSnapshotResult | SubParentSnapshotResult;
 
@@ -267,37 +270,55 @@ export interface WindowStreamData {
 }
 
 export interface LockWindowConfig {
-    windowPlacementId: string,
+    windowPlacementId: string;
     config?: {
-        allowExtract?: boolean,
-        showCloseButton?: boolean
-    }
+        allowExtract?: boolean;
+        showCloseButton?: boolean;
+    };
 }
 
-export interface LockContainerConfig {
-    itemId: string,
-    type: "row" | "column" | "group",
+export interface LockRowConfig {
+    itemId: string;
+    type: "row";
     config?: {
-        allowExtract?: boolean,
-        allowDrop?: boolean,
-        showMaximizeButton?: boolean,
-        showEjectButton?: boolean,
-        showAddWindowButton?: boolean
-    }
+        allowDrop?: boolean;
+    };
 }
+
+export interface LockColumnConfig {
+    itemId: string;
+    type: "column";
+    config?: {
+        allowDrop?: boolean;
+    };
+}
+
+export interface LockGroupConfig {
+    itemId: string;
+    type: "group";
+    config?: {
+        allowExtract?: boolean;
+        allowDrop?: boolean;
+        showMaximizeButton?: boolean;
+        showEjectButton?: boolean;
+        showAddWindowButton?: boolean;
+    };
+}
+
+export type LockContainerConfig = LockGroupConfig | LockColumnConfig | LockRowConfig;
 
 export interface LockWorkspaceConfig {
-    workspaceId: string,
+    workspaceId: string;
     config?: {
-        allowDrop?: boolean,
-        allowDropLeft?: boolean,
-        allowDropTop?: boolean,
-        allowDropRight?: boolean,
-        allowDropBottom?: boolean,
-        allowExtract?: boolean,
-        allowSplitters?: boolean,
-        showCloseButton?: boolean,
-        showSaveButton?: boolean,
-    }
+        allowDrop?: boolean;
+        allowDropLeft?: boolean;
+        allowDropTop?: boolean;
+        allowDropRight?: boolean;
+        allowDropBottom?: boolean;
+        allowExtract?: boolean;
+        allowSplitters?: boolean;
+        showCloseButton?: boolean;
+        showSaveButton?: boolean;
+    };
 }
 // #endregion

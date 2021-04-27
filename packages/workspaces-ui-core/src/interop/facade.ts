@@ -190,19 +190,19 @@ export class GlueFacade {
                     successCallback(undefined);
                     break;
                 case "resumeWorkspace":
-                    await this.handleResumeWorkspace(args.operationArguments)
+                    await this.handleResumeWorkspace(args.operationArguments);
                     successCallback(undefined);
                     break;
                 case "lockWorkspace":
-                    await this.handleLockWorkspace(args.operationArguments);
+                    this.handleLockWorkspace(args.operationArguments);
                     successCallback(undefined);
                     break;
                 case "lockContainer":
-                    await this.handleLockContainer(args.operationArguments);
+                    this.handleLockContainer(args.operationArguments);
                     successCallback(undefined);
                     break;
                 case "lockWindow":
-                    await this.handleLockWindow(args.operationArguments);
+                    this.handleLockWindow(args.operationArguments);
                     successCallback(undefined);
                     break;
                 default:
@@ -317,8 +317,8 @@ export class GlueFacade {
             appName: operationArguments.definition.appName,
             url: operationArguments.definition.url,
             context: operationArguments.definition.context,
-            allowExtract: true,
-            showCloseButton: true
+            allowExtract: undefined,
+            showCloseButton: undefined
         });
 
         if (operationArguments.definition.windowId) {

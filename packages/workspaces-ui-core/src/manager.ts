@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable indent */
 import { LayoutController } from "./layout/controller";
 import { WindowSummary, Workspace, WorkspaceOptionsWithTitle, WorkspaceOptionsWithLayoutName, ComponentFactory, LoadingStrategy } from "./types/internal";
 import { LayoutEventEmitter } from "./layout/eventEmitter";
@@ -458,7 +460,7 @@ export class WorkspacesManager {
         this._controller.showSaveIcon(workspaceId);
     }
 
-    public async lockWorkspace(lockConfig: LockWorkspaceArguments) {
+    public lockWorkspace(lockConfig: LockWorkspaceArguments): void {
         if (!lockConfig.config) {
             lockConfig.config = {
                 allowDrop: false,
@@ -469,7 +471,10 @@ export class WorkspacesManager {
                 allowExtract: false,
                 allowSplitters: false,
                 showCloseButton: false,
-                showSaveButton: false
+                showSaveButton: false,
+                showWindowCloseButtons: false,
+                showEjectButtons: false,
+                showAddWindowButtons: false
             };
         }
 
@@ -487,7 +492,7 @@ export class WorkspacesManager {
             lockConfig.config.allowDropBottom = lockConfig.config.allowDropBottom ?? lockConfig.config.allowDrop;
         }
 
-        const { allowDrop, allowExtract, allowSplitters, showCloseButton, showSaveButton } = lockConfig.config;
+        const { allowDrop, allowExtract, allowSplitters, showCloseButton, showSaveButton, showAddWindowButtons, showWindowCloseButtons, showEjectButtons } = lockConfig.config;
         const { workspaceId } = lockConfig;
 
         if (allowDrop === false) {
@@ -519,9 +524,27 @@ export class WorkspacesManager {
         } else {
             this._controller.enableWorkspaceSaveButton(workspaceId);
         }
+
+        if (showAddWindowButtons === false) {
+            this._controller.disableWorkspaceAddWindowButtons(workspaceId);
+        } else {
+            this._controller.enableWorkspaceAddWindowButtons(workspaceId);
+        }
+
+        if (showEjectButtons === false) {
+            this._controller.disableWorkspaceEjectButtons(workspaceId);
+        } else {
+            this._controller.enableWorkspaceEjectButtons(workspaceId);
+        }
+
+        if (showWindowCloseButtons === false) {
+            this._controller.disableWorkspaceWindowCloseButtons(workspaceId);
+        } else {
+            this._controller.enableWorkspaceWindowCloseButtons(workspaceId);
+        }
     }
 
-    public async lockContainer(lockConfig: LockContainerArguments) {
+    public lockContainer(lockConfig: LockContainerArguments): void {
         if (!lockConfig.config && lockConfig.type === "column") {
             lockConfig.config = {
                 allowDrop: false,
@@ -560,7 +583,7 @@ export class WorkspacesManager {
         }
     }
 
-    public async lockWindow(lockConfig: LockWindowArguments) {
+    public lockWindow(lockConfig: LockWindowArguments): void {
         if (!lockConfig.config) {
             lockConfig.config = {
                 allowExtract: false,

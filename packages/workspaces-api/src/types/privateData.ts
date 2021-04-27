@@ -1,14 +1,15 @@
-import { ParentSnapshotConfig, SwimlaneWindowSnapshotConfig, FrameSummaryResult, WorkspaceConfigResult, ChildSnapshotResult, GroupSnapshotConfig, RowSnapshotConfig, SimpleItemConfig, ColumnSnapshotConfig } from "./protocol";
+import { ParentSnapshotConfig, SwimlaneWindowSnapshotConfig, FrameSummaryResult, WorkspaceConfigResult, ChildSnapshotResult, GroupSnapshotConfig, RowSnapshotConfig, ColumnSnapshotConfig } from "./protocol";
 import { Frame } from "../models/frame";
 import { Workspace } from "../models/workspace";
 import { Row } from "../models/row";
 import { Column } from "../models/column";
 import { Group } from "../models/group";
-import { Child, SubParent } from "./builders";
+import { AllParentTypes, Child } from "./builders";
 import { Window } from "../models/window";
 import { IoC } from "../shared/ioc";
 import { Base } from "../models/base/base";
 import { WorkspacesController } from "./controller";
+import { Glue42Workspaces } from "../../workspaces";
 
 export type ModelTypes = "row" | "column" | "group" | "window" | "workspace" | "frame" | "child";
 
@@ -25,7 +26,7 @@ export interface ModelMaps {
 export interface SwimlaneItemConfig {
     id: string;
     controller: WorkspacesController;
-    parent: Workspace | Row | Column | Group;
+    parent: Glue42Workspaces.Workspace | Glue42Workspaces.Row | Glue42Workspaces.Column | Glue42Workspaces.Group;
     frame: Frame;
     workspace: Workspace;
 }
@@ -72,7 +73,7 @@ export interface FramePrivateData {
 }
 
 export interface RemapChildData {
-    parent?: Workspace | Row | Column | Group;
+    parent?: AllParentTypes;
     config?: SwimlaneWindowSnapshotConfig | ParentSnapshotConfig;
     children?: Child[];
 }
@@ -84,8 +85,8 @@ export interface RemapWorkspaceData {
 }
 
 export interface RefreshChildrenConfig {
-    workspace: Workspace;
-    parent: Child | Workspace;
+    workspace: Glue42Workspaces.Workspace;
+    parent: Child | Glue42Workspaces.Workspace;
     children: ChildSnapshotResult[];
     existingChildren: Child[];
 }

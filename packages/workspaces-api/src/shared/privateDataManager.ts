@@ -6,10 +6,10 @@ import { Workspace } from "../models/workspace";
 import { Window } from "../models/window";
 import { Frame } from "../models/frame";
 import { SwimlaneWindowSnapshotConfig, ParentSnapshotConfig, FrameSummaryResult } from "../types/protocol";
-import { Child } from "../types/builders";
+import { Child, SubParentTypes } from "../types/builders";
 
 export class PrivateDataManager {
-    private readonly parentsData = new WeakMap<Row | Column | Group, ParentPrivateData>();
+    private readonly parentsData = new WeakMap<SubParentTypes, ParentPrivateData>();
     private readonly workspacesData = new WeakMap<Workspace, WorkspacePrivateData>();
     private readonly windowsData = new WeakMap<Window, WindowPrivateData>();
     private readonly framesData = new WeakMap<Frame, FramePrivateData>();
@@ -53,7 +53,7 @@ export class PrivateDataManager {
         this.workspacesData.set(model, data);
     }
 
-    public setParentData(model: Row | Column | Group, data: ParentPrivateData): void {
+    public setParentData(model: SubParentTypes, data: ParentPrivateData): void {
         this.parentsData.set(model, data);
     }
 
@@ -73,7 +73,7 @@ export class PrivateDataManager {
         return this.workspacesData.get(model);
     }
 
-    public getParentData(model: Row | Column | Group): ParentPrivateData {
+    public getParentData(model: SubParentTypes): ParentPrivateData {
         return this.parentsData.get(model);
     }
 

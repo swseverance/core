@@ -129,7 +129,7 @@ export interface GenerateLayoutRequest {
 
 export interface PingRequest {
     operation: "ping";
-    operationArguments: {}
+    operationArguments: {};
 }
 
 export interface HibernateWorkspaceRequest {
@@ -246,6 +246,9 @@ export interface LockWorkspaceArguments {
         allowExtract?: boolean;
         showCloseButton?: boolean;
         showSaveButton?: boolean;
+        showWindowCloseButtons?: boolean;
+        showAddWindowButtons?: boolean;
+        showEjectButtons?: boolean;
     };
 }
 
