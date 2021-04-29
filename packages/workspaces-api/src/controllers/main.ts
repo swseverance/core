@@ -12,7 +12,7 @@ import { WorkspacesController } from "../types/controller";
 import { GDWindow } from "../types/glue";
 import { BaseController } from "./base";
 import { UnsubscribeFunction } from "callback-registry";
-import { WorkspaceLockConfig, WorkspaceWindowLockConfig } from "../types/temp";
+import { Constraints, WorkspaceLockConfig, WorkspaceWindowLockConfig } from "../types/temp";
 
 export class MainController implements WorkspacesController {
 
@@ -329,7 +329,7 @@ export class MainController implements WorkspacesController {
         return this.base.lockContainer(itemId, type, config);
     }
 
-    public async getFrameConstraints(frameId: string): Promise<Glue42Workspaces.Constraints> {
+    public async getFrameConstraints(frameId: string): Promise<Constraints> {
         const frameSnapshot = await this.getSnapshot(frameId, "frame");
 
         return {

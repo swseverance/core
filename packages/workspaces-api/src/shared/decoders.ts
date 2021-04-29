@@ -104,6 +104,8 @@ export const windowDefinitionConfigDecoder: Decoder<WindowDefinitionConfig> = ob
     maxWidth: optional(number()),
     minHeight: optional(number()),
     maxHeight: optional(number()),
+    allowExtract: optional(boolean()),
+    showCloseButton: optional(boolean())
 });
 
 export const groupDefinitionConfigDecoder: Decoder<GroupDefinitionConfig> = object({
@@ -111,16 +113,23 @@ export const groupDefinitionConfigDecoder: Decoder<GroupDefinitionConfig> = obje
     maxWidth: optional(number()),
     minHeight: optional(number()),
     maxHeight: optional(number()),
+    allowExtract: optional(boolean()),
+    allowDrop: optional(boolean()),
+    showMaximizeButton: optional(boolean()),
+    showEjectButton: optional(boolean()),
+    showAddWindowButton: optional(boolean())
 });
 
 export const rowDefinitionConfigDecoder: Decoder<RowDefinitionConfig> = object({
     minHeight: optional(number()),
-    maxHeight: optional(number())
+    maxHeight: optional(number()),
+    allowDrop: optional(boolean()),
 });
 
 export const columnDefinitionConfigDecoder: Decoder<ColumnDefinitionConfig> = object({
     minWidth: optional(number()),
     maxWidth: optional(number()),
+    allowDrop: optional(boolean()),
 });
 
 
@@ -150,7 +159,7 @@ export const parentDefinitionDecoder: Decoder<Glue42Workspaces.BoxDefinition> = 
             )
         ))
     ),
-    config: anyJson()
+    config: optional(oneOf(columnDefinitionConfigDecoder, rowDefinitionConfigDecoder, groupDefinitionConfigDecoder))
 }));
 
 export const strictParentDefinitionDecoder: Decoder<Glue42Workspaces.BoxDefinition> = object({
@@ -163,7 +172,7 @@ export const strictParentDefinitionDecoder: Decoder<Glue42Workspaces.BoxDefiniti
             )
         ))
     ),
-    config: optional(anyJson())
+    config: optional(oneOf(columnDefinitionConfigDecoder, rowDefinitionConfigDecoder, groupDefinitionConfigDecoder))
 });
 
 export const stateDecoder: Decoder<"maximized" | "normal"> = oneOf<"maximized" | "normal">(
@@ -220,7 +229,15 @@ export const workspaceDefinitionDecoder: Decoder<Glue42Workspaces.WorkspaceDefin
         isFocused: optional(boolean()),
         noTabHeader: optional(boolean()),
         reuseWorkspaceId: optional(nonEmptyStringDecoder),
-        loadingStrategy: optional(loadingStrategyDecoder)
+        loadingStrategy: optional(loadingStrategyDecoder),
+        allowDrop: optional(boolean()),
+        allowExtract: optional(boolean()),
+        showSaveButton: optional(boolean()),
+        showCloseButton: optional(boolean()),
+        allowSplitters: optional(boolean()),
+        showWindowCloseButtons: optional(boolean()),
+        showEjectButtons: optional(boolean()),
+        showAddWindowButtons: optional(boolean())
     })),
     frame: optional(object({
         reuseFrameId: optional(nonEmptyStringDecoder),

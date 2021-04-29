@@ -97,7 +97,6 @@ export class Workspace implements Glue42Workspaces.Workspace {
         return getData(this).config.showSaveButton;
     }
 
-<<<<<<< HEAD
     public get minWidth(): number {
         return getData(this).config.minWidth;
     }
@@ -112,7 +111,8 @@ export class Workspace implements Glue42Workspaces.Workspace {
 
     public get maxHeight(): number {
         return getData(this).config.maxHeight;
-=======
+    }
+    
     public get showWindowCloseButtons(): boolean {
         return getData(this).config.showWindowCloseButtons;
     }
@@ -123,7 +123,6 @@ export class Workspace implements Glue42Workspaces.Workspace {
 
     public get showAddWindowButtons(): boolean {
         return getData(this).config.showAddWindowButtons;
->>>>>>> implement-workspace-lockdown
     }
 
     public async removeChild(predicate: (child: Glue42Workspaces.WorkspaceElement) => boolean): Promise<void> {

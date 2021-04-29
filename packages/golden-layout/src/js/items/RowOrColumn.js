@@ -647,7 +647,7 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 			for (i = 0; i < entriesUnderMax.length; i++) {
 				entry = entriesUnderMax[i];
 				enlargedHeight = Math.round((entry.maxHeight - entry.height) * enlargePercent);
-				remainingHeightToEnlarge -= enlargeHeight;
+				remainingHeightToEnlarge -= enlargedHeight;
 				entry.height += enlargedHeight;
 			}
 		}

@@ -4,6 +4,7 @@ import { PrivateDataManager } from "../shared/privateDataManager";
 import { FrameStreamData, WorkspaceStreamData, WindowStreamData } from "../types/protocol";
 import { Glue42Workspaces } from "../../workspaces.d";
 import { FramePrivateData } from "../types/privateData";
+import { Constraints } from "../types/temp";
 
 interface PrivateData {
     manager: PrivateDataManager;
@@ -91,9 +92,9 @@ export class Frame implements Glue42Workspaces.Frame {
         return controller.getWorkspaces((wsp) => wsp.frameId === this.id);
     }
 
-    public async constraints(): Promise<Glue42Workspaces.Constraints> {
+    public async constraints(): Promise<Constraints> {
         const controller = getData(this).controller;
-        const myId = getData(this).summary.id
+        const myId = getData(this).summary.id;
 
         return controller.getFrameConstraints(myId);
     }

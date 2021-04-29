@@ -199,7 +199,12 @@ export const workspaceDefinitionDecoder: Decoder<Glue42Workspaces.WorkspaceDefin
         position: optional(nonNegativeNumberDecoder),
         isFocused: optional(boolean()),
         loadStrategy: optional(loadStrategyDecoder),
-        noTabHeader: optional(boolean())
+        noTabHeader: optional(boolean()),
+        allowDrop: optional(boolean()),
+        allowExtract: optional(boolean()),
+        showSaveButton: optional(boolean()),
+        showCloseButton: optional(boolean()),
+        allowSplitters: optional(boolean()),
     })),
     frame: optional(object({
         reuseFrameId: optional(nonEmptyStringDecoder),

@@ -57,26 +57,35 @@ export interface Constraints {
     maxHeight: number;
 }
 
-export interface WindowDefinitionConfig{
+export interface WindowDefinitionConfig {
     minWidth?: number;
     maxWidth?: number;
     minHeight?: number;
     maxHeight?: number;
+    allowExtract?: boolean;
+    showCloseButton?: boolean;
 }
 
-export interface GroupDefinitionConfig{
+export interface GroupDefinitionConfig {
     minWidth?: number;
     maxWidth?: number;
     minHeight?: number;
     maxHeight?: number;
+    allowExtract?: boolean;
+    showMaximizeButton?: boolean;
+    showEjectButton?: boolean;
+    allowDrop?: boolean;
+    showAddWindowButton?: boolean;
 }
 
-export interface RowDefinitionConfig{
+export interface RowDefinitionConfig {
     minHeight?: number;
     maxHeight?: number;
+    allowDrop?: boolean;
 }
 
-export interface ColumnDefinitionConfig{
+export interface ColumnDefinitionConfig {
     minWidth?: number;
     maxWidth?: number;
+    allowDrop?: boolean;
 }

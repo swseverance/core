@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any*/
 import GoldenLayout from "@glue42/golden-layout";
 import registryFactory from "callback-registry";
 const ResizeObserver = require("resize-observer-polyfill").default || require("resize-observer-polyfill");
 import { idAsString, getAllWindowsFromConfig, createWaitFor, getElementBounds, getAllItemsFromConfig } from "../utils";
-import { Workspace, Window, FrameLayoutConfig, StartupConfig, ComponentState, LayoutWithMaximizedItem, WorkspaceDropOptions } from "../types/internal";
+import { Workspace, Window, FrameLayoutConfig, StartupConfig, ComponentState, LayoutWithMaximizedItem, WorkspaceDropOptions, Bounds } from "../types/internal";
 import { LayoutEventEmitter } from "./eventEmitter";
 import store from "../state/store";
 import { LayoutStateResolver } from "../state/resolver";
@@ -41,11 +42,11 @@ export class LayoutController {
         this._configFactory = configFactory;
     }
 
-    public get emitter() {
+    public get emitter(): LayoutEventEmitter {
         return this._emitter;
     }
 
-    public get bounds() {
+    public get bounds(): Bounds {
         return getElementBounds(document.getElementById("outter-layout-container"));
     }
 
@@ -127,11 +128,18 @@ export class LayoutController {
                 config = getAllWindowsFromConfig([config])[0];
             }
 
-            if (emptyVisibleWindow && !emptyVisibleWindow.parent.config.workspacesConfig?.wrapper) {
+            if (emptyVisibleWindow &&
+                emptyVisibleWindow.parent &&
+                !emptyVisibleWindow.parent.config.workspacesConfig?.wrapper) {
                 // Triggered when the API level parent is an empty group
 
                 const group = this._configFactory.wrapInGroup([config as GoldenLayout.ComponentConfig]);
                 group.workspacesConfig.wrapper = false;
+                const { wrapper, ...options } = emptyVisibleWindow.parent.config?.workspacesConfig || {};
+                group.workspacesConfig = {
+                    ...group.workspacesConfig,
+                    ...options
+                };
                 // Replacing the whole stack in order to trigger the header logic and the properly update the title
                 emptyVisibleWindow.parent.parent.replaceChild(emptyVisibleWindow.parent, group);
 
@@ -146,6 +154,7 @@ export class LayoutController {
     }
 
     public async addContainer(config: GoldenLayout.RowConfig | GoldenLayout.ColumnConfig | GoldenLayout.StackConfig, parentId: string): Promise<string> {
+        console.log("INCOMING config", JSON.stringify(config));
         const workspace = store.getByContainerId(parentId);
         if (this._stateResolver.isWorkspaceHibernated(workspace.id)) {
             throw new Error(`Could not add container to ${workspace.id} because its hibernated`);
@@ -168,6 +177,7 @@ export class LayoutController {
         let contentItem = workspace.layout.root.getItemsByFilter((ci) => ci.isColumn || ci.isRow)[0];
         if (parentId) {
             contentItem = workspace.layout.root.getItemsById(parentId)[0];
+            console.log("found proper parent", parentId, contentItem);
         }
 
         if (!contentItem) {
@@ -215,6 +225,9 @@ export class LayoutController {
         const groupWrapperChild = contentItem.contentItems
             .find((ci) => ci.type === "stack" && ci.config.workspacesConfig.wrapper === true) as GoldenLayout.Stack;
 
+        console.log("GROUPWRAPPERCHILD0", contentItem);
+
+        console.log("GROUPWRAPPERCHILD", groupWrapperChild);
         const hasGroupWrapperAPlaceholder = (groupWrapperChild?.contentItems[0] as GoldenLayout.Component)?.config.componentName === this._emptyVisibleWindowName;
 
         return new Promise((res, rej) => {
@@ -238,6 +251,7 @@ export class LayoutController {
                 const emptyVisibleWindow = contentItem.getComponentsByName(this._emptyVisibleWindowName)[0];
 
                 emptyVisibleWindow.parent.replaceChild(emptyVisibleWindow, config);
+                console.log("Replacing");
             } else {
                 contentItem.addChild(config);
             }
@@ -310,7 +324,7 @@ export class LayoutController {
         this.emitter.raiseEvent("workspace-added", { workspace: store.getById(id) });
     }
 
-    public reinitializeWorkspace(id: string, config: GoldenLayout.Config) {
+    public reinitializeWorkspace(id: string, config: GoldenLayout.Config): Promise<unknown> {
         store.removeLayout(id);
         if (config.workspacesOptions?.reuseWorkspaceId) {
             // Making sure that the property doesn't leak in a workspace summary or a saved layout
@@ -354,7 +368,7 @@ export class LayoutController {
         return dragElement[0];
     }
 
-    public setDragElementSize(contentWidth: number, contentHeight: number) {
+    public setDragElementSize(contentWidth: number, contentHeight: number): void {
         const dragElement = this.getDragElement();
 
         if (!dragElement) {
@@ -882,7 +896,7 @@ export class LayoutController {
         wrapper.allowExtract = false;
     }
 
-    private initWorkspaceContents(id: string, config: GoldenLayout.Config | GoldenLayout.ItemConfig, useWorkspaceSpecificConfig: boolean): Promise<any> {
+    private initWorkspaceContents(id: string, config: GoldenLayout.Config | GoldenLayout.ItemConfig, useWorkspaceSpecificConfig: boolean): Promise<unknown> {
         if (!config || (config.type !== "component" && !config.content.length)) {
             store.addOrUpdate(id, []);
             this.showAddButton(id);
@@ -1320,7 +1334,7 @@ export class LayoutController {
         });
     }
 
-    private setupContentLayouts(id: string) {
+    private setupContentLayouts(id: string): void {
         this.emitter.onContentContainerResized((item) => {
             const currLayout = store.getById(id).layout;
             if (currLayout) {
@@ -1508,10 +1522,11 @@ export class LayoutController {
 
     private applyLockConfig(itemConfig: GoldenLayout.ItemConfig, parent: GoldenLayout.ContentItem, workspaceWrapper: WorkspaceWrapper, isParentWorkspace: boolean): void {
         const parentAllowDrop = isParentWorkspace ? workspaceWrapper.allowDrop : (parent.config.workspacesConfig as any).allowDrop;
-
+        console.log("WILL IT APPLY", JSON.stringify(itemConfig), parentAllowDrop, isParentWorkspace);
         if (itemConfig.type === "stack") {
             if (typeof (itemConfig.workspacesConfig as any).allowDrop === "undefined") {
                 (itemConfig.workspacesConfig as any).allowDrop = (itemConfig.workspacesConfig as any).allowDrop ?? parentAllowDrop;
+                console.log("APPLIED");
             }
 
             if (typeof (itemConfig.workspacesConfig as any).allowExtract === "undefined") {

@@ -14,7 +14,11 @@ export interface WorkspaceItem {
         name?: string;
         context?: object;
         reuseWorkspaceId?: string;
-        [k: string]: object | string;
+        minWidth?: number;
+        maxWidth?: number;
+        minHeight?: number;
+        maxHeight?: number;
+        [k: string]: any;
     };
 }
 
@@ -23,7 +27,11 @@ export interface GroupItem {
     type: "group";
     children: WindowItem[];
     config?: {
-        [k: string]: object;
+        minWidth?: number;
+        maxWidth?: number;
+        minHeight?: number;
+        maxHeight?: number;
+        [k: string]: any;
     };
 }
 
@@ -44,6 +52,10 @@ export interface WindowItem {
         context?: string;
         allowExtract?: boolean;
         showCloseButton?: boolean;
+        minWidth?: number;
+        maxWidth?: number;
+        minHeight?: number;
+        maxHeight?: number;
     };
 }
 
@@ -52,7 +64,11 @@ export interface RowItem {
     type: "row";
     children: Array<RowItem | ColumnItem | GroupItem | WindowItem>;
     config?: {
-        [k: string]: object;
+        minWidth?: number;
+        maxWidth?: number;
+        minHeight?: number;
+        maxHeight?: number;
+        [k: string]: any;
     };
 }
 
@@ -61,7 +77,11 @@ export interface ColumnItem {
     type: "column";
     children: Array<RowItem | ColumnItem | GroupItem | WindowItem>;
     config?: {
-        [k: string]: object;
+        minWidth?: number;
+        maxWidth?: number;
+        minHeight?: number;
+        maxHeight?: number;
+        [k: string]: any;
     };
 }
 
@@ -97,6 +117,10 @@ export interface WindowSummary {
         allowExtract?: boolean;
         showCloseButton?: boolean;
         title: string;
+        minWidth: number;
+        maxWidth: number;
+        minHeight: number;
+        maxHeight: number;
     };
 }
 
@@ -112,6 +136,10 @@ export interface ContainerSummary {
         showMaximizeButton?: boolean;
         showEjectButton?: boolean;
         showAddWindowButton?: boolean;
+        minWidth?: number;
+        maxWidth?: number;
+        minHeight?: number;
+        maxHeight?: number;
     };
 }
 
@@ -180,6 +208,14 @@ export interface WindowDefinition {
     url?: string;
     windowId?: string;
     context?: object;
+    config?: {
+        showCloseButton?: boolean;
+        allowExtract?: boolean;
+        minWidth?: number;
+        minHeight?: number;
+        maxWidth?: number;
+        maxHeight?: number;
+    };
 }
 
 export interface StartupConfig {
@@ -205,6 +241,25 @@ export interface APIWIndowSettings {
     positionIndex: number;
     allowExtract: boolean;
     showCloseButton: boolean;
+    minWidth: number;
+    minHeight: number;
+    maxWidth: number;
+    maxHeight: number;
+}
+
+export interface GDWindowOptions {
+    windowId: string;
+    id?: string;
+    appName?: string;
+    url?: string;
+    title?: string;
+    context?: object;
+    allowExtract: boolean;
+    showCloseButton: boolean;
+    minWidth: number;
+    maxWidth: number;
+    minHeight: number;
+    maxHeight: number;
 }
 
 export interface SavedConfigWithData {
@@ -333,4 +388,11 @@ export interface WorkspacesSystemConfig {
     src: string;
     hibernation?: WorkspacesHibernationConfig;
     loadingStrategy?: WorkspacesLoadingConfig;
+}
+
+export interface Constraints {
+    minWidth?: number;
+    maxWidth?: number;
+    minHeight?: number;
+    maxHeight?: number;
 }

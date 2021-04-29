@@ -559,4 +559,22 @@ describe("properties: ", () => {
             expect(resultWorkspace.id).to.eql(workspace.id);
         });
     });
+
+    describe("constraints: Should", () => {
+        Array.from(["group", "column", "row"]).forEach((parent) => {
+
+            it(`Should be default when the parent is a ${parent}`, () => {
+                const currParent = workspace.getBox(p => p.type === parent);
+
+                if (parent === "row") {
+                    expect(currParent.minWidth).to.eql(30);
+                }else{
+                    expect(currParent.minWidth).to.eql(10);
+                }
+                expect(currParent.maxWidth).to.eql(32767);
+                expect(currParent.minHeight).to.eql(10);
+                expect(currParent.maxHeight).to.eql(32767);
+            });
+        });
+    });
 });

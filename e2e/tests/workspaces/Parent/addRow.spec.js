@@ -172,6 +172,146 @@ describe("addRow() Should", () => {
         expect(allBoxesAfterAdd.length).to.eql(allBoxes.length + 1);
     });
 
+    it("add the row with allow drop false when its parent has been locked", async () => {
+        const column = workspace.getAllColumns().find(c => c.children.length === 0);
+
+        await column.lock();
+
+        const row = await column.addRow({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                }
+            ]
+        });
+
+        await workspace.refreshReference();
+
+        expect(row.allowDrop).to.be.false;
+    });
+
+    it("update the constraints when the row has constraints passed", async () => {
+        const column = workspace.getAllColumns().find(c => c.children.length === 0);
+
+        const row = await column.addRow({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+            ],
+            config: {
+                minHeight: 500,
+                maxHeight: 600
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(40);
+        expect(workspace.minHeight).to.eql(500);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.maxHeight).to.eql(600);
+    });
+
+    it("not update the constraints when the row has invalid constraints", async () => {
+        const column = workspace.getAllColumns().find(c => c.children.length === 0);
+
+        const row = await column.addRow({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+            ],
+            config: {
+                minHeight: 600,
+                maxHeight: 500
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(40);
+        expect(workspace.minHeight).to.eql(10);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.maxHeight).to.eql(32767);
+    });
+
+    it("not update the constraints when the row has invalid constraints inside", async () => {
+        const column = workspace.getAllColumns().find(c => c.children.length === 0);
+
+        const row = await column.addRow({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp",
+                    config: {
+                        minHeight: 600,
+                        maxHeight: 500
+                    }
+                },
+            ]
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(40);
+        expect(workspace.minHeight).to.eql(10);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.maxHeight).to.eql(32767);
+    });
+
+    it("not update the constraints when the row has incompatible constraints inside", async () => {
+        const column = workspace.getAllColumns().find(c => c.children.length === 0);
+
+        const row = await column.addRow({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp",
+                    config: {
+                        minHeight: 500,
+                        maxHeight: 600
+                    }
+                },
+            ],
+            config: {
+                minHeight: 700,
+                maxHeight: 900
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(40);
+        expect(workspace.minHeight).to.eql(10);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.maxHeight).to.eql(32767);
+    });
+
+
     it("reject when the parent is a row and is passed a row definition", (done) => {
         const allBoxes = workspace.getAllBoxes();
         const row = allBoxes.find(p => p.type === "row");

@@ -170,6 +170,94 @@ describe("addColumn() Should", () => {
         expect(allBoxesAfterAdd.length).to.eql(allBoxes.length + 1);
     });
 
+    it("update the constraints when a column with constraints is added", async () => {
+        const row = workspace.getAllRows()[0];
+
+        const column = await row.addColumn({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                }
+            ],
+            config: {
+                minWidth: 500,
+                maxWidth: 1000
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(530);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.minHeight).to.eql(20);
+        expect(workspace.maxWidth).to.eql(32767);
+    });
+
+    it("not update the constraints when a column with invalid constraints is added", async () => {
+        const row = workspace.getAllRows()[0];
+
+        const column = await row.addColumn({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                }
+            ],
+            config: {
+                minWidth: 1000,
+                maxWidth: 900
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(40);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.minHeight).to.eql(20);
+        expect(workspace.maxWidth).to.eql(32767);
+    });
+
+    it("not update the constraints when a column with incompatible inner constraints is added", async () => {
+        const row = workspace.getAllRows()[0];
+
+        const column = await row.addColumn({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp",
+                    config: {
+                        minWidth: 1200,
+                        maxWidth: 1900
+                    }
+                }
+            ],
+            config: {
+                minWidth: 900,
+                maxWidth: 1000
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(40);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.minHeight).to.eql(20);
+        expect(workspace.maxWidth).to.eql(32767);
+    });
+
     describe("", () => {
         beforeEach(async () => {
             await glue.workspaces.createWorkspace(config);

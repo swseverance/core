@@ -356,9 +356,24 @@ declare module '@glue42/golden-layout' {
              */
             wrapper?: boolean;
 
+            /**
+             * The minimum width of the element
+             */
             minWidth?: number;
+
+            /**
+             * The minimum height of the element
+             */
             minHeight?: number;
+
+            /**
+             * The maximum width of the element
+             */
             maxWidth?: number;
+
+            /**
+             * The maximum height of the element
+             */
             maxHeight?: number;
         }
 

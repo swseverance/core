@@ -248,6 +248,358 @@ describe("addGroup() Should", () => {
         expect(allBoxesAfterAdd.length).to.eql(allBoxes.length + 1);
     });
 
+    it("add group with allowDrop false when the parent is a column and has been locked", async () => {
+        const column = workspace.getAllColumns()[0];
+        await column.lock();
+
+        const group = await column.addGroup({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                }
+            ]
+        });
+
+        await workspace.refreshReference();
+
+        expect(group.allowDrop).to.be.false;
+    });
+
+    it("update the constraints when the parent is a column and the group has constraints", async () => {
+        const column = workspace.getAllColumns().find(c => c.children.length === 0);
+
+        const group = await column.addGroup({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                }
+            ],
+            config: {
+                minWidth: 500,
+                minHeight: 600,
+                maxWidth: 800,
+                maxHeight: 900
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(520);
+        expect(workspace.minHeight).to.eql(600);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.maxHeight).to.eql(900);
+    });
+
+    it("not update the constraints when the parent is a column and the group has invalid height constraints", async () => {
+        const column = workspace.getAllColumns().find(c => c.children.length === 0);
+
+        const group = await column.addGroup({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                }
+            ],
+            config: {
+                minWidth: 500,
+                minHeight: 1000,
+                maxWidth: 800,
+                maxHeight: 900
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(30);
+        expect(workspace.minHeight).to.eql(10);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.maxHeight).to.eql(32767);
+    });
+
+    it("not update the constraints when the parent is a column and the group has invalid width constraints", async () => {
+        const column = workspace.getAllColumns().find(c => c.children.length === 0);
+
+        const group = await column.addGroup({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                }
+            ],
+            config: {
+                minWidth: 1000,
+                minHeight: 6000,
+                maxWidth: 800,
+                maxHeight: 900
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(30);
+        expect(workspace.minHeight).to.eql(10);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.maxHeight).to.eql(32767);
+    });
+
+    it("not update the constraints when the parent is a row and the group has incompatible height constraints", async () => {
+        const workspace = await glue.workspaces.createWorkspace({
+            children: [
+                {
+                    type: "row",
+                    children: [],
+                    config: {
+                        minHeight: 1000,
+                        maxHeight: 1900
+                    }
+                }
+            ]
+        })
+        const row = workspace.getAllRows()[0];
+
+        const group = await row.addGroup({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                }
+            ],
+            config: {
+                minHeight: 500,
+                maxHeight: 600,
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(10);
+        expect(workspace.minHeight).to.eql(1000);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.maxHeight).to.eql(1900);
+    });
+
+    it("not update the constraints when the parent is a column and the group has incompatible width constraints", async () => {
+        const workspace = await glue.workspaces.createWorkspace({
+            children: [
+                {
+                    type: "column",
+                    children: [],
+                    config: {
+                        minWidth: 1000,
+                        maxWidth: 1800,
+                    }
+                }
+            ]
+        })
+        const column = workspace.getAllColumns().find(c => c.children.length === 0);
+
+        const group = await column.addGroup({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                }
+            ],
+            config: {
+                minWidth: 500,
+                maxWidth: 600,
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(1000);
+        expect(workspace.minHeight).to.eql(10);
+        expect(workspace.maxWidth).to.eql(1800);
+        expect(workspace.maxHeight).to.eql(32767);
+    });
+
+    it("not update the constraints when the parent is a row and the elements inside the group have incompatible height constraints", async () => {
+        const workspace = await glue.workspaces.createWorkspace({
+            children: [
+                {
+                    type: "row",
+                    children: [],
+                }
+            ]
+        })
+        const row = workspace.getAllRows()[0];
+
+        const group = await row.addGroup({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp",
+                    config: {
+                        minHeight: 800,
+                        maxHeight: 1600,
+                    }
+                }
+            ],
+            config: {
+                minHeight: 500,
+                maxHeight: 600,
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(10);
+        expect(workspace.minHeight).to.eql(10);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.maxHeight).to.eql(32767);
+    });
+
+    it("not update the constraints when the parent is a row and the elements inside the group have incompatible width constraints", async () => {
+        const workspace = await glue.workspaces.createWorkspace({
+            children: [
+                {
+                    type: "row",
+                    children: [],
+                }
+            ]
+        })
+        const row = workspace.getAllRows()[0];
+
+        const group = await row.addGroup({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp",
+                    config: {
+                        minWidth: 800,
+                        maxWidth: 1600,
+                    }
+                }
+            ],
+            config: {
+                minWidth: 500,
+                maxWidth: 600,
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(10);
+        expect(workspace.minHeight).to.eql(10);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.maxHeight).to.eql(32767);
+    });
+
+    it("not update the constraints when the parent is a column and the elements in the group have incompatible width constraints", async () => {
+        const workspace = await glue.workspaces.createWorkspace({
+            children: [
+                {
+                    type: "column",
+                    children: [],
+                }
+            ]
+        })
+        const column = workspace.getAllColumns()[0];
+
+        const group = await column.addGroup({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp",
+                    config: {
+                        minWidth: 1000,
+                        maxWidth: 1600,
+                    }
+                }
+            ],
+            config: {
+                minWidth: 500,
+                maxWidth: 600,
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(10);
+        expect(workspace.minHeight).to.eql(10);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.maxHeight).to.eql(32767);
+    });
+
+    it("not update the constraints when the parent is a column and the elements in the group have incompatible height constraints", async () => {
+        const workspace = await glue.workspaces.createWorkspace({
+            children: [
+                {
+                    type: "column",
+                    children: [],
+                }
+            ]
+        })
+        const column = workspace.getAllColumns()[0];
+
+        const group = await column.addGroup({
+            children: [
+                {
+                    type: "window",
+                    appName: "noGlueApp"
+                },
+                {
+                    type: "window",
+                    appName: "noGlueApp",
+                    config: {
+                        minHeight: 1000,
+                        maxHeight: 1600,
+                    }
+                }
+            ],
+            config: {
+                minHeight: 500,
+                maxHeight: 600,
+            }
+        });
+
+        await workspace.refreshReference();
+
+        expect(workspace.minWidth).to.eql(10);
+        expect(workspace.minHeight).to.eql(10);
+        expect(workspace.maxWidth).to.eql(32767);
+        expect(workspace.maxHeight).to.eql(32767);
+    });
+
     it("reject when the parent is a group and is passed a group definition", (done) => {
         const allBoxes = workspace.getAllBoxes();
         const group = allBoxes.find(p => p.type === "group");

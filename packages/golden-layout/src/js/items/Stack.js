@@ -72,15 +72,8 @@ lm.utils.copy(lm.items.Stack.prototype, {
 		const elementMaxWidth = this.config.workspacesConfig.maxWidth || this.layoutManager.config.dimensions.maxItemWidth;
 		const result = this.contentItems.reduce((maxWidth, ci) => {
 			const childMaxWidth = ci.getMaxWidth();
-			console.log("Child maxWidth", childMaxWidth, ci.config.workspacesConfig, this.config.id);
-			console.log("Current maxWidth", maxWidth, this.config.id);
 			return Math.min(maxWidth, childMaxWidth || this.layoutManager.config.dimensions.maxItemWidth);
 		}, elementMaxWidth);
-
-		console.log("Stack id", this.config.id);
-		console.log("Stack children", this.contentItems);
-		console.log("Stack max width", elementMaxWidth);
-		console.log("Stack result max width", result);
 
 		return result;
 	},
