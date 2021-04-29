@@ -1,5 +1,7 @@
 import { Base } from "./base/base";
 import { Glue42Workspaces } from "../../workspaces.d";
+import { rowLockConfigDecoder } from "../shared/decoders";
+import { RowLockConfig } from "../types/temp";
 
 interface PrivateData {
     base: Base;
@@ -49,6 +51,9 @@ export class Row implements Glue42Workspaces.Row {
     public get workspace(): Glue42Workspaces.Workspace {
         return getBase(this).getMyWorkspace(this);
     }
+    public get allowDrop(): boolean {
+        return getBase(this).getAllowDrop(this);
+    }
 
     public addWindow(definition: Glue42Workspaces.WorkspaceWindowDefinition): Promise<Glue42Workspaces.WorkspaceWindow> {
         return getBase(this).addWindow(this, definition, "row");
@@ -86,6 +91,24 @@ export class Row implements Glue42Workspaces.Row {
 
     public close(): Promise<void> {
         return getBase(this).close(this);
+    }
+
+    public lock(config?: RowLockConfig | ((config: RowLockConfig) => RowLockConfig)): Promise<void> {
+        let lockConfigResult = undefined;
+
+        if (typeof config === "function") {
+            const currentLockConfig = {
+                allowDrop: this.allowDrop,
+            };
+
+            lockConfigResult = config(currentLockConfig);
+        } else {
+            lockConfigResult = config;
+        }
+
+        const verifiedConfig = lockConfigResult === undefined ? undefined : rowLockConfigDecoder.runWithException(lockConfigResult);
+
+        return getBase(this).lockContainer(this, verifiedConfig);
     }
 
 }

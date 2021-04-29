@@ -25,6 +25,18 @@ export interface WorkspaceConfigResult {
     positionIndex: number;
     layoutName: string | undefined;
     isHibernated: boolean;
+    allowSplitters?: boolean;
+    allowDrop?: boolean;
+    allowDropLeft?: boolean;
+    allowDropTop?: boolean;
+    allowDropRight?: boolean;
+    allowDropBottom?: boolean;
+    allowExtract?: boolean;
+    showCloseButton?: boolean;
+    showSaveButton?: boolean;
+    showWindowCloseButtons?: boolean;
+    showAddWindowButtons?: boolean;
+    showEjectButtons?: boolean;
 }
 
 export interface BaseChildSnapshotConfig {
@@ -33,8 +45,25 @@ export interface BaseChildSnapshotConfig {
     positionIndex: number;
 }
 
-export interface ParentSnapshotConfig extends BaseChildSnapshotConfig {
-    type?: "window" | "row" | "column" | "group"; // this just a place-holder until there are real parent-specific configs
+export type ParentSnapshotConfig = RowSnapshotConfig | ColumnSnapshotConfig | GroupSnapshotConfig;
+
+export interface RowSnapshotConfig extends BaseChildSnapshotConfig {
+    type?: "row";
+    allowDrop: boolean;
+}
+
+export interface ColumnSnapshotConfig extends BaseChildSnapshotConfig {
+    type?: "column";
+    allowDrop: boolean;
+}
+
+export interface GroupSnapshotConfig extends BaseChildSnapshotConfig {
+    type?: "group";
+    allowDrop: boolean;
+    allowExtract: boolean;
+    showMaximizeButton: boolean;
+    showEjectButton: boolean;
+    showAddWindowButton: boolean;
 }
 
 export interface SwimlaneWindowSnapshotConfig extends BaseChildSnapshotConfig {
@@ -43,14 +72,23 @@ export interface SwimlaneWindowSnapshotConfig extends BaseChildSnapshotConfig {
     isFocused: boolean;
     appName?: string;
     title?: string;
+    allowExtract: boolean;
+    showCloseButton: boolean;
 }
 
-export interface ChildSnapshotResult {
+export interface WindowSnapshotResult {
     id: string;
-    type: "window" | "row" | "column" | "group";
-    children?: ChildSnapshotResult[];
-    config: ParentSnapshotConfig | SwimlaneWindowSnapshotConfig;
+    type: "window";
+    config: SwimlaneWindowSnapshotConfig;
 }
+
+export interface SubParentSnapshotResult {
+    id: string;
+    type: "row" | "column" | "group";
+    children: ChildSnapshotResult[];
+    config: ParentSnapshotConfig;
+}
+export type ChildSnapshotResult = WindowSnapshotResult | SubParentSnapshotResult;
 
 export interface FrameSnapshotResult {
     id: string;
@@ -187,8 +225,16 @@ export interface BundleConfig {
     workspaceId: string;
 }
 
-export interface WorkspaceSeletor {
+export interface WorkspaceSelector {
     workspaceId: string;
+}
+
+export interface WindowSelector {
+    windowPlacementId: string;
+}
+
+export interface ItemSelector {
+    itemId: string;
 }
 
 // #endregion
@@ -212,6 +258,59 @@ export interface WindowStreamData {
         itemId: string;
         parentId: string;
         config: SwimlaneWindowSnapshotConfig;
+    };
+}
+
+export interface LockWindowConfig {
+    windowPlacementId: string;
+    config?: {
+        allowExtract?: boolean;
+        showCloseButton?: boolean;
+    };
+}
+
+export interface LockRowConfig {
+    itemId: string;
+    type: "row";
+    config?: {
+        allowDrop?: boolean;
+    };
+}
+
+export interface LockColumnConfig {
+    itemId: string;
+    type: "column";
+    config?: {
+        allowDrop?: boolean;
+    };
+}
+
+export interface LockGroupConfig {
+    itemId: string;
+    type: "group";
+    config?: {
+        allowExtract?: boolean;
+        allowDrop?: boolean;
+        showMaximizeButton?: boolean;
+        showEjectButton?: boolean;
+        showAddWindowButton?: boolean;
+    };
+}
+
+export type LockContainerConfig = LockGroupConfig | LockColumnConfig | LockRowConfig;
+
+export interface LockWorkspaceConfig {
+    workspaceId: string;
+    config?: {
+        allowDrop?: boolean;
+        allowDropLeft?: boolean;
+        allowDropTop?: boolean;
+        allowDropRight?: boolean;
+        allowDropBottom?: boolean;
+        allowExtract?: boolean;
+        allowSplitters?: boolean;
+        showCloseButton?: boolean;
+        showSaveButton?: boolean;
     };
 }
 // #endregion

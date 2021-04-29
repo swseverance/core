@@ -127,6 +127,9 @@ lm.utils.copy(lm.controls.DragProxy.prototype, {
 		if (this._area !== null) {
 			this._lastValidArea = this._area;
 			this._area.contentItem._$highlightDropZone(x, y, this._area);
+		} else if (this._lastValidArea !== null) {
+			this._lastValidArea.contentItem._$highlightDropZone(x, y, this._area);
+			this._lastValidArea = this._area;
 		}
 	},
 
@@ -180,7 +183,7 @@ lm.utils.copy(lm.controls.DragProxy.prototype, {
 		const dragProxyIndex = this._layoutManager._dragProxies.indexOf(this);
 		if (dragProxyIndex > -1) {
 			this._layoutManager._dragProxies.splice(dragProxyIndex, 1);
-		  }
+		}
 		this._layoutManager.emit('itemDropped', this._contentItem);
 	},
 

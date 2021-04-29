@@ -87,9 +87,8 @@ describe("setTitle() Should", () => {
 
         await window.setTitle(randomTitle);
         await workspace.refreshReference();
-        const windowsAfterRename = workspace.getAllWindows();
 
-        expect(windowsAfterRename[0].title).to.eql(randomTitle);
+        expect(window.title).to.eql(randomTitle);
     });
 
     Array.from([undefined, null, [], 42, {}]).forEach((input) => {

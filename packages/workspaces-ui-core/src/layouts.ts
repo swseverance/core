@@ -2,7 +2,7 @@ import GoldenLayout from "@glue42/golden-layout";
 import { Workspace, FrameLayoutConfig, WorkspaceItem, WorkspaceLayout, AnyItem, SavedConfigWithData, WorkspaceOptionsWithLayoutName, SaveWorkspaceConfig } from "./types/internal";
 import storage from "./storage";
 import scReader from "./config/startupReader";
-import { LayoutStateResolver } from "./layout/stateResolver";
+import { LayoutStateResolver } from "./state/resolver";
 import { Glue42Web } from "@glue42/web";
 import { getWorkspaceContextName } from "./utils";
 import { WorkspacesConfigurationFactory } from "./config/factory";
@@ -104,7 +104,6 @@ export class LayoutsManager {
         const rendererFriendlyConfig = this._configConverter.convertToRendererConfig(savedWorkspace);
 
         this.addWorkspaceIds(rendererFriendlyConfig);
-        // this.addWindowIds(rendererFriendlyConfig);
 
         return {
             config: rendererFriendlyConfig as GoldenLayout.Config,

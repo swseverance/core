@@ -124,6 +124,79 @@ describe("resume() Should", () => {
         await Promise.all(workspace.getAllWindows().map(w => w.forceLoad()));
     });
 
+    it("resume the workpace with all of its contraints when the workspace was locked before", async () => {
+        const secondWorkspace = await workspace.frame.createWorkspace(basicConfig);
+
+        await workspace.lock();
+        await workspace.hibernate();
+        await workspace.resume();
+        await workspace.refreshReference();
+
+        expect(workspace.allowDrop).to.be.true;
+        expect(workspace.allowExtract).to.be.false;
+        expect(workspace.allowDropLeft).to.be.false;
+        expect(workspace.allowDropTop).to.be.false;
+        expect(workspace.allowDropRight).to.be.false;
+        expect(workspace.allowDropBottom).to.be.false;
+        expect(workspace.allowSplitters).to.be.false;
+        expect(workspace.showCloseButton).to.be.false;
+        expect(workspace.showSaveButton).to.be.false;
+    });
+
+    it("resume the workpace preserving the group constraints when the workspace was locked before", async () => {
+        const secondWorkspace = await workspace.frame.createWorkspace(basicConfig);
+
+        await workspace.lock();
+        await workspace.hibernate();
+        await workspace.resume();
+        await workspace.refreshReference();
+
+        workspace.getAllGroups().forEach((group) => {
+            expect(group.allowDrop).to.be.true;
+            expect(group.allowExtract).to.be.false;
+        });
+    });
+
+    it("resume the workpace preserving the row constraints when the workspace was locked before", async () => {
+        const secondWorkspace = await workspace.frame.createWorkspace(basicConfig);
+
+        await workspace.lock();
+        await workspace.hibernate();
+        await workspace.resume();
+        await workspace.refreshReference();
+
+        workspace.getAllRows().forEach((row) => {
+            expect(row.allowDrop).to.be.true;
+        });
+    });
+
+    it("resume the workpace preserving the column constraints when the workspace was locked before", async () => {
+        const secondWorkspace = await workspace.frame.createWorkspace(basicConfig);
+
+        await workspace.lock();
+        await workspace.hibernate();
+        await workspace.resume();
+        await workspace.refreshReference();
+
+        workspace.getAllColumns().forEach((column) => {
+            expect(column.allowDrop).to.be.true;
+        });
+    });
+
+    it("resume the workpace preserving the window constraints when the workspace was locked before", async () => {
+        const secondWorkspace = await workspace.frame.createWorkspace(basicConfig);
+
+        await workspace.lock();
+        await workspace.hibernate();
+        await workspace.resume();
+        await workspace.refreshReference();
+
+        workspace.getAllWindows().forEach((window) => {
+            expect(window.allowExtract).to.be.false;
+        });
+    });
+
+
     it("not trigger onWindowAdded after being resumed", (done) => {
         workspace.frame.createWorkspace(basicConfig).then(() => {
             return gtf.wait(3000, () => { });

@@ -289,6 +289,8 @@ lm.utils.copy(lm.items.Stack.prototype, {
 				return;
 			}
 		}
+
+		this.layoutManager.dropTargetIndicator.highlightArea(null);
 	},
 
 	_$getArea: function () {

@@ -42,6 +42,8 @@ export interface WindowItem {
         positionIndex?: number;
         title?: string;
         context?: string;
+        allowExtract?: boolean;
+        showCloseButton?: boolean;
     };
 }
 
@@ -92,15 +94,24 @@ export interface WindowSummary {
         isFocused: boolean;
         appName: string;
         url: string;
+        allowExtract?: boolean;
+        showCloseButton?: boolean;
+        title: string;
     };
 }
 
 export interface ContainerSummary {
     itemId: string;
+    type: "group" | "column" | "row" | "workspace";
     config: {
         frameId: string;
         workspaceId: string;
         positionIndex: number;
+        allowDrop: boolean;
+        allowExtract?: boolean;
+        showMaximizeButton?: boolean;
+        showEjectButton?: boolean;
+        showAddWindowButton?: boolean;
     };
 }
 
@@ -192,6 +203,8 @@ export interface APIWIndowSettings {
     frameId: string;
     title: string;
     positionIndex: number;
+    allowExtract: boolean;
+    showCloseButton: boolean;
 }
 
 export interface SavedConfigWithData {
@@ -208,6 +221,14 @@ export interface SaveWorkspaceConfig {
     workspace: Workspace;
     name: string;
     saveContext: boolean;
+}
+
+export interface WorkspaceDropOptions {
+    allowDrop?: boolean;
+    allowDropLeft?: boolean;
+    allowDropTop?: boolean;
+    allowDropRight?: boolean;
+    allowDropBottom?: boolean;
 }
 
 export interface ComponentFactory {

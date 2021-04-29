@@ -355,7 +355,7 @@ describe('createWorkspace() ', function () {
                         {
                             type: "window",
                             context,
-                            appName: "GTF_Glue_Isolated_Support"
+                            appName: "noGlueApp"
                         }
                     ]
                 }
@@ -589,6 +589,7 @@ describe('createWorkspace() ', function () {
             const workspaceOne = await glue.workspaces.createWorkspace(Object.assign(JSON.parse(JSON.stringify(basicConfig)), { frame: { newFrame: true } }));
             const workspaceTwo = await glue.workspaces.createWorkspace(Object.assign(JSON.parse(JSON.stringify(basicConfig)), { frame: { newFrame: true } }));
             const workspaceThree = await glue.workspaces.createWorkspace(Object.assign(JSON.parse(JSON.stringify(basicConfig)), { frame: { newFrame: true } }));
+
             const workspaceFour = await glue.workspaces.createWorkspace(Object.assign(JSON.parse(JSON.stringify(secondBasicConfig)), { config: { reuseWorkspaceId: workspaceTwo.id } }));
 
             const allWorkspaces = await glue.workspaces.getAllWorkspaces();
@@ -693,7 +694,7 @@ describe('createWorkspace() ', function () {
         it("load all windows when the loadingStrategy is lazy and all windows are focused", async () => {
             let loadedWindowsCount = 0;
             const lazyConfig = Object.assign(config, { config: { loadingStrategy: "lazy" } });
-
+            
             let unsub = await glue.workspaces.onWindowLoaded(() => {
                 loadedWindowsCount++;
             });
@@ -753,7 +754,7 @@ describe('createWorkspace() ', function () {
 
             gtf.addWindowHook(unsub);
 
-            const workspace = await glue.workspaces.createWorkspace(delayedConfig);
+            const workspace =  await glue.workspaces.createWorkspace(delayedConfig);
             await Promise.all(workspace.getAllWindows().map(w => w.focus()));
 
             await gtf.wait(3000);
@@ -779,7 +780,7 @@ describe('createWorkspace() ', function () {
                     }
                 });
 
-                gtf.addWindowHook(unsub);
+            gtf.addWindowHook(unsub);
 
                 const workspace = await glue.workspaces.createWorkspace(directConfig);
                 await gtf.wait(delay);

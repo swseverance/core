@@ -22,9 +22,12 @@ import {
     MoveWindowToArguments,
     GenerateLayoutArguments,
     WorkspaceSelector,
+    LockContainerArguments,
+    LockWindowArguments,
+    LockWorkspaceArguments,
 } from "./types";
 import manager from "../manager";
-import store from "../store";
+import store from "../state/store";
 import { WorkspaceSummary, ColumnItem, RowItem, WorkspaceLayout, WorkspaceItem } from "../types/internal";
 import GoldenLayout, { RowConfig, ColumnConfig } from "@glue42/golden-layout";
 import { idAsString } from "../utils";
@@ -187,7 +190,19 @@ export class GlueFacade {
                     successCallback(undefined);
                     break;
                 case "resumeWorkspace":
-                    await this.handleResumeWorkspace(args.operationArguments)
+                    await this.handleResumeWorkspace(args.operationArguments);
+                    successCallback(undefined);
+                    break;
+                case "lockWorkspace":
+                    this.handleLockWorkspace(args.operationArguments);
+                    successCallback(undefined);
+                    break;
+                case "lockContainer":
+                    this.handleLockContainer(args.operationArguments);
+                    successCallback(undefined);
+                    break;
+                case "lockWindow":
+                    this.handleLockWindow(args.operationArguments);
                     successCallback(undefined);
                     break;
                 default:
@@ -301,7 +316,9 @@ export class GlueFacade {
             id: undefined,
             appName: operationArguments.definition.appName,
             url: operationArguments.definition.url,
-            context: operationArguments.definition.context
+            context: operationArguments.definition.context,
+            allowExtract: undefined,
+            showCloseButton: undefined
         });
 
         if (operationArguments.definition.windowId) {
@@ -428,6 +445,18 @@ export class GlueFacade {
 
     private async handleResumeWorkspace(operationArguments: WorkspaceSelector) {
         return manager.resumeWorkspace(operationArguments.workspaceId);
+    }
+
+    private handleLockWorkspace(operationArguments: LockWorkspaceArguments) {
+        return manager.lockWorkspace(operationArguments);
+    }
+
+    private handleLockWindow(operationArguments: LockWindowArguments) {
+        return manager.lockWindow(operationArguments);
+    }
+
+    private handleLockContainer(operationArguments: LockContainerArguments) {
+        return manager.lockContainer(operationArguments);
     }
 
     private publishEventData(action: EventActionType, payload: EventPayload, type: "workspace" | "frame" | "box" | "window") {

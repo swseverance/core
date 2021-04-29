@@ -23,7 +23,9 @@ describe("convertToAPIConfig() Should", () => {
             frameId: undefined,
             positionIndex: undefined,
             title: undefined,
-            workspaceId: undefined
+            workspaceId: undefined,
+            allowExtract: undefined,
+            showCloseButton: undefined
         }
     };
 
@@ -58,7 +60,8 @@ describe("convertToAPIConfig() Should", () => {
                     height: undefined,
                     workspaceId: undefined,
                     width: undefined,
-                    positionIndex: undefined
+                    positionIndex: undefined,
+                    allowDrop: undefined,
                 },
                 id: undefined
             };
@@ -103,11 +106,12 @@ describe("convertToAPIConfig() Should", () => {
                 type,
                 config: {
                     activeTabIndex: undefined,
+                    allowDrop: undefined,
                     frameId: undefined,
                     height: undefined,
                     workspaceId: undefined,
                     width: undefined,
-                    positionIndex: undefined
+                    positionIndex: undefined,
                 },
                 id: undefined
             };
@@ -199,7 +203,8 @@ describe("convertToAPIConfig() Should", () => {
                                 height: undefined,
                                 workspaceId: undefined,
                                 width: undefined,
-                                positionIndex: undefined
+                                positionIndex: undefined,
+                                allowDrop:undefined
                             },
                             id: undefined,
                             children: []
@@ -212,7 +217,8 @@ describe("convertToAPIConfig() Should", () => {
                                 height: undefined,
                                 workspaceId: undefined,
                                 width: undefined,
-                                positionIndex: undefined
+                                positionIndex: undefined,
+                                allowDrop:undefined
                             },
                             id: undefined,
                             children: []
@@ -225,7 +231,8 @@ describe("convertToAPIConfig() Should", () => {
                                 height: undefined,
                                 workspaceId: undefined,
                                 width: undefined,
-                                positionIndex: undefined
+                                positionIndex: undefined,
+                                allowDrop:undefined
                             },
                             id: undefined,
                             children: []
@@ -238,7 +245,8 @@ describe("convertToAPIConfig() Should", () => {
                     height: undefined,
                     workspaceId: undefined,
                     width: undefined,
-                    positionIndex: undefined
+                    positionIndex: undefined,
+                    allowDrop:undefined
                 },
                 id: undefined
             };
@@ -305,7 +313,12 @@ describe("convertToAPIConfig() Should", () => {
                                 height: undefined,
                                 workspaceId: undefined,
                                 width: undefined,
-                                positionIndex: undefined
+                                positionIndex: undefined,
+                                allowDrop: undefined,
+                                allowExtract: undefined,
+                                showEjectButton: undefined,
+                                showAddWindowButton: undefined,
+                                showMaximizeButton: undefined
                             },
                             id: undefined,
                             children: []
@@ -318,7 +331,12 @@ describe("convertToAPIConfig() Should", () => {
                                 height: undefined,
                                 workspaceId: undefined,
                                 width: undefined,
-                                positionIndex: undefined
+                                positionIndex: undefined,
+                                allowDrop: undefined,
+                                allowExtract: undefined,
+                                showEjectButton: undefined,
+                                showAddWindowButton: undefined,
+                                showMaximizeButton: undefined
                             },
                             id: undefined,
                             children: []
@@ -331,7 +349,12 @@ describe("convertToAPIConfig() Should", () => {
                                 height: undefined,
                                 workspaceId: undefined,
                                 width: undefined,
-                                positionIndex: undefined
+                                positionIndex: undefined,
+                                allowDrop: undefined,
+                                allowExtract: undefined,
+                                showEjectButton: undefined,
+                                showAddWindowButton: undefined,
+                                showMaximizeButton: undefined
                             },
                             id: undefined,
                             children: []
@@ -344,7 +367,8 @@ describe("convertToAPIConfig() Should", () => {
                     height: undefined,
                     workspaceId: undefined,
                     width: undefined,
-                    positionIndex: undefined
+                    positionIndex: undefined,
+                    allowDrop: undefined
                 },
                 id: undefined
             };
@@ -390,7 +414,12 @@ describe("convertToAPIConfig() Should", () => {
                 height: undefined,
                 workspaceId: undefined,
                 width: undefined,
-                positionIndex: undefined
+                positionIndex: undefined,
+                allowDrop: undefined,
+                allowExtract: undefined,
+                showAddWindowButton: undefined,
+                showEjectButton: undefined,
+                showMaximizeButton: undefined
             },
             id: undefined
         };
@@ -429,7 +458,12 @@ describe("convertToAPIConfig() Should", () => {
                 height: undefined,
                 workspaceId: undefined,
                 width: undefined,
-                positionIndex: undefined
+                positionIndex: undefined,
+                allowExtract: undefined,
+                allowDrop: undefined,
+                showAddWindowButton: undefined,
+                showEjectButton: undefined,
+                showMaximizeButton: undefined
             },
             id: undefined
         };
@@ -488,6 +522,7 @@ describe("convertToAPIConfig() Should", () => {
                 type: "row",
                 config: {
                     activeTabIndex: undefined,
+                    allowDrop: undefined,
                     frameId: undefined,
                     height: undefined,
                     workspaceId: undefined,
@@ -543,6 +578,7 @@ describe("convertToAPIConfig() Should", () => {
                 type: "column",
                 config: {
                     activeTabIndex: undefined,
+                    allowDrop: undefined,
                     frameId: undefined,
                     height: undefined,
                     workspaceId: undefined,
@@ -603,7 +639,12 @@ describe("convertToAPIConfig() Should", () => {
                     height: undefined,
                     workspaceId: undefined,
                     width: undefined,
-                    positionIndex: undefined
+                    positionIndex: undefined,
+                    allowDrop: undefined,
+                    allowExtract: undefined,
+                    showAddWindowButton: undefined,
+                    showEjectButton: undefined,
+                    showMaximizeButton: undefined
                 },
             }],
             id: undefined,
@@ -649,7 +690,8 @@ describe("convertToAPIConfig() Should", () => {
                     height: undefined,
                     workspaceId: undefined,
                     width: undefined,
-                    positionIndex: undefined
+                    positionIndex: undefined,
+                    allowDrop: undefined
                 },
                 children: [
                     {
@@ -661,7 +703,8 @@ describe("convertToAPIConfig() Should", () => {
                             height: undefined,
                             workspaceId: undefined,
                             width: undefined,
-                            positionIndex: undefined
+                            positionIndex: undefined,
+                            allowDrop: undefined
                         },
                         children: [{
                             type: "group",
@@ -672,7 +715,12 @@ describe("convertToAPIConfig() Should", () => {
                                 height: undefined,
                                 workspaceId: undefined,
                                 width: undefined,
-                                positionIndex: undefined
+                                positionIndex: undefined,
+                                allowDrop: undefined,
+                                allowExtract: undefined,
+                                showAddWindowButton: undefined,
+                                showEjectButton: undefined,
+                                showMaximizeButton: undefined
                             },
                             children: [
                                 mockAppConfig
@@ -688,7 +736,8 @@ describe("convertToAPIConfig() Should", () => {
                             height: undefined,
                             workspaceId: undefined,
                             width: undefined,
-                            positionIndex: undefined
+                            positionIndex: undefined,
+                            allowDrop: undefined
                         },
                         children: [{
                             type: "row",
@@ -699,7 +748,8 @@ describe("convertToAPIConfig() Should", () => {
                                 height: undefined,
                                 workspaceId: undefined,
                                 width: undefined,
-                                positionIndex: undefined
+                                positionIndex: undefined,
+                                allowDrop: undefined
                             },
                             children: [{
                                 type: "group",
@@ -710,7 +760,12 @@ describe("convertToAPIConfig() Should", () => {
                                     height: undefined,
                                     workspaceId: undefined,
                                     width: undefined,
-                                    positionIndex: undefined
+                                    positionIndex: undefined,
+                                    allowDrop: undefined,
+                                    allowExtract: undefined,
+                                    showAddWindowButton: undefined,
+                                    showEjectButton: undefined,
+                                    showMaximizeButton: undefined,
                                 },
                                 children: [
                                     mockAppConfig

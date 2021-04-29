@@ -96,6 +96,10 @@ export namespace Glue42Workspaces {
             url?: string;
             /** The title of the window */
             title?: string;
+            /** Controls the visibility of the close button*/
+            showCloseButton?: boolean;
+            /** Controls whether the window can be dragged*/
+            allowExtract?: boolean;
         };
     }
 
@@ -301,6 +305,12 @@ export namespace Glue42Workspaces {
 
         /** The title of the window */
         title: string;
+
+        /** A flag showing whether the window can be dragged */
+        allowExtract: boolean;
+
+          /** A flag showing whether the window close button is visible */
+        showCloseButton: boolean;
     }
 
     /** An object describing a workspace layout without the underlying structure */
@@ -682,6 +692,8 @@ export namespace Glue42Workspaces {
         /** An object representing the workspace containing this box */
         workspace: Workspace;
 
+        allowDrop: boolean;
+
         /**
          * Opens a new window inside this box and loads it's content.
          * @param definition An object describing the requested window.
@@ -741,6 +753,14 @@ export namespace Glue42Workspaces {
     /** An object describing a group type workspace box */
     export interface Group extends Box {
         type: "group";
+
+        showMaximizeButton: boolean;
+
+        showEjectButton: boolean;
+
+        showAddWindowButton: boolean;
+
+        allowExtract: boolean;
     }
 
     /** An object describing a window part of an existing workspace */

@@ -3,7 +3,7 @@ import { Glue42Workspaces } from "../../workspaces";
 import { AddItemResult, WorkspaceSnapshotResult, FrameSnapshotResult } from "./protocol";
 import { SubscriptionConfig, WorkspaceEventType, WorkspaceEventAction } from "./subscription";
 import { RefreshChildrenConfig } from "./privateData";
-import { Child } from "./builders";
+import { Child, ContainerLockConfig, SubParentTypes } from "./builders";
 import { GDWindow } from "./glue";
 import { UnsubscribeFunction } from "callback-registry";
 
@@ -54,4 +54,7 @@ export interface WorkspacesController {
     iterateFilterChildren(children: Child[], predicate: (child: Child) => boolean): Child[];
     hibernateWorkspace(workspaceId: string): Promise<void>;
     resumeWorkspace(workspaceId: string): Promise<void>;
+    lockWorkspace(workspaceId: string, config?: Glue42Workspaces.WorkspaceLockConfig): Promise<void>;
+    lockWindow(windowPlacementId: string, config?: Glue42Workspaces.WorkspaceWindowLockConfig): Promise<void>;
+    lockContainer(itemId: string, type: SubParentTypes["type"], config?: ContainerLockConfig): Promise<void>;
 }

@@ -3,7 +3,7 @@ import shortId from "shortid";
 import { FrameLayoutConfig, APIWIndowSettings, WorkspaceOptionsWithTitle } from "../types/internal";
 import { TitleGenerator } from "./titleGenerator";
 import { idAsString } from "../utils";
-import store from "../store";
+import store from "../state/store";
 import { EmptyVisibleWindowName } from "../utils/constants";
 import { Glue42Web } from "@glue42/web";
 
@@ -35,8 +35,12 @@ export class WorkspacesConfigurationFactory {
         };
     }
 
-    public createGDWindowConfig(args: { windowId: string; id?: string; appName?: string; url?: string; title?: string; context?: object }): GoldenLayout.ComponentConfig {
+    public createGDWindowConfig(args: { windowId: string; id?: string; appName?: string; url?: string; title?: string; context?: object, allowExtract: boolean, showCloseButton: boolean }): GoldenLayout.ComponentConfig {
         const baseConfiguration = this.createWindowConfigurationCore(args.id);
+        const workspacesConfig = {
+            allowExtract: args.allowExtract,
+            showCloseButton: args.showCloseButton
+        } as GoldenLayout.BaseItemConfig["workspacesConfig"];
         return {
             ...baseConfiguration,
             ...{
@@ -49,7 +53,8 @@ export class WorkspacesConfigurationFactory {
                     url: args.url,
                     title: args.title,
                     context: args.context
-                }
+                },
+                workspacesConfig
             }
         };
     }
@@ -68,7 +73,9 @@ export class WorkspacesConfigurationFactory {
                 title: args.title,
                 workspaceId: args.workspaceId,
                 frameId: args.frameId,
-                positionIndex: args.positionIndex
+                positionIndex: args.positionIndex,
+                allowExtract: args.allowExtract,
+                showCloseButton: args.showCloseButton
             }
         };
     }

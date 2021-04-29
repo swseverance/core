@@ -1,9 +1,8 @@
 import { FrameSummaryResult, SwimlaneWindowSnapshotConfig, WorkspaceSnapshotResult, ParentSnapshotConfig, ChildSnapshotResult } from "./protocol";
 import { Workspace } from "../models/workspace";
-import { Row } from "../models/row";
-import { Column } from "../models/column";
-import { Group } from "../models/group";
 import { Frame } from "../models/frame";
+import { Glue42Workspaces } from "../../workspaces";
+import { AllParentTypes } from "./builders";
 
 export interface FrameCreateConfig {
     summary: FrameSummaryResult;
@@ -11,7 +10,7 @@ export interface FrameCreateConfig {
 
 export interface WindowCreateConfig {
     id: string;
-    parent: Workspace | Row | Column | Group;
+    parent: AllParentTypes;
     frame: Frame;
     workspace: Workspace;
     config: SwimlaneWindowSnapshotConfig;
@@ -20,9 +19,9 @@ export interface WindowCreateConfig {
 export interface ParentCreateConfig {
     id: string;
     children: ChildSnapshotResult[];
-    parent: Workspace | Row | Column | Group;
+    parent: AllParentTypes;
     frame: Frame;
-    workspace: Workspace;
+    workspace: Glue42Workspaces.Workspace;
     config: ParentSnapshotConfig;
 }
 

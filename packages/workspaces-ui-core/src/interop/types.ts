@@ -129,7 +129,7 @@ export interface GenerateLayoutRequest {
 
 export interface PingRequest {
     operation: "ping";
-    operationArguments: {}
+    operationArguments: {};
 }
 
 export interface HibernateWorkspaceRequest {
@@ -140,6 +140,21 @@ export interface HibernateWorkspaceRequest {
 export interface ResumeWorkspaceRequest {
     operation: "resumeWorkspace";
     operationArguments: WorkspaceSelector;
+}
+
+export interface LockWorkspaceRequest {
+    operation: "lockWorkspace";
+    operationArguments: LockWorkspaceArguments;
+}
+
+export interface LockWindowRequest {
+    operation: "lockWindow";
+    operationArguments: LockWindowArguments;
+}
+
+export interface LockContainerRequest {
+    operation: "lockContainer";
+    operationArguments: LockContainerArguments;
 }
 
 //#endregion
@@ -219,6 +234,62 @@ export interface MoveWindowToArguments {
     containerId: string;
 }
 
+export interface LockWorkspaceArguments {
+    workspaceId: string;
+    config?: {
+        allowSplitters?: boolean;
+        allowDrop?: boolean;
+        allowDropLeft?: boolean;
+        allowDropTop?: boolean;
+        allowDropRight?: boolean;
+        allowDropBottom?: boolean;
+        allowExtract?: boolean;
+        showCloseButton?: boolean;
+        showSaveButton?: boolean;
+        showWindowCloseButtons?: boolean;
+        showAddWindowButtons?: boolean;
+        showEjectButtons?: boolean;
+    };
+}
+
+export interface LockWindowArguments {
+    windowPlacementId: string;
+    config?: {
+        showCloseButton?: boolean;
+        allowExtract?: boolean;
+    };
+}
+
+export interface LockGroupArguments {
+    type: "group";
+    itemId: string;
+    config?: {
+        allowExtract?: boolean;
+        allowDrop?: boolean;
+        showMaximizeButton?: boolean;
+        showEjectButton?: boolean;
+        showAddWindowButton?: boolean;
+    };
+}
+
+export interface LockRowArguments {
+    type: "row";
+    itemId: string;
+    config?: {
+        allowDrop?: boolean;
+    };
+}
+
+export interface LockColumnArguments {
+    type: "column";
+    itemId: string;
+    config: {
+        allowDrop?: boolean;
+    };
+}
+
+export type LockContainerArguments = LockGroupArguments | LockColumnArguments | LockRowArguments;
+
 //#endregion
 
 //#region Results
@@ -278,4 +349,5 @@ export type ControlArguments = SaveLayoutRequest | DeleteLayoutRequest |
     CloseItemRequest | MaximizeItemRequest | RestoreItemRequest | AddWindowRequest | AddContainerRequest | SetItemTitleRequest |
     AddWorkspaceChildrenRequest | EjectRequest | CreateWorkspaceRequest | ForceLoadWindowRequest | FocusItemRequest |
     BundleWorkspaceRequest | IsWindowInWorkspaceRequest | GetFrameSummaryRequest | MoveFrameRequest | GetFrameSnapshotRequest |
-    GetSnapshotRequest | MoveWindowToRequest | GenerateLayoutRequest | PingRequest | HibernateWorkspaceRequest | ResumeWorkspaceRequest;
+    GetSnapshotRequest | MoveWindowToRequest | GenerateLayoutRequest | PingRequest | HibernateWorkspaceRequest | ResumeWorkspaceRequest |
+    LockWorkspaceRequest | LockContainerRequest | LockWindowRequest;

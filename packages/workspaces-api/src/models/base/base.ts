@@ -1,11 +1,12 @@
 import { Workspace } from "../workspace";
 import { ParentBuilder } from "../../builders/parentBuilder";
 import { strictParentDefinitionDecoder, swimlaneWindowDefinitionDecoder, checkThrowCallback } from "../../shared/decoders";
-import { SubParent, AllParentTypes, Child, SubParentTypes, AllParent } from "../../types/builders";
+import { SubParent, AllParentTypes, Child, SubParentTypes, AllParent, ContainerLockConfig } from "../../types/builders";
 import { PrivateDataManager } from "../../shared/privateDataManager";
 import { ParentPrivateData, WorkspacePrivateData } from "../../types/privateData";
 import { Window } from "../../models/window";
 import { Glue42Workspaces } from "../../../workspaces";
+import { Group } from "../group";
 
 interface PrivateData {
     manager: PrivateDataManager;
@@ -20,7 +21,7 @@ const getData = (base: Base, model: AllParentTypes): WorkspacePrivateData | Pare
         return manager.getWorkspaceData(model);
     }
 
-    return data.get(base).manager.getParentData(model);
+    return data.get(base).manager.getParentData(model as SubParentTypes);
 };
 
 const getWindowFromPlacementId = (base: Base, placemenId: string): Window => {
@@ -163,6 +164,56 @@ export class Base {
         } else {
             await this.getMyWorkspace(modelData.parent).refreshReference();
         }
+    }
+
+    public async lockContainer(model: SubParentTypes, config?: ContainerLockConfig) {
+        const modelData = getData(this, model) as ParentPrivateData;
+
+        const controller = getData(this, model).controller;
+
+        await controller.lockContainer(modelData.id, model.type, config);
+
+        if (modelData.parent instanceof Workspace) {
+            await modelData.parent.refreshReference();
+        } else {
+            await this.getMyWorkspace(modelData.parent).refreshReference();
+        }
+    }
+
+    public getAllowDrop(model: SubParentTypes) {
+        return getData(this, model).config.allowDrop;
+    }
+
+    public getAllowExtract(model: Group) {
+        const privateData = getData(this, model);
+        if (privateData.type !== "group") {
+            throw new Error(`Cannot get allow extract from private data${privateData.type} with config ${privateData.type !== "workspace" ? privateData.config.type : ""}`);
+        }
+        return privateData.config.allowExtract;
+    }
+
+    public getShowMaximizeButton(model: Group) {
+        const privateData = getData(this, model);
+        if (privateData.type !== "group") {
+            throw new Error(`Cannot get show maximize button from private data${privateData.type} with config ${privateData.type !== "workspace" ? privateData.config.type : ""}`);
+        }
+        return privateData.config.showMaximizeButton;
+    }
+
+    public getShowEjectButton(model: Group) {
+        const privateData = getData(this, model);
+        if (privateData.type !== "group") {
+            throw new Error(`Cannot get show eject button from private data${privateData.type} with config ${privateData.type !== "workspace" ? privateData.config.type : ""}`);
+        }
+        return privateData.config.showEjectButton;
+    }
+
+    public getShowAddWindowButton(model: Group) {
+        const privateData = getData(this, model);
+        if (privateData.type !== "group") {
+            throw new Error(`Cannot get add window button from private data${privateData.type} with config ${privateData.type !== "workspace" ? privateData.config.type : ""}`);
+        }
+        return privateData.config.showAddWindowButton;
     }
 
     private transformDefinition(type: "group" | "row" | "column", definition?: Glue42Workspaces.BoxDefinition | ParentBuilder): Glue42Workspaces.BoxDefinition {

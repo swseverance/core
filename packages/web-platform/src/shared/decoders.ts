@@ -90,7 +90,9 @@ export const windowLayoutItemDecoder: Decoder<Glue42Workspaces.WindowLayoutItem>
     config: object({
         appName: nonEmptyStringDecoder,
         url: optional(nonEmptyStringDecoder),
-        title: optional(string())
+        title: optional(string()),
+        showCloseButton: optional(boolean()),
+        allowExtract: optional(boolean())
     })
 });
 
@@ -283,7 +285,7 @@ export const loadingConfigDecoder: Decoder<Glue42WebPlatform.Workspaces.LoadingC
     })),
     defaultStrategy: optional(oneOf(constant("direct"), constant("delayed"), constant("lazy"))),
     showDelayedIndicator: optional(boolean())
-})
+});
 
 export const workspacesConfigDecoder: Decoder<Glue42WebPlatform.Workspaces.Config> = object({
     src: nonEmptyStringDecoder,

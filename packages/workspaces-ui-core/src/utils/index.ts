@@ -19,6 +19,25 @@ export const getAllWindowsFromConfig = (contents: GoldenLayout.ItemConfig[] = []
     }, []);
 };
 
+export const getAllItemsFromConfig = (contents: GoldenLayout.ItemConfig[]): GoldenLayout.ItemConfig[] => {
+    const recursiveElementTraversal = (currItem: GoldenLayout.ItemConfig) => {
+        if (currItem.type === "component") {
+            return currItem.id ? [currItem] : [];
+        }
+
+        const resultArray = currItem.content.reduce((acc: any, currContent: any) => {
+            acc = [...acc, ...recursiveElementTraversal(currContent)];
+            return acc;
+        }, []);
+
+        return [...resultArray, currItem];
+    };
+
+    return contents.reduce((acc, ci) => {
+        return [...acc, ...recursiveElementTraversal(ci)];
+    }, []);
+};
+
 export const getElementBounds = (element: Element | Container | JQuery<Element>) => {
     const rawBounds = ($(element) as JQuery)[0].getBoundingClientRect();
     return {
