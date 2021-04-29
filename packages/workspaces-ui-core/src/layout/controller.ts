@@ -1522,7 +1522,6 @@ export class LayoutController {
 
     private applyLockConfig(itemConfig: GoldenLayout.ItemConfig, parent: GoldenLayout.ContentItem, workspaceWrapper: WorkspaceWrapper, isParentWorkspace: boolean): void {
         const parentAllowDrop = isParentWorkspace ? workspaceWrapper.allowDrop : (parent.config.workspacesConfig as any).allowDrop;
-        console.log("WILL IT APPLY", JSON.stringify(itemConfig), parentAllowDrop, isParentWorkspace);
         if (itemConfig.type === "stack") {
             if (typeof (itemConfig.workspacesConfig as any).allowDrop === "undefined") {
                 (itemConfig.workspacesConfig as any).allowDrop = (itemConfig.workspacesConfig as any).allowDrop ?? parentAllowDrop;

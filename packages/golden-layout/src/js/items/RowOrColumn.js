@@ -406,7 +406,6 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 	 * @returns {}
 	 */
 	_respectMinItemWidth: function () {
-		const newError = new Error();
 		var minItemWidth = this.layoutManager.config.dimensions ? (this.layoutManager.config.dimensions.minItemWidth || 0) : 0,
 			maxItemWidth = this.layoutManager.config.dimensions ? (this.layoutManager.config.dimensions.minItemWidth || 32767) : 32767,
 			sizeData = null,

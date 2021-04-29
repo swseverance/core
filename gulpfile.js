@@ -6,7 +6,7 @@ const { join } = require('path');
 const { spawn } = require('child_process');
 const { PublishCommand } = require('@lerna/publish');
 const git = require('simple-git/promise')(__dirname);
-const sync = require('./scripts/preversion/sync.js');
+// const sync = require('./scripts/preversion/sync.js');
 
 const stableBranch = 'master';
 const releaseBranch = 'release-V2';
@@ -105,9 +105,9 @@ const bootstrap = () => {
     });
 };
 
-const versionSync = async () => {
-    await sync(git, false);
-};
+// const versionSync = async () => {
+//     await sync(git, false);
+// };
 
 const addCommit = async (message) => {
     await git.add('.');
@@ -129,7 +129,6 @@ exports.release = series(
     syncAllContentsExceptPackages,
     syncPackagesToRelease,
     bootstrap,
-    versionSync,
     commitIsolatedPackages,
     publish,
     checkoutMaster

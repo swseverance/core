@@ -41,7 +41,6 @@ export class LayoutStateResolver {
         if (!workspace) {
             throw new Error(`Could find workspace to remove with id ${workspaceId}`);
         }
-
         const wrapper = new WorkspaceWrapper(this, workspace, store.getWorkspaceContentItem(workspace.id), this._frameId);
 
         return wrapper.config;

@@ -337,7 +337,7 @@ export class MainController implements WorkspacesController {
             maxWidth: frameSnapshot.config.maxWidth,
             minHeight: frameSnapshot.config.minHeight,
             maxHeight: frameSnapshot.config.maxHeight,
-        }
+        };
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

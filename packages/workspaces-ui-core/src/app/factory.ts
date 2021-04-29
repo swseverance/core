@@ -58,7 +58,7 @@ export class ApplicationFactory {
     public getLoadingStrategy(systemSettings: WorkspacesSystemConfig, contentConfig: GoldenLayout.Config, restoreConfig?: RestoreWorkspaceConfig) {
         if (restoreConfig?.loadingStrategy) {
             return restoreConfig.loadingStrategy;
-        } else if ((contentConfig.workspacesOptions as any)?.loadingStrategy) {
+        } else if ((contentConfig?.workspacesOptions as any)?.loadingStrategy) {
             return (contentConfig.workspacesOptions as any).loadingStrategy;
         } else if (systemSettings?.loadingStrategy) {
             return systemSettings?.loadingStrategy?.defaultStrategy;

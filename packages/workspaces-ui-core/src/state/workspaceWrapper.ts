@@ -155,7 +155,6 @@ export class WorkspaceWrapper {
     public get allowDrop(): boolean {
         let result;
         if (this.workspace?.layout) {
-            console.log("returning from first", (this.workspace.layout.config.workspacesOptions as any).allowDrop);
             result = (this.workspace.layout.config.workspacesOptions as any).allowDrop;
         } else {
             result = (this.workspaceContentItem.config.workspacesConfig as any).allowDrop;
