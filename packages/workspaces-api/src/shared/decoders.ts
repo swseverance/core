@@ -159,11 +159,12 @@ export const parentDefinitionDecoder: Decoder<Glue42Workspaces.BoxDefinition> = 
             )
         ))
     ),
-    config: optional(oneOf(columnDefinitionConfigDecoder, rowDefinitionConfigDecoder, groupDefinitionConfigDecoder))
+    config: optional(anyJson())
 }));
 
-export const strictParentDefinitionDecoder: Decoder<Glue42Workspaces.BoxDefinition> = object({
-    type: subParentDecoder,
+
+export const strictColumnDefinitionDecoder: Decoder<Glue42Workspaces.BoxDefinition> = object({
+    type: constant("column"),
     children: optional(
         lazy(() => array(
             oneOf<Glue42Workspaces.WorkspaceWindowDefinition | Glue42Workspaces.BoxDefinition>(
@@ -172,8 +173,36 @@ export const strictParentDefinitionDecoder: Decoder<Glue42Workspaces.BoxDefiniti
             )
         ))
     ),
-    config: optional(oneOf(columnDefinitionConfigDecoder, rowDefinitionConfigDecoder, groupDefinitionConfigDecoder))
+    config: optional(columnDefinitionConfigDecoder)
 });
+
+export const strictRowDefinitionDecoder: Decoder<Glue42Workspaces.BoxDefinition> = object({
+    type: constant("row"),
+    children: optional(
+        lazy(() => array(
+            oneOf<Glue42Workspaces.WorkspaceWindowDefinition | Glue42Workspaces.BoxDefinition>(
+                strictSwimlaneWindowDefinitionDecoder,
+                strictParentDefinitionDecoder
+            )
+        ))
+    ),
+    config: optional(rowDefinitionConfigDecoder)
+});
+
+export const strictGroupDefinitionDecoder: Decoder<Glue42Workspaces.BoxDefinition> = object({
+    type: constant("group"),
+    children: optional(
+        lazy(() => array(
+            oneOf<Glue42Workspaces.WorkspaceWindowDefinition | Glue42Workspaces.BoxDefinition>(
+                strictSwimlaneWindowDefinitionDecoder,
+                strictParentDefinitionDecoder
+            )
+        ))
+    ),
+    config: optional(groupDefinitionConfigDecoder)
+});
+
+export const strictParentDefinitionDecoder: Decoder<Glue42Workspaces.BoxDefinition> = oneOf(strictGroupDefinitionDecoder, strictColumnDefinitionDecoder, strictRowDefinitionDecoder);
 
 export const stateDecoder: Decoder<"maximized" | "normal"> = oneOf<"maximized" | "normal">(
     (string().where((s) => s.toLowerCase() === "maximized", "Expected a case insensitive variation of 'maximized'") as Decoder<"maximized">),
