@@ -2,6 +2,7 @@ import { Base } from "./base/base";
 import { Glue42Workspaces } from "../../workspaces.d";
 import { rowLockConfigDecoder } from "../shared/decoders";
 import { RowLockConfig } from "../types/temp";
+import { number } from "decoder-validate";
 
 interface PrivateData {
     base: Base;
@@ -71,6 +72,14 @@ export class Row implements Glue42Workspaces.Row {
         return getBase(this).getMaxHeight(this);
     }
 
+    public get width(): number {
+        return getBase(this).getWidthInPx(this);
+    }
+
+    public get height(): number {
+        return getBase(this).getHeightInPx(this);
+    }
+
     public addWindow(definition: Glue42Workspaces.WorkspaceWindowDefinition): Promise<Glue42Workspaces.WorkspaceWindow> {
         return getBase(this).addWindow(this, definition, "row");
     }
@@ -125,6 +134,10 @@ export class Row implements Glue42Workspaces.Row {
         const verifiedConfig = lockConfigResult === undefined ? undefined : rowLockConfigDecoder.runWithException(lockConfigResult);
 
         return getBase(this).lockContainer(this, verifiedConfig);
+    }
+
+    public setHeight(height: number): Promise<void> {
+        return getBase(this).setHeight(this, height);
     }
 
 }

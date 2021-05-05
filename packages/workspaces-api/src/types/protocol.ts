@@ -41,6 +41,8 @@ export interface WorkspaceConfigResult {
     showWindowCloseButtons?: boolean;
     showAddWindowButtons?: boolean;
     showEjectButtons?: boolean;
+    widthInPx?: number;
+    heightInPx?: number;
 }
 
 export interface BaseChildSnapshotConfig {
@@ -57,21 +59,27 @@ export type ParentSnapshotConfig = RowSnapshotConfig | ColumnSnapshotConfig | Gr
 
 export interface RowSnapshotConfig extends BaseChildSnapshotConfig {
     type?: "row";
-    allowDrop: boolean;
+    allowDrop?: boolean;
+    widthInPx?: number;
+    heightInPx?: number;
 }
 
 export interface ColumnSnapshotConfig extends BaseChildSnapshotConfig {
     type?: "column";
-    allowDrop: boolean;
+    allowDrop?: boolean;
+    widthInPx?: number;
+    heightInPx?: number;
 }
 
 export interface GroupSnapshotConfig extends BaseChildSnapshotConfig {
     type?: "group";
-    allowDrop: boolean;
-    allowExtract: boolean;
-    showMaximizeButton: boolean;
-    showEjectButton: boolean;
-    showAddWindowButton: boolean;
+    allowDrop?: boolean;
+    allowExtract?: boolean;
+    showMaximizeButton?: boolean;
+    showEjectButton?: boolean;
+    showAddWindowButton?: boolean;
+    widthInPx?: number;
+    heightInPx?: number;
 }
 
 export interface SwimlaneWindowSnapshotConfig extends BaseChildSnapshotConfig {
@@ -80,8 +88,10 @@ export interface SwimlaneWindowSnapshotConfig extends BaseChildSnapshotConfig {
     isFocused: boolean;
     appName?: string;
     title?: string;
-    allowExtract: boolean;
-    showCloseButton: boolean;
+    allowExtract?: boolean;
+    showCloseButton?: boolean;
+    widthInPx?: number;
+    heightInPx?: number;
 }
 
 export interface WindowSnapshotResult {

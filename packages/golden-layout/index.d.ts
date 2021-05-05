@@ -375,6 +375,75 @@ declare module '@glue42/golden-layout' {
              * The maximum height of the element
              */
             maxHeight?: number;
+
+            /**
+             * Controls whether a drop target should appear
+             */
+            allowDrop?: boolean;
+
+            /**
+            * Controls whether a window can be dragged out
+            */
+            allowExtract?: boolean;
+
+            /**
+           * Controls the visibility of the add window buttons in the group headers
+           */
+            showAddWindowButton?: boolean;
+
+            /**
+           * Controls the visibility of the maximize buttons in the group headers
+           */
+            showMaximizeButton?: boolean;
+
+            /**
+           * Controls the visibility of the eject buttons in the group headers
+           */
+            showEjectButton?: boolean;
+
+            /**
+         * Controls the visibility of the close button in the window tabs
+         */
+            showCloseButton?: boolean;
+
+            /**
+          * Enables or disables the abilitiy to drop windows in the left area of the workspace
+          */
+            allowDropLeft?: boolean;
+            /**
+          * Enables or disables the abilitiy to drop windows in the top area of the workspace
+          */
+            allowDropTop?: boolean;
+            /**
+          * Enables or disables the abilitiy to drop windows in the right area of the workspace
+          */
+            allowDropRight?: boolean;
+            /**
+          * Enables or disables the abilitiy to drop windows in the bottom area of the workspace
+          */
+            allowDropBottom?: boolean;
+
+            /**
+          * Controls the visibility of the save button located in the workspace tab
+          */
+            showSaveButton?: boolean;
+            /**
+          * Controls the visibility of the close buttons located in the window tabs
+          */
+            showWindowCloseButtons?: boolean;
+            /**
+          * Controls the visibility of the eject buttons located in the group headers
+          */
+            showEjectButtons?: boolean;
+            /**
+          * Controls the visibility of the add window buttons located in the group headers
+          */
+            showAddWindowButtons?: boolean;
+            /**
+          * Disables/enables the splitters
+          */
+            allowSplitters?: boolean;
+
         }
 
         interface BaseItemConfig {
@@ -505,6 +574,60 @@ declare module '@glue42/golden-layout' {
              * Replaces the specified workspace instead of creating a new one
              */
             reuseWorkspaceId?: string;
+
+            /**
+          * Enables or disables the abilitiy to drop windows in the workspace
+          */
+            allowDrop?: boolean;
+            /**
+          * Enables or disables the abilitiy to drop windows in the left area of the workspace
+          */
+            allowDropLeft?: boolean;
+            /**
+          * Enables or disables the abilitiy to drop windows in the top area of the workspace
+          */
+            allowDropTop?: boolean;
+            /**
+          * Enables or disables the abilitiy to drop windows in the right area of the workspace
+          */
+            allowDropRight?: boolean;
+            /**
+          * Enables or disables the abilitiy to drop windows in the bottom area of the workspace
+          */
+            allowDropBottom?: boolean;
+            /**
+          * Enables or disables the ability to drag windows out of the workspace
+          */
+            allowExtract?: boolean;
+            /**
+          * Constrols the visibility of the workspace close button located in the workspace tab
+          */
+            showCloseButton?: boolean;
+            /**
+          * Controls the visibility of the save button located in the workspace tab
+          */
+            showSaveButton?: boolean;
+            /**
+          * Controls the visibility of the close buttons located in the window tabs
+          */
+            showWindowCloseButtons?: boolean;
+            /**
+          * Controls the visibility of the eject buttons located in the group headers
+          */
+            showEjectButtons?: boolean;
+            /**
+          * Controls the visibility of the add window buttons located in the group headers
+          */
+            showAddWindowButtons?: boolean;
+            /**
+          * Disables/enables the splitters
+          */
+            allowSplitters?: boolean;
+
+            /**
+             * The name of the layout with which the workspace is associated with
+             */
+            layoutName?: string;
         }
 
         export interface Config {

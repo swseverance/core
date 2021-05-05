@@ -112,7 +112,15 @@ export class Workspace implements Glue42Workspaces.Workspace {
     public get maxHeight(): number {
         return getData(this).config.maxHeight;
     }
-    
+
+    public get width(): number {
+        return getData(this).config.widthInPx;
+    }
+
+    public get height(): number {
+        return getData(this).config.heightInPx;
+    }
+
     public get showWindowCloseButtons(): boolean {
         return getData(this).config.showWindowCloseButtons;
     }

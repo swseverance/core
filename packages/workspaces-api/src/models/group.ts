@@ -2,6 +2,7 @@ import { Base } from "./base/base";
 import { Glue42Workspaces } from "../../workspaces.d";
 import { groupLockConfigDecoder } from "../shared/decoders";
 import { GroupLockConfig } from "../types/temp";
+import { number, optional } from "decoder-validate";
 
 interface PrivateData {
     base: Base;
@@ -87,6 +88,14 @@ export class Group implements Glue42Workspaces.Group {
         return getBase(this).getMaxHeight(this);
     }
 
+    public get width(): number {
+        return getBase(this).getWidthInPx(this);
+    }
+
+    public get height(): number {
+        return getBase(this).getHeightInPx(this);
+    }
+
     public addWindow(definition: Glue42Workspaces.WorkspaceWindowDefinition): Promise<Glue42Workspaces.WorkspaceWindow> {
         return getBase(this).addWindow(this, definition, "group");
     }
@@ -137,6 +146,10 @@ export class Group implements Glue42Workspaces.Group {
         }
         const verifiedConfig = lockConfigResult === undefined ? undefined : groupLockConfigDecoder.runWithException(lockConfigResult);
         return getBase(this).lockContainer(this, verifiedConfig);
+    }
+
+    public async setSize(width?: number, height?: number): Promise<void> {
+        return getBase(this).setSize(this, width, height);
     }
 
 }

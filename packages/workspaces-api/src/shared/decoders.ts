@@ -371,6 +371,8 @@ export const workspaceConfigResultDecoder: Decoder<WorkspaceConfigResult> = obje
     showAddWindowButtons: optional(boolean()),
     showEjectButtons: optional(boolean()),
     showWindowCloseButtons: optional(boolean()),
+    widthInPx: optional(number()),
+    heightInPx: optional(number())
 });
 
 // todo: remove number positionIndex when fixed
@@ -400,7 +402,9 @@ export const swimlaneWindowSnapshotConfigDecoder: Decoder<SwimlaneWindowSnapshot
         minWidth: optional(number()),
         minHeigth: optional(number()),
         maxWidth: optional(number()),
-        maxHeight: optional(number())
+        maxHeight: optional(number()),
+        widthInPx: optional(number()),
+        heightInPx: optional(number())
     })
 ) as any;
 

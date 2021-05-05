@@ -8,6 +8,7 @@ import { Row } from "./row";
 import { Column } from "./column";
 import { Group } from "./group";
 import { WorkspaceWindowLockConfig } from "../types/temp";
+import { number, optional } from "decoder-validate";
 
 interface PrivateData {
     manager: PrivateDataManager;
@@ -103,6 +104,14 @@ export class Window implements Glue42Workspaces.WorkspaceWindow {
 
     public get appName(): string {
         return getData(this).config.appName;
+    }
+
+    public get width(): number {
+        return getData(this).config.widthInPx;
+    }
+
+    public get height(): number {
+        return getData(this).config.heightInPx;
     }
 
     public async forceLoad(): Promise<void> {
@@ -231,6 +240,13 @@ export class Window implements Glue42Workspaces.WorkspaceWindow {
         const verifiedConfig = lockConfigResult === undefined ? undefined : windowLockConfigDecoder.runWithException(lockConfigResult);
         const windowPlacementId = getData(this).id;
         await getData(this).controller.lockWindow(windowPlacementId, verifiedConfig);
+        await this.workspace.refreshReference();
+    }
+
+    public async setSize(width?: number, height?: number): Promise<void> {
+        const data = getData(this);
+        const windowPlacementId = data.id;
+        await data.controller.resizeItem(windowPlacementId, { height, width });
         await this.workspace.refreshReference();
     }
 

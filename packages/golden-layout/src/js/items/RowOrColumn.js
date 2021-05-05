@@ -160,6 +160,7 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 		}
 		this.emitBubblingEvent('stateChanged');
 		this.emit('resize');
+		this._layoutManager._ignorePinned = false;
 	},
 
 	/**
@@ -264,9 +265,32 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 		var i,
 			sizeData = this._calculateAbsoluteSizes();
 
+		const pinnedItemsInCollection = this.contentItems.filter((ci) => ci.config.workspacesConfig.isPinned && !this._layoutManager._ignorePinned);
+		let additionalPixels = sizeData.additionalPixel;
+		const pinnedItemsWhichWillReceivePixel = pinnedItemsInCollection.filter((pi) => {
+			const currentSize = this.isColumn ? pi.element.height() : pi.element.width();
+			const indexInCollection = this.contentItems.indexOf(pi);
+
+			return Math.floor(currentSize) > Math.floor(sizeData.itemSizes[indexInCollection]);
+		});
+
+		pinnedItemsWhichWillReceivePixel.forEach((pi) => {
+			const currentSize = this.isColumn ? pi.element.height() : pi.element.width();
+			const indexInCollection = this.contentItems.indexOf(pi);
+			const pixelsRequired = Math.floor(currentSize - sizeData.itemSizes[indexInCollection]);
+
+			const pixelsToAdd = Math.min(additionalPixels, pixelsRequired);
+			sizeData.itemSizes[indexInCollection] += pixelsToAdd;
+			additionalPixels -= pixelsToAdd;
+		});
+
+		const pixelPerItem = Math.ceil(additionalPixels / (this.contentItems.length - pinnedItemsInCollection.length));
+
 		for (i = 0; i < this.contentItems.length; i++) {
-			if (sizeData.additionalPixel - i > 0) {
-				sizeData.itemSizes[i]++;
+			if (additionalPixels > 0 && !this.contentItems[i].config.workspacesConfig.isPinned) {
+				const pixelsToAdd = Math.min(additionalPixels, pixelPerItem);
+				sizeData.itemSizes[i] += pixelsToAdd;
+				additionalPixels -= pixelsToAdd;
 			}
 
 			if (this._isColumn) {
@@ -441,8 +465,8 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 			contentItem = this.contentItems[i];
 			itemSize = sizeData.itemSizes[i];
 
-			const contentItemMaxWidth = contentItem.getMaxWidth();
-			const contentItemMinWidth = contentItem.getMinWidth();
+			const contentItemMaxWidth = contentItem.config.workspacesConfig.isPinned && !this._layoutManager._ignorePinned ? contentItem.element.width() : contentItem.getMaxWidth();
+			const contentItemMinWidth = contentItem.config.workspacesConfig.isPinned && !this._layoutManager._ignorePinned ? contentItem.element.width() : contentItem.getMinWidth();
 			const validContentItemMaxWidth = Math.min((contentItemMaxWidth === undefined) ? maxItemWidth : contentItemMaxWidth, sizeData.totalWidth)
 			const validContentItemMinWidth = (contentItemMinWidth === undefined) ? minItemWidth : contentItemMinWidth;
 
@@ -512,7 +536,6 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 			}
 		}
 
-
 		if (!isMinWidthImpossible) {
 			/**
 					 * Take anything remaining from the last item.
@@ -581,8 +604,8 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 			contentItem = this.contentItems[i];
 			itemSize = sizeData.itemSizes[i];
 
-			const contentItemMaxHeight = contentItem.getMaxHeight();
-			const contentItemMinHeight = contentItem.getMinHeight();
+			const contentItemMaxHeight = contentItem.config.workspacesConfig.isPinned && !this._layoutManager._ignorePinned ? contentItem.element.height() : contentItem.getMaxHeight();
+			const contentItemMinHeight = contentItem.config.workspacesConfig.isPinned && !this._layoutManager._ignorePinned ? contentItem.element.height() : contentItem.getMinHeight();
 			const validContentItemMaxHeight = Math.min((contentItemMaxHeight === undefined) ? maxItemHeight : contentItemMaxHeight, sizeData.totalHeight);
 			const validContentItemMinHeight = (contentItemMinHeight === undefined) ? minItemHeight : contentItemMinHeight;
 
@@ -749,18 +772,9 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 		return { horizontal: maxWidth, vertical: maxHeight };
 	},
 
-	/**
-	 * Invoked when a splitter's dragListener fires dragStart. Calculates the splitters
-	 * movement area once (so that it doesn't need calculating on every mousemove event)
-	 *
-	 * @param   {lm.controls.Splitter} splitter
-	 *
-	 * @returns {void}
-	 */
-	_onSplitterDragStart: function (splitter) {
-		var items = this._getItemsForSplitter(splitter),
-			minSize = this.layoutManager.config.dimensions[this._isColumn ? 'minItemHeight' : 'minItemWidth'],
-			maxSize = this.layoutManager.config.dimensions[this.isColumn ? 'maxItemHeight' : 'maxItemWidth'];
+	_setMinMaxSplitterPosition(items) {
+		const minSize = this.layoutManager.config.dimensions[this._isColumn ? 'minItemHeight' : 'minItemWidth'];
+		const maxSize = this.layoutManager.config.dimensions[this.isColumn ? 'maxItemHeight' : 'maxItemWidth'];
 
 		var beforeMinDim = this._getMinimumDimensions([...items.before.contentItems, items.before]);
 		var beforeMaxDim = this._getMaximumDimensions([...items.before.contentItems, items.before]);
@@ -781,6 +795,19 @@ lm.utils.copy(lm.items.RowOrColumn.prototype, {
 		this._splitterPosition = 0;
 		this._splitterMinPosition = Math.max(splitterMinPositionFromBeforeElement, splitterMinPositionFromAfterElement);
 		this._splitterMaxPosition = Math.min(splitterMaxPositionFromBeforeElement, splitterMaxPositionFromAfterElement);
+	},
+	/**
+	 * Invoked when a splitter's dragListener fires dragStart. Calculates the splitters
+	 * movement area once (so that it doesn't need calculating on every mousemove event)
+	 *
+	 * @param   {lm.controls.Splitter} splitter
+	 *
+	 * @returns {void}
+	 */
+	_onSplitterDragStart: function (splitter) {
+		this.layoutManager._ignorePinned = true;
+		var items = this._getItemsForSplitter(splitter);
+		this._setMinMaxSplitterPosition(items);
 	},
 
 	/**
