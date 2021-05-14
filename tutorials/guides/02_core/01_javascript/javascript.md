@@ -602,7 +602,7 @@ Finally, pass these arguments to `createChannelSelectorWidget()`:
 ```javascript
 // In `start()`.
 
-await createChannelSelectorWidget(
+createChannelSelectorWidget(
     NO_CHANNEL_VALUE,
     channelNamesAndColors,
     onChannelSelected
